@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelCommissionWithdrawalDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelCommissionWithdrawalEntity" id="hotelCommissionWithdrawalMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="state" column="state"/>
+        <result property="time" column="time"/>
+        <result property="shTime" column="sh_time"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="account" column="account"/>
+        <result property="txCost" column="tx_cost"/>
+        <result property="sjCost" column="sj_cost"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+
+</mapper>

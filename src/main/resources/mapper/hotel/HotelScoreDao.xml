@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelScoreDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelScoreEntity"
+		id="hotelScoreMap">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="orderId" column="order_id" />
+		<result property="assessId" column="assess_id" />
+		<result property="score" column="score" />
+		<result property="note" column="note" />
+		<result property="createTime" column="create_time" />
+		<result property="sellerId" column="seller_id" />
+		<result property="goodsId" column="goods_id" />
+		<result property="type" column="type" />
+		<result property="time" column="time" />
+	</resultMap>
+
+
+</mapper>

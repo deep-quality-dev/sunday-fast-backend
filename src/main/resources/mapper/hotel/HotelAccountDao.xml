@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelAccountDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelAccountEntity" id="hotelAccountMap">
+        <result property="id" column="id"/>
+        <result property="weid" column="weid"/>
+        <result property="storeid" column="storeid"/>
+        <result property="uid" column="uid"/>
+        <result property="fromUser" column="from_user"/>
+        <result property="accountname" column="accountname"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="pwd" column="pwd"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="username" column="username"/>
+        <result property="payAccount" column="pay_account"/>
+        <result property="displayorder" column="displayorder"/>
+        <result property="dateline" column="dateline"/>
+        <result property="status" column="status"/>
+        <result property="role" column="role"/>
+        <result property="lastvisit" column="lastvisit"/>
+        <result property="lastip" column="lastip"/>
+        <result property="areaid" column="areaid"/>
+        <result property="isAdminOrder" column="is_admin_order"/>
+        <result property="isNoticeOrder" column="is_notice_order"/>
+        <result property="isNoticeQueue" column="is_notice_queue"/>
+        <result property="isNoticeService" column="is_notice_service"/>
+        <result property="isNoticeBoss" column="is_notice_boss"/>
+        <result property="remark" column="remark"/>
+        <result property="lat" column="lat"/>
+        <result property="lng" column="lng"/>
+        <result property="authority" column="authority"/>
+    </resultMap>
+
+
+</mapper>

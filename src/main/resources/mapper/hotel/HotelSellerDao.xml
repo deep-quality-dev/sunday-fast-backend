@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelSellerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelSellerEntity" id="hotelSellerMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="owner" column="owner"/>
+        <result property="name" column="name"/>
+        <result property="star" column="star"/>
+        <result property="address" column="address"/>
+        <result property="linkName" column="link_name"/>
+        <result property="linkTel" column="link_tel"/>
+        <result property="tel" column="tel"/>
+        <result property="handle" column="handle"/>
+        <result property="openTime" column="open_time"/>
+        <result property="wake" column="wake"/>
+        <result property="wifi" column="wifi"/>
+        <result property="park" column="park"/>
+        <result property="breakfast" column="breakfast"/>
+        <result property="unionpay" column="unionPay"/>
+        <result property="gym" column="gym"/>
+        <result property="boardroom" column="boardroom"/>
+        <result property="water" column="water"/>
+        <result property="policy" column="policy"/>
+        <result property="introduction" column="introduction"/>
+        <result property="img" column="img"/>
+        <result property="rule" column="rule"/>
+        <result property="prompt" column="prompt"/>
+        <result property="bqLogo" column="bq_logo"/>
+        <result property="support" column="support"/>
+        <result property="ewmLogo" column="ewm_logo"/>
+        <result property="time" column="time"/>
+        <result property="coordinates" column="coordinates"/>
+        <result property="scort" column="scort"/>
+        <result property="sfzImg1" column="sfz_img1"/>
+        <result property="sfzImg2" column="sfz_img2"/>
+        <result property="yyImg" column="yy_img"/>
+        <result property="other" column="other"/>
+        <result property="zdMoney" column="zd_money"/>
+        <result property="state" column="state"/>
+        <result property="sqTime" column="sq_time"/>
+        <result property="isUse" column="is_use"/>
+        <result property="llNum" column="ll_num"/>
+        <result property="bdId" column="bd_id"/>
+        <result property="yeOpen" column="ye_open"/>
+        <result property="wxOpen" column="wx_open"/>
+        <result property="ddOpen" column="dd_open"/>
+    </resultMap>
+
+
+</mapper>

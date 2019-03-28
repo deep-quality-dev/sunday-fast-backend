@@ -1,0 +1,82 @@
+spring:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        druid:
+            driver-class-name: com.mysql.jdbc.Driver
+            url: jdbc:mysql://127.0.0.1:3306/hotel_sass?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+            username: root
+            password: root
+            initial-size: 10
+            max-active: 100
+            min-idle: 10
+            max-wait: 60000
+            pool-prepared-statements: true
+            max-pool-prepared-statement-per-connection-size: 20
+            time-between-eviction-runs-millis: 60000
+            min-evictable-idle-time-millis: 300000
+            #Oracle需要打开注释
+            #validation-query: SELECT 1 FROM DUAL
+            test-while-idle: true
+            test-on-borrow: false
+            test-on-return: false
+            stat-view-servlet:
+                enabled: true
+                url-pattern: /druid/*
+                #login-username: admin
+                #login-password: admin
+            filter:
+                stat:
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: false
+                wall:
+                    config:
+                        multi-statement-allow: true
+sms:
+  dingtalk:
+    webhook: https://oapi.dingtalk.com/robot/send?access_token=639c8b9cbe01b2d664e5bfd69c2514ad145fb68da6efd554691eeae7fcb317d8
+  aliyun:
+    accessKey: LTAIz55SzMsiNx7c
+    secretKey: 0O7ZyB5u6jjjrUDKMV4j5LNnLZBWVV
+    channels:
+      loginCodeChannel: SMS_34630023
+fdfs:
+  file-host: http://photo.xqtinfo.cn/
+  tracker-list: 
+    - 112.74.32.78:22122
+wx:
+  mp:
+    configs:
+      - appId: wxeddf8532f51bcbf9 
+        secret: c26c629af156e18283a4f4be0ae11bf8
+        token: 111
+        aesKey: 111
+      - appId: wx6065ce85bbd4e19e 
+        secret: 9cc8fb5d9f7d73db102a1ed4819355f6
+        token: 111
+        aesKey: 111
+      - appId: wxd19b7512c49cd4ea
+        secret: 989851d2be1f8e9bf0cd0b69f2211c85
+        token: 111
+        aesKey: 111
+  pay:
+    appId: wxeddf8532f51bcbf9
+    mchId: 1529134941
+    mchKey: 930464364F4B4C399C87ABAE48858154
+    subAppId: #服务商模式下的子商户公众账号ID
+    subMchId: #服务商模式下的子商户号
+    keyPath: # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+    notifyUrl: http://hotel.xqtinfo.cn/pay/notify/order
+##多数据源的配置
+#dynamic:
+#  datasource:
+#    slave1:
+#      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#      url: jdbc:sqlserver://localhost:1433;DatabaseName=renren_security
+#      username: sa
+#      password: 123456
+#    slave2:
+#      driver-class-name: org.postgresql.Driver
+#      url: jdbc:postgresql://localhost:5432/renren_security
+#      username: renren
+#      password: 123456

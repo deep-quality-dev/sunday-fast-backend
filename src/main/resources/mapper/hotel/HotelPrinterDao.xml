@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelPrinterDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelPrinterEntity" id="hotelPrinterMap">
+        <result property="id" column="id"/>
+        <result property="dyjTitle" column="dyj_title"/>
+        <result property="dyjId" column="dyj_id"/>
+        <result property="dyjKey" column="dyj_key"/>
+        <result property="uniacid" column="uniacid"/>
+        <result property="type" column="type"/>
+        <result property="name" column="name"/>
+        <result property="mid" column="mid"/>
+        <result property="api" column="api"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="state" column="state"/>
+        <result property="yyId" column="yy_id"/>
+        <result property="token" column="token"/>
+        <result property="dyjTitle2" column="dyj_title2"/>
+        <result property="dyjId2" column="dyj_id2"/>
+        <result property="dyjKey2" column="dyj_key2"/>
+        <result property="fezh" column="fezh"/>
+        <result property="feUkey" column="fe_ukey"/>
+        <result property="feDycode" column="fe_dycode"/>
+    </resultMap>
+
+
+</mapper>

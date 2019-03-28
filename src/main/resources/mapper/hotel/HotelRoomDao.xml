@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelRoomDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelRoomEntity" id="hotelRoomMap">
+        <result property="id" column="id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="img" column="img"/>
+        <result property="floor" column="floor"/>
+        <result property="people" column="people"/>
+        <result property="bed" column="bed"/>
+        <result property="breakfast" column="breakfast"/>
+        <result property="facilities" column="facilities"/>
+        <result property="windows" column="windows"/>
+        <result property="logo" column="logo"/>
+        <result property="totalNum" column="total_num"/>
+        <result property="uniacid" column="uniacid"/>
+        <result property="size" column="size"/>
+        <result property="isRefund" column="is_refund"/>
+        <result property="yjState" column="yj_state"/>
+        <result property="yjCost" column="yj_cost"/>
+        <result property="sort" column="sort"/>
+        <result property="state" column="state"/>
+        <result property="classify" column="classify"/>
+        <result property="rzTime" column="rz_time"/>
+    </resultMap>
+
+
+</mapper>

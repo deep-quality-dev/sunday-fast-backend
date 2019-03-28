@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelRoomMoneyDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelRoomMoneyEntity" id="hotelRoomMoneyMap">
+        <result property="id" column="id"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="motitle" column="motitle"/>
+        <result property="oprice" column="oprice"/>
+        <result property="cprice" column="cprice"/>
+        <result property="mprice" column="mprice"/>
+        <result property="status" column="status"/>
+        <result property="isHot" column="is_hot"/>
+    </resultMap>
+
+
+</mapper>

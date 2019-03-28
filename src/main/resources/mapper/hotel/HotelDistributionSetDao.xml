@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelDistributionSetDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelDistributionSetEntity" id="hotelDistributionSetMap">
+        <result property="id" column="id"/>
+        <result property="distributionDetails" column="distribution_details"/>
+        <result property="withdrawDetails" column="withdraw_details"/>
+        <result property="isDistribution" column="is_distribution"/>
+        <result property="is second" column="is_ second"/>
+        <result property="withdrawRate" column="withdraw_rate"/>
+        <result property="commission" column="commission"/>
+        <result property="commission2" column="commission2"/>
+        <result property="withdrawMoney" column="withdraw_money"/>
+        <result property="img" column="img"/>
+        <result property="img2" column="img2"/>
+        <result property="sellerId" column="seller_id"/>
+        <result property="isOpen" column="is_open"/>
+        <result property="instructions" column="instructions"/>
+        <result property="enabled" column="enabled"/>
+    </resultMap>
+
+
+</mapper>

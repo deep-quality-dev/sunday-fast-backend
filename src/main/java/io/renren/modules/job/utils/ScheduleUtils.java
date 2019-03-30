@@ -136,6 +136,7 @@ public class ScheduleUtils {
 		try {
 			scheduler.pauseJob(getJobKey(jobId));
 		} catch (SchedulerException e) {
+			e.printStackTrace();
 			throw new RRException("暂停定时任务失败", e);
 		}
 	}

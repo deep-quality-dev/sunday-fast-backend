@@ -40,7 +40,7 @@ public class HotelRoomAPI extends BaseController {
 	@ApiOperation("查询房型列表")
 	@GetMapping("/roomList")
 	public R roomList(@PathVariable String appId, String checkInTime, String checkOutTime) {
-		List<RoomVO> roomVOs = hotelRoomService.roomList(sellerId(), checkInTime, checkOutTime);
+		List<RoomVO> roomVOs = hotelRoomService.roomList(sellerId(appId), checkInTime, checkOutTime);
 		return R.ok().put("data", roomVOs);
 	}
 

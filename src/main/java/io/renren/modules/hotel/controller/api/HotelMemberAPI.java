@@ -52,7 +52,7 @@ public class HotelMemberAPI extends BaseController {
 	@ApiOperation("用户信息")
 	@GetMapping("/userInfo")
 	public R userInfo(@PathVariable String appId, @RequestAttribute("userId") Long userId) {
-		MemberVo memberVo = hotelMemberService.userInfo(sellerId(), userId);
+		MemberVo memberVo = hotelMemberService.userInfo(sellerId(appId), userId);
 		return R.ok().put("data", memberVo);
 	}
 
@@ -65,16 +65,16 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户签到")
 	@GetMapping("/signIn")
-	public R signIn(@RequestAttribute("userId") Long userId) {
-		boolean result = hotelScoreService.signIn(sellerId(), userId);
+	public R signIn(@PathVariable String appId,@RequestAttribute("userId") Long userId) {
+		boolean result = hotelScoreService.signIn(sellerId(appId), userId);
 		return R.ok().put("data", result);
 	}
 
 	@Login
 	@ApiOperation("用户积分列表")
 	@GetMapping("/scoreList")
-	public R scoreList(@RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
-		PageUtils page = hotelScoreService.signInList(sellerId(), userId, params);
+	public R scoreList(@PathVariable String appId,@RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
+		PageUtils page = hotelScoreService.signInList(sellerId(appId), userId, params);
 		return R.ok().put("data", page);
 	}
 
@@ -89,7 +89,7 @@ public class HotelMemberAPI extends BaseController {
 	@ApiOperation("用户优惠券")
 	@GetMapping("/userCoupons")
 	public R userCoupons(@PathVariable String appId, @RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
-		PageUtils page = hotelCouponsService.userCoupons(sellerId(), userId, params);
+		PageUtils page = hotelCouponsService.userCoupons(sellerId(appId), userId, params);
 		return R.ok().put("data", page);
 	}
 
@@ -101,7 +101,7 @@ public class HotelMemberAPI extends BaseController {
 		String vcode = params.get("vcode");
 		Assert.notBlank(mobile, "手机号不能为空");
 		Assert.notBlank(vcode, "验证码不能为空");
-		hotelMemberService.bindSms(sellerId(), userId, mobile, vcode);
+		hotelMemberService.bindSms(sellerId(appId), userId, mobile, vcode);
 		return R.ok();
 	}
 }

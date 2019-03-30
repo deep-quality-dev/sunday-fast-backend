@@ -39,7 +39,7 @@ sms:
     accessKey: LTAIz55SzMsiNx7c
     secretKey: 0O7ZyB5u6jjjrUDKMV4j5LNnLZBWVV
     channels:
-      loginCodeChannel: SMS_34630023
+      loginCodeChannel: SMS_162220476
 fdfs:
   file-host: http://photo.xqtinfo.cn/
   tracker-list: 

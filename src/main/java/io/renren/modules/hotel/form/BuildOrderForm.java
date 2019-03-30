@@ -75,6 +75,10 @@ public class BuildOrderForm {
 	private String coordinates;
 
 	private String ip;
+	
+	private String hotelAddress;
+	
+	private String sellerName;
 
 	// 明细
 	List<OrderDetail> record = new ArrayList<OrderDetail>();

@@ -34,7 +34,7 @@ public class HotelSellerAPI extends BaseController {
 	@ApiOperation("酒店信息")
 	@GetMapping("/info")
 	public R info(@PathVariable String appId) {
-		HotelInfo hotelInfo = hotelSellerService.sellerInfo(sellerId());
+		HotelInfo hotelInfo = hotelSellerService.sellerInfo(sellerId(appId));
 		return R.ok().put("data", hotelInfo);
 	}
 }

@@ -1,6 +1,5 @@
 package io.renren.modules.hotel.wx;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,10 +33,10 @@ import io.swagger.annotations.ApiOperation;
 public class EntPayController {
 	private WxPayService wxService;
 
-	@Autowired
-	public EntPayController(WxPayService wxService) {
-		this.wxService = wxService;
-	}
+//	@Autowired
+//	public EntPayController(WxPayService wxService) {
+//		this.wxService = wxService;
+//	}
 
 	/**
 	 * <pre>

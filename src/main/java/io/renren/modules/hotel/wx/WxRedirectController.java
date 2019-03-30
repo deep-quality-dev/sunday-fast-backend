@@ -62,7 +62,7 @@ public class WxRedirectController extends BaseController {
 		try {
 			WxMpOAuth2AccessToken accessToken = mpService.oauth2getAccessToken(code);
 			user = mpService.oauth2getUserInfo(accessToken, null);
-			hotelMemberEntity = hotelMemberService.wxLogin(user, sellerId());
+			hotelMemberEntity = hotelMemberService.wxLogin(user, sellerId(appId));
 		} catch (WxErrorException e) {
 			e.printStackTrace();
 		}

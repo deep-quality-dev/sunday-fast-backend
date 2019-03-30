@@ -36,7 +36,7 @@ public class HotelCouponAPI extends BaseController {
 	@ApiOperation("s商家优惠券")
 	@GetMapping("/sellerCoupons")
 	public R sellerCoupons(@PathVariable String appId, @RequestAttribute("userId") Long userId,@RequestParam Map<String, Object> params) {
-		 PageUtils page  = hotelCouponsService.sellerCoupons(sellerId(), userId,params);
+		 PageUtils page  = hotelCouponsService.sellerCoupons(sellerId(appId), userId,params);
 		return R.ok().put("data", page);
 	}
 }

@@ -33,7 +33,7 @@ public class HotelAdvertisingAPI extends BaseController {
 	@ApiOperation("获取广告")
 	@GetMapping("/loadByType")
 	public R loadByType(@PathVariable String appId, @RequestParam int type) {
-		List<HotelAdvertisingEntity> advertisingEntities = hotelAdvertisingService.loadByType(sellerId(), type);
+		List<HotelAdvertisingEntity> advertisingEntities = hotelAdvertisingService.loadByType(sellerId(appId), type);
 		return R.ok().put("data", advertisingEntities);
 	}
 }

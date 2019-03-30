@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
 
@@ -36,8 +35,7 @@ import me.chanjar.weixin.mp.constant.WxMpEventConstants;
  *
  * @author Binary Wang(https://github.com/binarywang)
  */
-@Configuration
-@EnableConfigurationProperties(WxMpProperties.class)
+@Component
 public class WxMpConfiguration {
 	private LogHandler logHandler;
 	private NullHandler nullHandler;
@@ -50,6 +48,7 @@ public class WxMpConfiguration {
 	private SubscribeHandler subscribeHandler;
 	private ScanHandler scanHandler;
 
+	@Autowired
 	private WxMpProperties properties;
 
 	private static Map<String, WxMpMessageRouter> routers = Maps.newHashMap();
@@ -80,7 +79,7 @@ public class WxMpConfiguration {
 
 	@PostConstruct
 	public void initServices() {
-		final List<WxMpProperties.MpConfig> configs = this.properties.getConfigs();
+		final List<WxMpProperties.MpConfig> configs = properties.getConfigs();
 		if (configs == null) {
 			throw new RuntimeException();
 		}

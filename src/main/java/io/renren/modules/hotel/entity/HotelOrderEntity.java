@@ -130,7 +130,7 @@ public class HotelOrderEntity implements Serializable {
 	 */
 	private BigDecimal totalCost;
 	/**
-	 * 是否删除,1删除
+	 * 是否删除,-1删除
 	 */
 	private Integer enabled;
 	/**

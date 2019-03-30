@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelRoomDao;
@@ -53,6 +54,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 		for (HotelRoomEntity hotelRoomEntity : hotelRoomEntities) {
 			roomVO = new RoomVO();
 			BeanUtil.copyProperties(hotelRoomEntity, roomVO);
+			roomVO.setPrice(NumberUtil.decimalFormat("0.00", hotelRoomEntity.getPrice().doubleValue()));
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(hotelRoomEntity.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);

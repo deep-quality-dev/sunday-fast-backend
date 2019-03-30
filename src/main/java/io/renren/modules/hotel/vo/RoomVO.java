@@ -42,6 +42,11 @@ public class RoomVO {
 	 * 床型尺寸
 	 */
 	private String size;
+	
+	/**
+	 * 最低价格
+	 */
+	private String price;
 
 	/**
 	 * 价格列表

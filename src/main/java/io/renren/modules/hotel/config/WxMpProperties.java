@@ -1,25 +1,52 @@
 package io.renren.modules.hotel.config;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 
+import io.renren.modules.hotel.entity.HotelWxConfigEntity;
+import io.renren.modules.hotel.service.HotelWxConfigService;
 import lombok.Data;
 
 /**
- * wechat mp properties
+ * 初始化微信配置
+ * @author taoz
  *
- * @author Binary Wang(https://github.com/binarywang)
  */
 @Data
-@ConfigurationProperties(prefix = "wx.mp")
+//@ConfigurationProperties(prefix = "wx.mp")
+@Component
 public class WxMpProperties {
+	
+	@Autowired
+	private HotelWxConfigService hotelWxConfigService;
+	
 	private List<MpConfig> configs;
 
+	@PostConstruct // 指定该方法在对象被创建后马上调用 相当于配置文件中的init-method属性
+	public void init() {
+		MpConfig config = null;
+		List<MpConfig> configs = new ArrayList<WxMpProperties.MpConfig>();
+		List<HotelWxConfigEntity> configEntities = hotelWxConfigService.list();
+		for (HotelWxConfigEntity hotelWxConfigEntity : configEntities) {
+			config = new MpConfig();
+			config.setAppId(hotelWxConfigEntity.getAppId());
+			config.setSecret(hotelWxConfigEntity.getSecret());
+			config.setAesKey(hotelWxConfigEntity.getAesKey());
+			config.setToken(hotelWxConfigEntity.getToken());
+			configs.add(config);
+		}
+		this.setConfigs(configs);
+	}
+
 	@Data
-	public static class MpConfig {
+	public class MpConfig {
 		/**
 		 * 设置微信公众号的appid
 		 */

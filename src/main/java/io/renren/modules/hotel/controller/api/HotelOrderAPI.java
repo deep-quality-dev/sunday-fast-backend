@@ -5,9 +5,11 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +54,7 @@ public class HotelOrderAPI extends BaseController {
 	@ApiOperation("获取订单信息")
 	@GetMapping("/buildOrder")
 	public R buildOrder(@PathVariable String appId, @RequestParam Long roomId, @RequestAttribute("userId") Long userId, @RequestParam Long moneyId, int roomNum, String checkInDate, String checkOutDate) {
-		BuildOrderForm buildOrderForm = hotelOrderService.buildOrder(sellerId(), userId, roomId, moneyId, roomNum, checkInDate, checkOutDate);
+		BuildOrderForm buildOrderForm = hotelOrderService.buildOrder(sellerId(appId), userId, roomId, moneyId, roomNum, checkInDate, checkOutDate);
 		return R.ok().put("data", buildOrderForm);
 	}
 
@@ -75,7 +77,7 @@ public class HotelOrderAPI extends BaseController {
 			return R.error("创建订单失败，请稍后再试");
 		}
 		try {
-			mpOrderResult = hotelOrderService.createOrder(buildOrderForm, userId, sellerId());
+			mpOrderResult = hotelOrderService.createOrder(buildOrderForm, userId, sellerId(appId));
 		} catch (WxPayException e) {
 			log.error("创建订单异常，msg:{}", e.getMessage());
 			return R.error("创建订单失败，请稍后再试");
@@ -93,8 +95,8 @@ public class HotelOrderAPI extends BaseController {
 	@Login
 	@ApiOperation("会员订单列表")
 	@GetMapping("/orderList")
-	public R orderList(@PathVariable String appId, @RequestAttribute("userId") Long userId,@RequestParam(name="page",required=false,defaultValue="1") int page,@RequestParam(name="limie",required=false,defaultValue="10") int limie, @RequestParam(required=false) Integer orderStatus) {
-		PageUtils pageUtil = hotelOrderService.userOrderList(userId, sellerId(), orderStatus, page, limie);
+	public R orderList(@PathVariable String appId, @RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limie", required = false, defaultValue = "10") int limie, @RequestParam(required = false) Integer orderStatus) {
+		PageUtils pageUtil = hotelOrderService.userOrderList(userId, sellerId(appId), orderStatus, page, limie);
 		return R.ok().put("data", pageUtil);
 	}
 
@@ -108,9 +110,9 @@ public class HotelOrderAPI extends BaseController {
 	 */
 	@Login
 	@ApiOperation("会员订单详情")
-	@GetMapping("/orderDetail")
-	public R orderDetail(@PathVariable String appId, @RequestAttribute("userId") Long userId, Long orderId) {
-		HotelOrderVo hotelOrderVo = hotelOrderService.orderDetail(sellerId(), userId, orderId);
+	@GetMapping("/orderDetail/{orderId}")
+	public R orderDetail(@PathVariable String appId, @RequestAttribute("userId") Long userId, @PathVariable Long orderId) {
+		HotelOrderVo hotelOrderVo = hotelOrderService.orderDetail(sellerId(appId), userId, orderId);
 		return R.ok().put("data", hotelOrderVo);
 	}
 
@@ -124,9 +126,25 @@ public class HotelOrderAPI extends BaseController {
 	 */
 	@Login
 	@ApiOperation("取消订单")
-	@GetMapping("/cancelOrder")
-	public R cancelOrder(@PathVariable String appId, @RequestAttribute("userId") Long userId, Long orderId) {
-		hotelOrderService.cancelOrder(sellerId(), userId, orderId);
+	@PutMapping("/cancelOrder/{orderId}")
+	public R cancelOrder(@PathVariable String appId, @RequestAttribute("userId") Long userId, @PathVariable Long orderId) {
+		hotelOrderService.cancelOrder(sellerId(appId), userId, orderId);
+		return R.ok();
+	}
+
+	/**
+	 * 删除订单
+	 * 
+	 * @param appId
+	 * @param userId
+	 * @param orderId
+	 * @return
+	 */
+	@Login
+	@ApiOperation("取消订单")
+	@DeleteMapping("/deleteOrder/{orderId}")
+	public R deleteOrder(@PathVariable String appId, @RequestAttribute("userId") Long userId, @PathVariable Long orderId) {
+		hotelOrderService.deleteOrder(sellerId(appId), userId, orderId);
 		return R.ok();
 	}
 
@@ -140,7 +158,7 @@ public class HotelOrderAPI extends BaseController {
 	 */
 	public R payOrder(@PathVariable String appId, @RequestAttribute("userId") Long userId, Long orderId) {
 		try {
-			hotelOrderService.payOrder(sellerId(), userId, orderId, "127.0.0.1");
+			hotelOrderService.payOrder(sellerId(appId), userId, orderId, "127.0.0.1");
 		} catch (WxPayException e) {
 			e.printStackTrace();
 		}

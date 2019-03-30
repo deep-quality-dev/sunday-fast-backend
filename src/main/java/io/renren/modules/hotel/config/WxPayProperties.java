@@ -1,92 +1,80 @@
 package io.renren.modules.hotel.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import io.renren.modules.hotel.entity.HotelWxConfigEntity;
+import io.renren.modules.hotel.service.HotelWxConfigService;
+import lombok.Data;
 
 /**
  * wxpay pay properties
  *
  * @author Binary Wang
  */
-@ConfigurationProperties(prefix = "wx.pay")
+
+@Data
+@Component
+//@ConfigurationProperties(prefix = "wx.pay")
 public class WxPayProperties {
-	/**
-	 * 设置微信公众号或者小程序等的appid
-	 */
-	private String appId;
+	@Autowired
+	private HotelWxConfigService hotelWxConfigService;
 
-	/**
-	 * 微信支付商户号
-	 */
-	private String mchId;
+	private List<PayConfig> configs;
 
-	/**
-	 * 微信支付商户密钥
-	 */
-	private String mchKey;
-
-	/**
-	 * 服务商模式下的子商户公众账号ID，普通模式请不要配置，请在配置文件中将对应项删除
-	 */
-	private String subAppId;
-
-	/**
-	 * 服务商模式下的子商户号，普通模式请不要配置，最好是请在配置文件中将对应项删除
-	 */
-	private String subMchId;
-
-	/**
-	 * apiclient_cert.p12文件的绝对路径，或者如果放在项目中，请以classpath:开头指定
-	 */
-	private String keyPath;
-
-	public String getAppId() {
-		return this.appId;
+	@PostConstruct
+	public void init() {
+		PayConfig config = null;
+		List<PayConfig> configs = new ArrayList<WxPayProperties.PayConfig>();
+		List<HotelWxConfigEntity> configEntities = hotelWxConfigService.list();
+		for (HotelWxConfigEntity hotelWxConfigEntity : configEntities) {
+			config = new PayConfig();
+			config.setAppId(hotelWxConfigEntity.getAppId());
+			config.setMchId(hotelWxConfigEntity.getMchId());
+			config.setMchKey(hotelWxConfigEntity.getMchKey());
+			configs.add(config);
+		}
+		this.setConfigs(configs);
 	}
 
-	public void setAppId(String appId) {
-		this.appId = appId;
-	}
+	@Data
+	public class PayConfig {
+		/**
+		 * 设置微信公众号或者小程序等的appid
+		 */
+		private String appId;
 
-	public String getMchId() {
-		return mchId;
-	}
+		/**
+		 * 微信支付商户号
+		 */
+		private String mchId;
 
-	public void setMchId(String mchId) {
-		this.mchId = mchId;
-	}
+		/**
+		 * 微信支付商户密钥
+		 */
+		private String mchKey;
 
-	public String getMchKey() {
-		return mchKey;
-	}
+		/**
+		 * 服务商模式下的子商户公众账号ID，普通模式请不要配置，请在配置文件中将对应项删除
+		 */
+		private String subAppId;
 
-	public void setMchKey(String mchKey) {
-		this.mchKey = mchKey;
-	}
+		/**
+		 * 服务商模式下的子商户号，普通模式请不要配置，最好是请在配置文件中将对应项删除
+		 */
+		private String subMchId;
 
-	public String getSubAppId() {
-		return subAppId;
-	}
-
-	public void setSubAppId(String subAppId) {
-		this.subAppId = subAppId;
-	}
-
-	public String getSubMchId() {
-		return subMchId;
-	}
-
-	public void setSubMchId(String subMchId) {
-		this.subMchId = subMchId;
-	}
-
-	public String getKeyPath() {
-		return this.keyPath;
-	}
-
-	public void setKeyPath(String keyPath) {
-		this.keyPath = keyPath;
+		/**
+		 * apiclient_cert.p12文件的绝对路径，或者如果放在项目中，请以classpath:开头指定
+		 */
+		private String keyPath;
 	}
 
 	@Override

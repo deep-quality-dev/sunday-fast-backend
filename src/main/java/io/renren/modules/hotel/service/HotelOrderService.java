@@ -93,7 +93,22 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param orderId  订单ID
 	 * @param ip       下单IP
 	 * @return
-	 * @throws WxPayException 
+	 * @throws WxPayException
 	 */
 	WxPayUnifiedOrderResult payOrder(Long sellerId, Long userId, Long orderId, String ip) throws WxPayException;
+
+	/**
+	 * 删除订单
+	 * 
+	 * @param sellerId 商家ID
+	 * @param userId   用户ID
+	 * @param orderId  订单ID
+	 */
+	void deleteOrder(Long sellerId, Long userId, Long orderId);
+	
+	
+	/**
+	 * 自动取消订单
+	 */
+	public void updateOrder2Cancel();
 }

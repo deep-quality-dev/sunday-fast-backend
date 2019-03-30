@@ -62,10 +62,10 @@ public class WxPayController {
 	@Autowired
 	private HotelOrderService hotelOrderService;
 
-	@Autowired
-	public WxPayController(WxPayService wxService) {
-		this.wxService = wxService;
-	}
+//	@Autowired
+//	public WxPayController(WxPayService wxService) {
+//		this.wxService = wxService;
+//	}
 
 	/**
 	 * <pre>

@@ -1,12 +1,14 @@
 package io.renren.modules.hotel.service;
 
-import java.util.Map;
-
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.vo.HotelInfo;
+import io.renren.modules.hotel.vo.HotelItemVo;
+import io.renren.modules.hotel.vo.HotelSearchCondition;
+
+import java.util.Map;
 
 /**
  * 
@@ -26,4 +28,13 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	 * @return
 	 */
 	HotelInfo sellerInfo(Long sellerId);
+
+	/**
+	 * 酒店列表
+	 * @param userId
+	 * @param params
+	 * @param page
+	 * @return
+	 */
+	Page<HotelItemVo> hotelPage(Long userId, HotelSearchCondition params, Page<HotelItemVo> page);
 }

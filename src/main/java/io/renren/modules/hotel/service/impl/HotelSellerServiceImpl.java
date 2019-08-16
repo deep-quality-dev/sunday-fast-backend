@@ -2,6 +2,9 @@ package io.renren.modules.hotel.service.impl;
 
 import java.util.Map;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.renren.modules.hotel.vo.HotelItemVo;
+import io.renren.modules.hotel.vo.HotelSearchCondition;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
@@ -22,21 +25,26 @@ import lombok.extern.slf4j.Slf4j;
 @Service("hotelSellerService")
 public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSellerEntity> implements HotelSellerService {
 
-	@Override
-	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelSellerEntity> page = this.page(new Query<HotelSellerEntity>().getPage(params), new QueryWrapper<HotelSellerEntity>());
+    @Override
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<HotelSellerEntity> page = this.page(new Query<HotelSellerEntity>().getPage(params), new QueryWrapper<HotelSellerEntity>());
 
-		return new PageUtils(page);
-	}
+        return new PageUtils(page);
+    }
 
-	@Override
-	public HotelInfo sellerInfo(Long sellerId) {
-		log.info("获取酒店信息--start,sellerId", sellerId);
-		HotelInfo hotelInfo = new HotelInfo();
-		HotelSellerEntity hotelSellerEntity = this.getById(sellerId);
-		BeanUtil.copyProperties(hotelSellerEntity, hotelInfo);
-		log.info("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
-		return hotelInfo;
-	}
+    @Override
+    public HotelInfo sellerInfo(Long sellerId) {
+        log.info("获取酒店信息--start,sellerId", sellerId);
+        HotelInfo hotelInfo = new HotelInfo();
+        HotelSellerEntity hotelSellerEntity = this.getById(sellerId);
+        BeanUtil.copyProperties(hotelSellerEntity, hotelInfo);
+        log.info("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
+        return hotelInfo;
+    }
+
+    @Override
+    public Page<HotelItemVo> hotelPage(Long userId, HotelSearchCondition params, Page<HotelItemVo> page) {
+        return baseMapper.hotelPage(page, params);
+    }
 
 }

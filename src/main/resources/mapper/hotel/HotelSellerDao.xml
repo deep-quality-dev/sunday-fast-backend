@@ -3,7 +3,7 @@
 
 <mapper namespace="io.renren.modules.hotel.dao.HotelSellerDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="io.renren.modules.hotel.entity.HotelSellerEntity" id="hotelSellerMap">
         <result property="id" column="id"/>
         <result property="userId" column="user_id"/>
@@ -50,5 +50,14 @@
         <result property="ddOpen" column="dd_open"/>
     </resultMap>
 
-
+    <select id="hotelPage" resultType="io.renren.modules.hotel.vo.HotelItemVo">
+        SELECT
+        t.id,
+        t.name,
+        t.ewm_logo as logo,
+        t1.price
+    From t_hotel_seller t INNER JOIN
+        (SELECT t.seller_id,MIN(t.price) as price from t_hotel_room t GROUP BY t.seller_id ) t1
+        on t.id = t1.seller_id
+    </select>
 </mapper>

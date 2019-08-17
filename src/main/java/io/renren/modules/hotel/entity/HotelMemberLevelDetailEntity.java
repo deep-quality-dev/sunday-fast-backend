@@ -76,5 +76,10 @@ public class HotelMemberLevelDetailEntity implements Serializable {
 	 * 商家ID
 	 */
 	private Long sellerId;
+	
+	/**
+	 * 状态，当为1的时候才有效
+	 */
+	private int status;
 
 }

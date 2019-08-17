@@ -21,7 +21,7 @@ import java.util.Objects;
  **/
 @Api(value = "微信公众号消息服务器配置", tags = {"微信公众号消息服务器配置"})
 @RestController
-@RequestMapping("/wx/portal/{appid}")
+@RequestMapping("/wx/ma/portal/{appid}")
 public class WxMaPortalController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

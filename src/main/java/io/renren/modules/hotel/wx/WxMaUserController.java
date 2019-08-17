@@ -2,7 +2,10 @@ package io.renren.modules.hotel.wx;
 
 
 import com.alibaba.fastjson.JSON;
+import io.renren.common.utils.R;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +23,7 @@ import me.chanjar.weixin.common.error.WxErrorException;
 /**
  * 微信小程序用户接口
  */
+@Api(value = "微信小程序用户接口", tags = {"微信小程序用户接口"})
 @RestController
 @RequestMapping("/wx/user/{appid}")
 public class WxMaUserController {
@@ -28,10 +32,11 @@ public class WxMaUserController {
     /**
      * 登陆接口
      */
+    @ApiOperation("登陆接口")
     @GetMapping("/login")
-    public String login(@PathVariable String appid, String code) {
+    public R login(@PathVariable String appid, String code) {
         if (StringUtils.isBlank(code)) {
-            return "empty jscode";
+            return R.error("empty jscode");
         }
         final WxMaService wxService = WxMaConfiguration.getMaService(appid);
         try {
@@ -39,10 +44,10 @@ public class WxMaUserController {
             this.logger.info(session.getSessionKey());
             this.logger.info(session.getOpenid());
             //TODO 可以增加自己的逻辑，关联业务相关数据
-            return JSON.toJSONString(session);
+            return R.ok(session);
         } catch (WxErrorException e) {
             this.logger.error(e.getMessage(), e);
-            return e.toString();
+            return R.error();
         }
     }
 
@@ -51,20 +56,21 @@ public class WxMaUserController {
      * 获取用户信息接口
      * </pre>
      */
+    @ApiOperation("获取用户信息接口")
     @GetMapping("/info")
-    public String info(@PathVariable String appid, String sessionKey,
-                       String signature, String rawData, String encryptedData, String iv) {
+    public R info(@PathVariable String appid, String sessionKey,
+                  String signature, String rawData, String encryptedData, String iv) {
         final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
         if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
-            return "user check failed";
+            return R.error("user check failed");
         }
 
         // 解密用户信息
         WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
 
-        return JSON.toJSONString(userInfo);
+        return R.ok(userInfo);
     }
 
     /**
@@ -72,20 +78,21 @@ public class WxMaUserController {
      * 获取用户绑定手机号信息
      * </pre>
      */
+    @ApiOperation("获取用户绑定手机号信息")
     @GetMapping("/phone")
-    public String phone(@PathVariable String appid, String sessionKey, String signature,
-                        String rawData, String encryptedData, String iv) {
+    public R phone(@PathVariable String appid, String sessionKey, String signature,
+                   String rawData, String encryptedData, String iv) {
         final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 
         // 用户信息校验
         if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
-            return "user check failed";
+            return R.ok("user check failed");
         }
 
         // 解密
         WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
 
-        return JSON.toJSONString(phoneNoInfo);
+        return R.ok(phoneNoInfo);
     }
 
 }

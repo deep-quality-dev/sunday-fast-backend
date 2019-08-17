@@ -8,11 +8,11 @@
         <result property="id" column="id"/>
         <result property="sellerId" column="seller_id"/>
         <result property="name" column="name"/>
-        <result property="value" column="value"/>
+        <result property="payAmount" column="pay_amount"/>
         <result property="icon" column="icon"/>
         <result property="discount" column="discount"/>
         <result property="orderby" column="orderby"/>
-        <result property="uniacid" column="uniacid"/>
+        <result property="payFlag" column="pay_flag"/>
         <result property="content" column="content"/>
     </resultMap>
 

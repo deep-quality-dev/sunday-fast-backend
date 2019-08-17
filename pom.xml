@@ -44,6 +44,7 @@
 		<fastdfs.version>0.2.0</fastdfs.version>
 		<weixin-java-pay.version>3.3.0</weixin-java-pay.version>
 		<weixin-java-mp.version>3.3.0</weixin-java-mp.version>
+		<weixin-java-miniapp.version>3.5.0</weixin-java-miniapp.version>
 		<!--wagon plugin 配置 -->
 		<service-path>/work/renren</service-path>
 		<pack-name>${project.artifactId}-${project.version}.jar</pack-name>
@@ -114,6 +115,12 @@
 			<groupId>com.github.binarywang</groupId>
 			<artifactId>weixin-java-pay</artifactId>
 			<version>${weixin-java-pay.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-miniapp</artifactId>
+			<version>${weixin-java-miniapp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alibaba</groupId>

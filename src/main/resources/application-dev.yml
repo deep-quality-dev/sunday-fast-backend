@@ -55,6 +55,13 @@ wx:
         secret: 989851d2be1f8e9bf0cd0b69f2211c85
         token: 111
         aesKey: 111
+  miniapp:
+    configs:
+      - appid: wx126f4073ab229daa #微信小程序的appid
+        secret: 3da39248911c5c00526344b9a3905810 #微信小程序的Secret
+        token: #微信小程序消息服务器配置的token
+        aesKey: #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
   pay:
     appId: wxeddf8532f51bcbf9
     mchId: 1529134941

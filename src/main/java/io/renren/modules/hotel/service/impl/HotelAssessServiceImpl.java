@@ -2,26 +2,69 @@ package io.renren.modules.hotel.service.impl;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
+import io.renren.modules.hotel.form.CommentForm;
 import io.renren.modules.hotel.service.HotelAssessService;
+import io.renren.modules.hotel.service.HotelOrderService;
+import io.renren.modules.hotel.vo.CommentItemVo;
 
 @Service("hotelAssessService")
 public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAssessEntity> implements HotelAssessService {
+
+	@Autowired
+	private HotelOrderService hotelOrderService;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		IPage<HotelAssessEntity> page = this.page(new Query<HotelAssessEntity>().getPage(params), new QueryWrapper<HotelAssessEntity>());
 
 		return new PageUtils(page);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void addAssess(Long userId, CommentForm commentForm) {
+		Long sellerId = null;
+		if (1 == commentForm.getType()) {
+			sellerId = hotelOrderService.getById(commentForm.getBizId()).getSellerId();
+		}
+		if (2 == commentForm.getType()) {
+			sellerId = null;
+		}
+		HotelAssessEntity hotelAssessEntity = new HotelAssessEntity();
+		BeanUtil.copyProperties(commentForm, hotelAssessEntity);
+		hotelAssessEntity.setSellerId(sellerId);
+		hotelAssessEntity.setTime(DateUtil.millsecond(DateUtil.date()));
+		hotelAssessEntity.setStatus(1);
+		hotelAssessEntity.setUserId(userId);
+		hotelAssessEntity.setOrderId(commentForm.getBizId());
+		baseMapper.insert(hotelAssessEntity);
+	}
+
+	@Override
+	public Page<CommentItemVo> hotelCommnetList(int page, int limit,Long sellerId) {
+		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(new Page<CommentItemVo>(page, limit),sellerId);
+		return pageResult;
+	}
+
+	@Override
+	public Page<CommentItemVo> goodsCommnetList(int page, int limit, Long goodsId) {
+		Page<CommentItemVo> pageResult = baseMapper.goodsCommnetList(new Page<CommentItemVo>(page, limit),goodsId);
+		return pageResult;
 	}
 
 }

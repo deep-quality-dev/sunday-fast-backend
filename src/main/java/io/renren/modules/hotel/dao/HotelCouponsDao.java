@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.vo.WalletDataVo;
 
 /**
  * 优惠券
@@ -15,5 +16,12 @@ import io.renren.modules.hotel.entity.HotelCouponsEntity;
  */
 @Mapper
 public interface HotelCouponsDao extends BaseMapper<HotelCouponsEntity> {
+
+	/**
+	 * 钱包主页数据
+	 * @param userId
+	 * @return
+	 */
+	WalletDataVo walletData(Long userId);
 
 }

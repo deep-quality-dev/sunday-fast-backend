@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.vo.WalletDataVo;
 
 /**
  * 优惠券
@@ -37,5 +38,12 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @return
 	 */
 	PageUtils userCoupons(Long sellerId, Long userId, Map<String, Object> params);
+
+	/**
+	 * 	钱包主页数据
+	 * @param userId
+	 * @return
+	 */
+	WalletDataVo walletData(Long userId);
 	
 }

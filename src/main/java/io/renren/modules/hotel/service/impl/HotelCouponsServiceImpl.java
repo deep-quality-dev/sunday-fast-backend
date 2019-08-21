@@ -21,13 +21,14 @@ import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.vo.UserCoupons;
+import io.renren.modules.hotel.vo.WalletDataVo;
 
 @Service("hotelCouponsService")
 public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelCouponsEntity> implements HotelCouponsService {
-	
+
 	@Autowired
 	private HotelMemberCouponsDao hotelMemberCouponsDao;
-	
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		IPage<HotelCouponsEntity> page = this.page(new Query<HotelCouponsEntity>().getPage(params), new QueryWrapper<HotelCouponsEntity>());
@@ -68,6 +69,11 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 			userCoupons.add(coupons);
 		}
 		return new PageUtils(userCoupons, page.getTotal(), page.getSize(), page.getCurrent());
+	}
+
+	@Override
+	public WalletDataVo walletData(Long userId) {
+		return baseMapper.walletData(userId);
 	}
 
 }

@@ -4,21 +4,59 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelCouponsDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelCouponsEntity" id="hotelCouponsMap">
-        <result property="id" column="id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="name" column="name"/>
-        <result property="startTime" column="start_time"/>
-        <result property="endTime" column="end_time"/>
-        <result property="conditions" column="conditions"/>
-        <result property="number" column="number"/>
-        <result property="cost" column="cost"/>
-        <result property="type" column="type"/>
-        <result property="introduce" column="introduce"/>
-        <result property="lqNum" column="lq_num"/>
-        <result property="klqzs" column="klqzs"/>
-        <result property="time" column="time"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelCouponsEntity"
+		id="hotelCouponsMap">
+		<result property="id" column="id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="name" column="name" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="conditions" column="conditions" />
+		<result property="number" column="number" />
+		<result property="cost" column="cost" />
+		<result property="type" column="type" />
+		<result property="introduce" column="introduce" />
+		<result property="lqNum" column="lq_num" />
+		<result property="klqzs" column="klqzs" />
+		<result property="time" column="time" />
+	</resultMap>
 
-
+	<select id="walletData"
+		resultType="io.renren.modules.hotel.vo.WalletDataVo">
+		SELECT
+		count( * ) as discountoupns_num
+		FROM
+		t_hotel_member_coupons t
+		INNER JOIN t_hotel_coupons t1 ON t.coupons_id
+		= t1.id
+		WHERE
+		t.coupons_type = 1
+		AND t.user_id = #{userId} UNION ALL
+		SELECT
+		count( * ) as cash_coupon_num
+		FROM
+		t_hotel_member_coupons t
+		INNER
+		JOIN t_hotel_coupons_cash t1 ON t.coupons_id = t1.id
+		WHERE
+		t.coupons_type = 2
+		AND t.user_id = #{userId} UNION ALL
+		SELECT
+		count( * )
+		as breakfast_coupon_num
+		FROM
+		t_hotel_member_coupons t
+		INNER JOIN
+		t_hotel_coupons_breakfast t1 ON t.coupons_id = t1.id
+		WHERE
+		t.coupons_type = 3
+		AND t.user_id = #{userId} UNION ALL
+		SELECT
+		count( * )
+		as vip_card_num
+		FROM
+		t_hotel_member_level_detail t where t.member_id =
+		#{userId}
+	</select>
 </mapper>

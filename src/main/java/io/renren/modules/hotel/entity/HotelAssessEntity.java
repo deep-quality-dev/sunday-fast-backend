@@ -23,11 +23,11 @@ public class HotelAssessEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 商家ID
 	 */
-	private Integer sellerId;
+	private Long sellerId;
 	/**
 	 * 分数
 	 */
@@ -47,7 +47,7 @@ public class HotelAssessEntity implements Serializable {
 	/**
 	 * 用户ID
 	 */
-	private Integer userId;
+	private Long userId;
 	/**
 	 * 商家回复
 	 */
@@ -60,5 +60,20 @@ public class HotelAssessEntity implements Serializable {
 	 * 回复时间
 	 */
 	private Integer replyTime;
+
+	/**
+	 * 评论类型 1-酒店 2-商品
+	 */
+	private Integer type;
+
+	/**
+	 * 订单ID
+	 */
+	private Long orderId;
+
+	/**
+	 * 商品ID
+	 */
+	private Long goodsId;
 
 }

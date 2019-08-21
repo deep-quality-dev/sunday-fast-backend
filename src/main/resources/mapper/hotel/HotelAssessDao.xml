@@ -4,18 +4,53 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelAssessDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelAssessEntity" id="hotelAssessMap">
-        <result property="id" column="id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="score" column="score"/>
-        <result property="content" column="content"/>
-        <result property="img" column="img"/>
-        <result property="time" column="time"/>
-        <result property="userId" column="user_id"/>
-        <result property="reply" column="reply"/>
-        <result property="status" column="status"/>
-        <result property="replyTime" column="reply_time"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelAssessEntity"
+		id="hotelAssessMap">
+		<result property="id" column="id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="score" column="score" />
+		<result property="content" column="content" />
+		<result property="img" column="img" />
+		<result property="time" column="time" />
+		<result property="userId" column="user_id" />
+		<result property="reply" column="reply" />
+		<result property="status" column="status" />
+		<result property="replyTime" column="reply_time" />
+		<result property="type" column="type" />
+		<result property="orderId" column="order_id" />
+		<result property="goodsId" column="goods_id" />
+	</resultMap>
 
+	<select id="hotelCommnetList"
+		resultType="io.renren.modules.hotel.vo.CommentItemVo">
+		SELECT
+		t.id,
+		t.content,
+		t.time,
+		t.score,
+		t1.`name`,
+		t1.img
+		From t_hotel_assess t inner join t_hotel_member t1
+		on t.user_id = t1.id
+		where t.seller_id = #{sellerId} and t.type = 1
+		order by t.time desc
+	</select>
+	
+	<select id="goodsCommnetList"
+		resultType="io.renren.modules.hotel.vo.CommentItemVo">
+		SELECT
+		t.id,
+		t.content,
+		t.time,
+		t.score,
+		t1.`name`,
+		t1.img
+		From t_hotel_assess t inner join t_hotel_member t1
+		on t.user_id = t1.id
+		where t.goods_id = #{goodsId} and t.type = 2
+		order by t.time desc
+	</select>
+	
 
 </mapper>

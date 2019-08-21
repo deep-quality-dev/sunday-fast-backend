@@ -57,6 +57,7 @@ public class ShiroConfig {
 		filterMap.put("/app/**", "anon");
 		filterMap.put("/*/hotel/**", "anon");
 		filterMap.put("/*/wx/**", "anon");
+		filterMap.put("/wx/user/**", "anon");
 		filterMap.put("/pay/**", "anon");
 		filterMap.put("/sys/login", "anon");
 		filterMap.put("/upload/**", "anon");

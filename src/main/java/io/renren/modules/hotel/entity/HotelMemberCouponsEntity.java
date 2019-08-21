@@ -48,5 +48,10 @@ public class HotelMemberCouponsEntity implements Serializable {
 	 * 商家ID
 	 */
 	private String sellerId;
+	
+	/**
+	 * 优惠券类型
+	 */
+	private int couponsType;
 
 }

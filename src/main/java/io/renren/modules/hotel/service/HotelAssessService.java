@@ -2,10 +2,13 @@ package io.renren.modules.hotel.service;
 
 import java.util.Map;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
+import io.renren.modules.hotel.form.CommentForm;
+import io.renren.modules.hotel.vo.CommentItemVo;
 
 /**
  * 评价表
@@ -17,4 +20,30 @@ import io.renren.modules.hotel.entity.HotelAssessEntity;
 public interface HotelAssessService extends IService<HotelAssessEntity> {
 
 	PageUtils queryPage(Map<String, Object> params);
+
+	/**
+	 * 添加评论
+	 * 
+	 * @param userId
+	 * @param commentForm
+	 */
+	void addAssess(Long userId, CommentForm commentForm);
+
+	/**
+	 * 酒店评论列表
+	 * @param page
+	 * @param limie
+	 * @param sellerId 
+	 * @return
+	 */
+	Page<CommentItemVo> hotelCommnetList(int page, int limie, Long sellerId);
+
+	/**
+	 * 商品评论列表
+	 * @param page
+	 * @param limie
+	 * @param goodsId
+	 * @return
+	 */
+	Page<CommentItemVo> goodsCommnetList(int page, int limie, Long goodsId);
 }

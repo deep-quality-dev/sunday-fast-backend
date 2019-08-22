@@ -16,6 +16,9 @@ import lombok.Data;
 @ApiModel(value = "添加发票表单")
 public class AddInvoiceForm {
 
+	@ApiModelProperty(value = "id-添加不传")
+	private Long id;
+
 	/**
 	 * 公司名称
 	 */

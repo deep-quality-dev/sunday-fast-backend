@@ -16,6 +16,9 @@ import lombok.Data;
 @ApiModel(value = "添加联系人表单")
 public class AddContactsForm {
 
+	@ApiModelProperty(value = "id-添加为空")
+	private Long id;
+
 	/**
 	 * 姓名
 	 */

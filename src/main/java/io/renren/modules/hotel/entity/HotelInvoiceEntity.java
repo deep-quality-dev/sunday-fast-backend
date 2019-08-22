@@ -24,6 +24,11 @@ public class HotelInvoiceEntity implements Serializable {
 	 */
 	@TableId
 	private Long id;
+
+	/**
+	 * 会员ID
+	 */
+	private Long memberId;
 	/**
 	 * 公司名称
 	 */

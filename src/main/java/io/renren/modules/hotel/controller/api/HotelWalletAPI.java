@@ -28,5 +28,5 @@ public class HotelWalletAPI {
 		WalletDataVo walletDataVo = hotelWalletService.walletData(userId);
 		return R.ok(walletDataVo);
 	}
-	
+
 }

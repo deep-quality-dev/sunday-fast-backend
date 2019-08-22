@@ -19,6 +19,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import io.renren.common.utils.R;
 import io.renren.modules.app.utils.JwtUtils;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.renren.modules.hotel.service.HotelMemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -31,6 +32,9 @@ import me.chanjar.weixin.common.error.WxErrorException;
 @RequestMapping("/wx/user/{appid}")
 public class WxMaUserController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private HotelMemberService hotelMemberService;
 
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -56,8 +60,8 @@ public class WxMaUserController {
 			}
 			// 解密用户信息
 			WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(session.getSessionKey(), encryptedData, iv);
-			// TODO 创建数据
-			String token = jwtUtils.generateToken(1L);
+			Long userId = hotelMemberService.wxMaLogin(userInfo);
+			String token = jwtUtils.generateToken(userId);
 			Map<String, Object> map = new HashMap<>();
 			map.put("token", token);
 			map.put("expire", jwtUtils.getExpire());
@@ -106,7 +110,7 @@ public class WxMaUserController {
 
 		// 解密
 		WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
-
+//		hotelMemberService.bindWxPhone(phoneNoInfo);
 		return R.ok(phoneNoInfo);
 	}
 

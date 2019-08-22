@@ -15,6 +15,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -144,6 +146,32 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 			this.updateById(hotelMemberEntity);
 		}
 		log.info("用户绑定手机成功");
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Long wxMaLogin(WxMaUserInfo userInfo) {
+		log.info("微信登陆--start,params:{}", JSON.toJSONString(userInfo));
+		HotelMemberEntity hotelMemberEntity = null;
+		hotelMemberEntity = this.getOne(new QueryWrapper<HotelMemberEntity>().eq("openid", userInfo.getOpenId()));
+		if (null == hotelMemberEntity) {
+			hotelMemberEntity = new HotelMemberEntity();
+			hotelMemberEntity.setOpenid(userInfo.getOpenId());
+			hotelMemberEntity.setImg(userInfo.getAvatarUrl());
+			hotelMemberEntity.setJoinTime(DateUtil.date());
+			hotelMemberEntity.setName(userInfo.getNickName());
+			this.save(hotelMemberEntity);
+		}
+		return hotelMemberEntity.getId();
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+
+	public void bindWxPhone(WxMaPhoneNumberInfo phoneNoInfo) {
+		HotelMemberEntity hotelMemberEntity = null;
+//		hotelMemberEntity = this.getOne(new QueryWrapper<HotelMemberEntity>().eq("openid", ));
+
 	}
 
 }

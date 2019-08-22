@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.vo.MemberVo;
@@ -48,6 +50,7 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 
 	/**
 	 * 发送验证码
+	 * 
 	 * @param mobile
 	 */
 	void sendSmsCode(String mobile);
@@ -62,5 +65,19 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 * @return
 	 */
 	void bindSms(Long sellerId, Long userId, String mobile, String vcode);
+
+	/**
+	 * 微信小程序登陆
+	 * 
+	 * @param userInfo
+	 * @return
+	 */
+	Long wxMaLogin(WxMaUserInfo userInfo);
+
+	/**
+	 * 绑定微信手机
+	 * @param phoneNoInfo
+	 */
+	void bindWxPhone(WxMaPhoneNumberInfo phoneNoInfo);
 
 }

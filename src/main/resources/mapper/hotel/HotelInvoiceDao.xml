@@ -8,6 +8,7 @@
 		type="io.renren.modules.hotel.entity.HotelInvoiceEntity"
 		id="hotelInvoiceMap">
 		<result property="id" column="id" />
+		<result property="memberId" column="member_id" />
 		<result property="company" column="company" />
 		<result property="identifyNumber" column="identify_number" />
 		<result property="openingBank" column="opening_bank" />

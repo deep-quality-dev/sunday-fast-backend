@@ -27,7 +27,7 @@ public class HotelContactsEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Integer memberId;
+	private Long memberId;
 	/**
 	 * 姓名
 	 */

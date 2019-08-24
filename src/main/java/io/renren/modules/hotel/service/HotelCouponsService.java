@@ -2,10 +2,12 @@ package io.renren.modules.hotel.service;
 
 import java.util.Map;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.vo.UserCoupons;
 import io.renren.modules.hotel.vo.WalletDataVo;
 
 /**
@@ -32,12 +34,11 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	/**
 	 * 用户优惠券
 	 * 
-	 * @param sellerId 商家ID
 	 * @param userId   用户ID·
 	 * @param params
 	 * @return
 	 */
-	PageUtils userCoupons(Long sellerId, Long userId, Map<String, Object> params);
+	Page<UserCoupons> userCoupons(Long userId, int page, int limit);
 
 	/**
 	 * 	钱包主页数据
@@ -45,5 +46,23 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @return
 	 */
 	WalletDataVo walletData(Long userId);
+
+	/**
+	 * 用户代金券
+	 * @param userId
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	Page<UserCoupons> userCashCoupons(Long userId, int page, int limit);
+
+	/**
+	 * 用户早餐券
+	 * @param userId
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	Page<UserCoupons> userBreakfastCoupons(Long userId, int page, int limit);
 	
 }

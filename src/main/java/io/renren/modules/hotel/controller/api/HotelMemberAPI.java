@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import cn.hutool.core.lang.Assert;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -20,6 +22,7 @@ import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelScoreService;
 import io.renren.modules.hotel.vo.MemberVo;
+import io.renren.modules.hotel.vo.UserCoupons;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -31,7 +34,7 @@ import io.swagger.annotations.ApiOperation;
  */
 @Api(value = "酒店会员接口", tags = { "酒店会员接口" })
 @RestController
-@RequestMapping("/{appId}/hotel/user")
+@RequestMapping("/hotel/user")
 public class HotelMemberAPI extends BaseController {
 
 	@Autowired
@@ -51,8 +54,8 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户信息")
 	@GetMapping("/userInfo")
-	public R userInfo(@PathVariable String appId, @RequestAttribute("userId") Long userId) {
-		MemberVo memberVo = hotelMemberService.userInfo(sellerId(appId), userId);
+	public R userInfo(@RequestAttribute("userId") Long userId) {
+		MemberVo memberVo = hotelMemberService.userInfo(userId);
 		return R.ok().put("data", memberVo);
 	}
 
@@ -65,7 +68,7 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户签到")
 	@GetMapping("/signIn")
-	public R signIn(@PathVariable String appId,@RequestAttribute("userId") Long userId) {
+	public R signIn(@PathVariable String appId, @RequestAttribute("userId") Long userId) {
 		boolean result = hotelScoreService.signIn(sellerId(appId), userId);
 		return R.ok().put("data", result);
 	}
@@ -73,8 +76,8 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户积分列表")
 	@GetMapping("/scoreList")
-	public R scoreList(@PathVariable String appId,@RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
-		PageUtils page = hotelScoreService.signInList(sellerId(appId), userId, params);
+	public R scoreList(@RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
+		PageUtils page = hotelScoreService.signInList(userId, params);
 		return R.ok().put("data", page);
 	}
 
@@ -88,9 +91,39 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户优惠券")
 	@GetMapping("/userCoupons")
-	public R userCoupons(@PathVariable String appId, @RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
-		PageUtils page = hotelCouponsService.userCoupons(sellerId(appId), userId, params);
-		return R.ok().put("data", page);
+	public R userCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userCoupons(userId, page, limit);
+		return R.ok().put("data", pageResult);
+	}
+
+	/**
+	 * 用户代金券
+	 * 
+	 * @param appId  app ID
+	 * @param userId 用户ID
+	 * @return
+	 */
+	@Login
+	@ApiOperation("用户代金券")
+	@GetMapping("/userCashCoupons")
+	public R userCashCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userCashCoupons(userId, page, limit);
+		return R.ok().put("data", pageResult);
+	}
+
+	/**
+	 * 用户早餐券
+	 * 
+	 * @param appId  app ID
+	 * @param userId 用户ID
+	 * @return
+	 */
+	@Login
+	@ApiOperation("用户早餐券")
+	@GetMapping("/userBreakfastCoupons")
+	public R userBreakfastCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userBreakfastCoupons(userId, page, limit);
+		return R.ok().put("data", pageResult);
 	}
 
 	@Login

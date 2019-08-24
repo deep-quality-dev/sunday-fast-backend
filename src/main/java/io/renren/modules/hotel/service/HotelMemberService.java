@@ -26,10 +26,9 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 * 用户信息
 	 * 
 	 * @param sellerId
-	 * @param userId
 	 * @return
 	 */
-	MemberVo userInfo(Long sellerId, Long userId);
+	MemberVo userInfo(Long sellerId);
 
 	/**
 	 * 微信登陆

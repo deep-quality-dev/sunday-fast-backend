@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,11 +39,11 @@ public class AppLoginController {
 	/**
 	 * 登录
 	 */
-	@PostMapping("login")
+	@GetMapping("login/{id}")
 	@ApiOperation("登录")
-	public R login() {
+	public R login(Long id) {
 		// 生成token
-		String token = jwtUtils.generateToken(1L);
+		String token = jwtUtils.generateToken(id);
 		Map<String, Object> map = new HashMap<>();
 		map.put("token", token);
 		map.put("expire", jwtUtils.getExpire());

@@ -10,6 +10,11 @@ public class UserCoupons {
 	private Long id;
 
 	/**
+	 * 优惠券类型
+	 */
+	private int type;
+
+	/**
 	 * 优惠券名称
 	 */
 	private String name;

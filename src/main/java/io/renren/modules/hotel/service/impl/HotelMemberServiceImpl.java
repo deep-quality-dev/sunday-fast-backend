@@ -52,7 +52,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 	}
 
 	@Override
-	public MemberVo userInfo(Long sellerId, Long userId) {
+	public MemberVo userInfo(Long userId) {
 		log.info("获取用户信息--start,userId:{}", userId);
 		MemberVo memberVo = new MemberVo();
 		HotelMemberEntity hotelMemberEntity = this.getById(userId);

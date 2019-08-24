@@ -1,24 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="io.renren.modules.hotel.dao.HotelCouponsBreakfastDao">
+<mapper
+	namespace="io.renren.modules.hotel.dao.HotelCouponsBreakfastDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity" id="hotelCouponsBreakfastMap">
-        <result property="id" column="id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="name" column="name"/>
-        <result property="startTime" column="start_time"/>
-        <result property="endTime" column="end_time"/>
-        <result property="conditions" column="conditions"/>
-        <result property="number" column="number"/>
-        <result property="cost" column="cost"/>
-        <result property="type" column="type"/>
-        <result property="introduce" column="introduce"/>
-        <result property="lqNum" column="lq_num"/>
-        <result property="klqzs" column="klqzs"/>
-        <result property="time" column="time"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity"
+		id="hotelCouponsBreakfastMap">
+		<result property="id" column="id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="name" column="name" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="conditions" column="conditions" />
+		<result property="number" column="number" />
+		<result property="cost" column="cost" />
+		<result property="type" column="type" />
+		<result property="introduce" column="introduce" />
+		<result property="lqNum" column="lq_num" />
+		<result property="klqzs" column="klqzs" />
+		<result property="time" column="time" />
+	</resultMap>
 
+	<select id="userBreakfastCoupons"
+		resultType="io.renren.modules.hotel.vo.UserCoupons">
+		SELECT
+		t.coupons_type,
+		t1.`name`,
+		t1.cost,
+		t1.start_time,
+		t1.end_time,
+		t1.conditions
+		from t_hotel_member_coupons t inner join
+		t_hotel_coupons_breakfast t1 on
+		t.coupons_id = t1.id
+		where
+		t.coupons_type = 3 and t.user_id = #{userId};
+	</select>
 
 </mapper>

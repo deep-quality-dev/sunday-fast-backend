@@ -43,5 +43,5 @@ public interface HotelScoreService extends IService<HotelScoreEntity> {
 	 * @param params
 	 * @return
 	 */
-	PageUtils signInList(Long sellerId, Long userId, Map<String, Object> params);
+	PageUtils signInList(Long userId, Map<String, Object> params);
 }

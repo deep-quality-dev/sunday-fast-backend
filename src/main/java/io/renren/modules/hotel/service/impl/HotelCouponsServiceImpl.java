@@ -9,16 +9,18 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.HotelCouponsBreakfastDao;
+import io.renren.modules.hotel.dao.HotelCouponsCashDao;
 import io.renren.modules.hotel.dao.HotelCouponsDao;
 import io.renren.modules.hotel.dao.HotelMemberCouponsDao;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
-import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.vo.UserCoupons;
 import io.renren.modules.hotel.vo.WalletDataVo;
@@ -28,6 +30,12 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 
 	@Autowired
 	private HotelMemberCouponsDao hotelMemberCouponsDao;
+
+	@Autowired
+	private HotelCouponsCashDao hotelCouponsCashDao;
+
+	@Autowired
+	private HotelCouponsBreakfastDao hotelCouponsBreakfastDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -53,27 +61,23 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public PageUtils userCoupons(Long sellerId, Long userId, Map<String, Object> params) {
-		QueryWrapper<HotelMemberCouponsEntity> queryWrapper = new QueryWrapper<HotelMemberCouponsEntity>();
-		queryWrapper.eq("seller_id", sellerId);
-		queryWrapper.eq("user_id", userId);
-		List<UserCoupons> userCoupons = new ArrayList<>();
-		UserCoupons coupons = null;
-		IPage<HotelMemberCouponsEntity> page = hotelMemberCouponsDao.selectPage(new Query<HotelMemberCouponsEntity>().getPage(params), queryWrapper);
-		List<HotelMemberCouponsEntity> memberCouponsEntities = page.getRecords();
-		HotelCouponsEntity hotelCouponsEntity = null;
-		for (HotelMemberCouponsEntity memberCouponsEntity : memberCouponsEntities) {
-			hotelCouponsEntity = this.getById(memberCouponsEntity.getCouponsId());
-			coupons = new UserCoupons();
-			BeanUtil.copyProperties(hotelCouponsEntity, coupons);
-			userCoupons.add(coupons);
-		}
-		return new PageUtils(userCoupons, page.getTotal(), page.getSize(), page.getCurrent());
+	public Page<UserCoupons> userCoupons(Long userId, int page, int limit) {
+		return baseMapper.userCoupons(new Page<UserCoupons>(page, limit), userId);
 	}
 
 	@Override
 	public WalletDataVo walletData(Long userId) {
 		return baseMapper.walletData(userId);
+	}
+
+	@Override
+	public Page<UserCoupons> userCashCoupons(Long userId, int page, int limit) {
+		return hotelCouponsCashDao.userCashCouponsPage(new Page<UserCoupons>(page, limit), userId);
+	}
+
+	@Override
+	public Page<UserCoupons> userBreakfastCoupons(Long userId, int page, int limit) {
+		return hotelCouponsBreakfastDao.userBreakfastCoupons(new Page<UserCoupons>(page, limit),userId);
 	}
 
 }

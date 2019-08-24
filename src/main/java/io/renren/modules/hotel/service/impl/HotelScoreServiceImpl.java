@@ -91,11 +91,10 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 	}
 
 	@Override
-	public PageUtils signInList(Long sellerId, Long userId, Map<String, Object> params) {
-		log.info("用户积分列表--start,userId:{},sellerId:{},params:{}", userId, sellerId, JSON.toJSONString(params));
+	public PageUtils signInList(Long userId, Map<String, Object> params) {
+		log.info("用户积分列表--start,userId:{},params:{}", userId, JSON.toJSONString(params));
 		List<HotelScore> hotelScores = new ArrayList<HotelScore>();
 		QueryWrapper<HotelScoreEntity> queryWrapper = new QueryWrapper<HotelScoreEntity>();
-		queryWrapper.eq("seller_id", sellerId);
 		queryWrapper.eq("user_id", userId);
 		queryWrapper.orderByDesc("create_time");
 		IPage<HotelScoreEntity> page = this.page(new Query<HotelScoreEntity>().getPage(params), queryWrapper);

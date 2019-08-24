@@ -16,9 +16,11 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
+import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.R;
 import io.renren.modules.app.utils.JwtUtils;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,10 +62,12 @@ public class WxMaUserController {
 			}
 			// 解密用户信息
 			WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(session.getSessionKey(), encryptedData, iv);
-			Long userId = hotelMemberService.wxMaLogin(userInfo);
-			String token = jwtUtils.generateToken(userId);
+			HotelMemberEntity member = hotelMemberService.wxMaLogin(userInfo);
+			String token = jwtUtils.generateToken(member.getId());
 			Map<String, Object> map = new HashMap<>();
 			map.put("token", token);
+			map.put("bindMobild", StrUtil.isNotEmpty(member.getTel()) ? 1 : 0);
+			map.put("sessionKey", session.getSessionKey());
 			map.put("expire", jwtUtils.getExpire());
 			return R.ok(map);
 		} catch (WxErrorException e) {

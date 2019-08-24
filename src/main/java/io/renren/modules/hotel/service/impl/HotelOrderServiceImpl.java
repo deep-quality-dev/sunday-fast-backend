@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -113,8 +114,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public BuildOrderForm buildOrder(Long sellerId, Long userId, Long roomId, Long moneyId, int roomNum, String checkInDate, String checkOutDate) {
-		log.info("构建订单信息--start,sellerId:{},userId,{},roomId:{},moneyId:{},checkInDate:{},checkOutDate:{}", sellerId, userId, roomId, moneyId, checkInDate, checkOutDate);
+	public BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, int roomNum, String checkInDate, String checkOutDate) {
+		log.info("构建订单信息--start,userId,{},roomId:{},moneyId:{},checkInDate:{},checkOutDate:{}", userId, roomId, moneyId, checkInDate, checkOutDate);
 		BuildOrderForm buildOrderForm = new BuildOrderForm();
 		// 总金额
 		Double totalAmount = 0.0;
@@ -141,15 +142,15 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelRoomPriceEntity hotelRoomPriceEntity = null;
 		DateTime curentTime = new DateTime(DateUtil.parse(checkInDate));
 		// 酒店信息
-		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelRoomEntity.getSellerId());
 		buildOrderForm.setHotelAddress(hotelSellerEntity.getAddress());
 		buildOrderForm.setSellerName(hotelSellerEntity.getName());
 		for (int i = 0; i < checkInDay; i++) {
 			orderDetail = new OrderDetail();
 			// 是否有特殊价格
 			long thisdateTimes = curentTime.millsecond();// 当天时间戳
-			log.info("查询每日房价--start，time:{},roomId:{},moneyId:{},sellerId:{}", thisdateTimes, roomId, moneyId, sellerId);
-			hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("seller_id", sellerId).eq("money_id", moneyId).eq("room_id", roomId).eq("thisdate", thisdateTimes));
+			log.info("查询每日房价--start，time:{},roomId:{},moneyId:{},sellerId:{}", thisdateTimes, roomId, moneyId, hotelRoomEntity.getSellerId());
+			hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("seller_id", hotelRoomEntity.getSellerId()).eq("money_id", moneyId).eq("room_id", roomId).eq("thisdate", thisdateTimes));
 			// 时间后移
 			curentTime = DateUtil.offsetDay(curentTime, 1);
 			Double amount = 0.0;
@@ -177,22 +178,23 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Override
 	@Transactional
-	public WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId, Long sellerId) throws WxPayException {
+	public WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException {
 		CreateOrderForm createOrderForm = new CreateOrderForm();
-		BuildOrderForm newBuildOrderForm = this.buildOrder(sellerId, userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
+		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
 		createOrderForm.setMoneyId(buildOrderForm.getMoneyId());
-		createOrderForm.setSellerId(sellerId);
+		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(buildOrderForm.getRoomId());
+		createOrderForm.setSellerId(hotelRoomEntity.getSellerId());
 		createOrderForm.setUserId(userId);
 		HotelOrderEntity hotelOrderEntity = this.createHotelOrder(createOrderForm);
-		log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, sellerId, JSON.toJSONString(buildOrderForm));
+		log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
 		// 酒店信息
-		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelRoomEntity.getSellerId());
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		// 商户微信信息
-		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", sellerId));
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelRoomEntity.getSellerId()));
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
 		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + createOrderForm.getRoomName() + "(" + createOrderForm.getCheckInDay() + "晚)");
@@ -293,14 +295,13 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public PageUtils userOrderList(Long userId, Long sellerId, Integer orderStatus, int page, int limie) {
-		log.info("获取用户订单--start,userId:{},sellerId:{},orderStatus:{}", userId, sellerId, orderStatus);
+	public Page<HotelOrderVo> userOrderList(Long userId, Integer orderStatus, int page, int limie) {
+		log.info("获取用户订单--start,userId:{},orderStatus:{}", userId, orderStatus);
 		QueryWrapper<HotelOrderEntity> queryWrapper = new QueryWrapper<HotelOrderEntity>();
 		if (null != orderStatus) {
 			queryWrapper.eq("status", orderStatus);
 		}
 		queryWrapper.eq("enabled", 1);
-		queryWrapper.eq("seller_id", sellerId);
 		queryWrapper.eq("user_id", userId);
 		queryWrapper.orderByDesc("create_time");
 		Map<String, Object> pageMap = new HashMap<String, Object>();
@@ -315,15 +316,19 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelOrderVos.add(hotelOrderVo);
 		}
 		log.info("获取用户订单--end,record:{},total,size:{},current:{}", JSON.toJSONString(hotelOrderVos), pageResult.getTotal(), pageResult.getSize(), pageResult.getCurrent());
-		return new PageUtils(hotelOrderVos, pageResult.getTotal(), pageResult.getSize(), pageResult.getCurrent());
+		Page<HotelOrderVo> returnPage = new Page<HotelOrderVo>();
+		returnPage.setTotal(pageResult.getTotal());
+		returnPage.setCurrent(pageResult.getCurrent());
+		returnPage.setRecords(hotelOrderVos);
+		return returnPage;
 	}
 
 	@Override
-	public HotelOrderVo orderDetail(Long sellerId, Long userId, Long orderId) {
-		log.info("查询订单详情--start,sellerId:{},userId:{},orderId:{}", sellerId, userId, orderId);
-		HotelOrderEntity hotelOrderEntity = this.getOne(new QueryWrapper<HotelOrderEntity>().eq("id", orderId).eq("seller_id", sellerId).eq("user_id", userId));
+	public HotelOrderVo orderDetail(Long userId, Long orderId) {
+		log.info("查询订单详情--start,sellerId:{},userId:{},", userId, orderId);
+		HotelOrderEntity hotelOrderEntity = this.getOne(new QueryWrapper<HotelOrderEntity>().eq("id", orderId).eq("user_id", userId));
 		if (null == hotelOrderEntity) {
-			log.error("查询订单详情--参数错误，未找到订单信息,sellerId:{},userId:{},orderId:{}", sellerId, userId, orderId);
+			log.error("查询订单详情--参数错误，未找到订单信息,userId:{},orderId:{}", userId, orderId);
 			throw new RRException("参数错误，未找到订单信息");
 		}
 		HotelOrderVo hotelOrderVo = new HotelOrderVo();
@@ -336,11 +341,11 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public void cancelOrder(Long sellerId, Long userId, Long orderId) {
-		log.info("取消订单--start,sellerId:{},userId:{},orderId:{}", sellerId, userId, orderId);
-		HotelOrderEntity hotelOrderEntity = this.getOne(new QueryWrapper<HotelOrderEntity>().eq("id", orderId).eq("seller_id", sellerId).eq("user_id", userId));
+	public void cancelOrder(Long userId, Long orderId) {
+		log.info("取消订单--start,userId:{},orderId:{}", userId, orderId);
+		HotelOrderEntity hotelOrderEntity = this.getOne(new QueryWrapper<HotelOrderEntity>().eq("id", orderId).eq("user_id", userId));
 		if (null == hotelOrderEntity) {
-			log.error("取消订单--参数错误，未找到订单信息,sellerId:{},userId:{},orderId:{}", sellerId, userId, orderId);
+			log.error("取消订单--参数错误，未找到订单信息,userId:{},orderId:{}", userId, orderId);
 			throw new RRException("参数错误，未找到订单信息");
 		}
 		// 判断订单状态
@@ -392,12 +397,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public WxPayUnifiedOrderResult payOrder(Long sellerId, Long userId, Long orderId, String ip) throws WxPayException {
+	public WxPayUnifiedOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException {
+		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		// 商户微信信息
-		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", sellerId));
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
-		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
 		wxPayUnifiedOrderRequest.setAppid(hotelMemberEntity.getOpenid());
 		wxPayUnifiedOrderRequest.setBody(hotelOrderEntity.getSellerName() + "-" + hotelOrderEntity.getRoomType());
@@ -417,8 +422,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Override
 	@Transactional
-	public void deleteOrder(Long sellerId, Long userId, Long orderId) {
-		log.info("删除订单--start,sellerId:{},userId:{},orderId:{}", sellerId, userId, orderId);
+	public void deleteOrder(Long userId, Long orderId) {
+		log.info("删除订单--start,userId:{},orderId:{}", userId, orderId);
 		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		if (hotelOrderEntity.getUserId().intValue() != userId.intValue()) {
 			log.error("删除订单， 当前订单与用户ID不匹配！！！");
@@ -472,7 +477,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 						templateMessage = new WxMpTemplateMessage(hotelMemberEntity.getOpenid(), hotelWxTemplateEntity.getTemplateId(), null, null, data);
 						try {
 							String result = mpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
-							log.info("发送取消订单微信模板消息：result：{}",result);
+							log.info("发送取消订单微信模板消息：result：{}", result);
 						} catch (WxErrorException e) {
 							e.printStackTrace();
 						}

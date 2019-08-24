@@ -150,7 +150,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public Long wxMaLogin(WxMaUserInfo userInfo) {
+	public HotelMemberEntity wxMaLogin(WxMaUserInfo userInfo) {
 		log.info("微信登陆--start,params:{}", JSON.toJSONString(userInfo));
 		HotelMemberEntity hotelMemberEntity = null;
 		hotelMemberEntity = this.getOne(new QueryWrapper<HotelMemberEntity>().eq("openid", userInfo.getOpenId()));
@@ -162,7 +162,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 			hotelMemberEntity.setName(userInfo.getNickName());
 			this.save(hotelMemberEntity);
 		}
-		return hotelMemberEntity.getId();
+		return hotelMemberEntity;
 	}
 
 	@Override

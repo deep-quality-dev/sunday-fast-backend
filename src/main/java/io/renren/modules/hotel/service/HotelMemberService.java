@@ -71,7 +71,7 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 * @param userInfo
 	 * @return
 	 */
-	Long wxMaLogin(WxMaUserInfo userInfo);
+	HotelMemberEntity wxMaLogin(WxMaUserInfo userInfo);
 
 	/**
 	 * 绑定微信手机

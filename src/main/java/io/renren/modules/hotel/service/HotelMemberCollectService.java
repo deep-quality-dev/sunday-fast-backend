@@ -41,6 +41,6 @@ public interface HotelMemberCollectService extends IService<HotelMemberCollectEn
 	 * @param type
 	 * @return
 	 */
-	Page<CollectItemVo> collectList(int page, int limie);
+	Page<CollectItemVo> collectList(Page<CollectItemVo> page, Long userId, int type);
 }
 

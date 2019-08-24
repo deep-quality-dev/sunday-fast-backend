@@ -42,7 +42,7 @@ public class HotelCommentAPI {
 	@ApiOperation("酒店评论列表")
 	@GetMapping("/hotelList")
 	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limie", required = false, defaultValue = "10") int limie, Long sellerId) {
-		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(page, limie, sellerId);
+		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page,limie), sellerId);
 		return R.ok(pageResult);
 	}
 
@@ -67,7 +67,7 @@ public class HotelCommentAPI {
 	@ApiOperation("商品评论列表")
 	@GetMapping("/goodsList")
 	public R goodsList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limie", required = false, defaultValue = "10") int limie, Long goodsId) {
-		Page<CommentItemVo> pageResult = hotelAssessService.goodsCommnetList(page, limie, goodsId);
+		Page<CommentItemVo> pageResult = hotelAssessService.goodsCommnetList(new Page<CommentItemVo>(page,limie), goodsId);
 		return R.ok(pageResult);
 	}
 }

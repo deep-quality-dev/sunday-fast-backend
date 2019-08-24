@@ -56,14 +56,14 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	}
 
 	@Override
-	public Page<CommentItemVo> hotelCommnetList(int page, int limit,Long sellerId) {
-		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(new Page<CommentItemVo>(page, limit),sellerId);
+	public Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId) {
+		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId);
 		return pageResult;
 	}
 
 	@Override
-	public Page<CommentItemVo> goodsCommnetList(int page, int limit, Long goodsId) {
-		Page<CommentItemVo> pageResult = baseMapper.goodsCommnetList(new Page<CommentItemVo>(page, limit),goodsId);
+	public Page<CommentItemVo> goodsCommnetList(Page<CommentItemVo> page, Long goodsId) {
+		Page<CommentItemVo> pageResult = baseMapper.goodsCommnetList(page, goodsId);
 		return pageResult;
 	}
 

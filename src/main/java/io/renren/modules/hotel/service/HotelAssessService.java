@@ -36,7 +36,7 @@ public interface HotelAssessService extends IService<HotelAssessEntity> {
 	 * @param sellerId 
 	 * @return
 	 */
-	Page<CommentItemVo> hotelCommnetList(int page, int limie, Long sellerId);
+	Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId);
 
 	/**
 	 * 商品评论列表
@@ -45,5 +45,5 @@ public interface HotelAssessService extends IService<HotelAssessEntity> {
 	 * @param goodsId
 	 * @return
 	 */
-	Page<CommentItemVo> goodsCommnetList(int page, int limie, Long goodsId);
+	Page<CommentItemVo> goodsCommnetList(Page<CommentItemVo> page, Long goodsId);
 }

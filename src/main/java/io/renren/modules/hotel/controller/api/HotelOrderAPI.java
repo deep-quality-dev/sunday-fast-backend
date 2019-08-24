@@ -94,8 +94,8 @@ public class HotelOrderAPI extends BaseController {
 	@Login
 	@ApiOperation("会员订单列表")
 	@GetMapping("/orderList")
-	public R orderList(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limie, @RequestParam(required = false) Integer orderStatus) {
-		Page<HotelOrderVo> pageResult = hotelOrderService.userOrderList(userId, orderStatus, page, limie);
+	public R orderList(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, @RequestParam(required = false) Integer orderStatus) {
+		Page<HotelOrderVo> pageResult = hotelOrderService.userOrderList(userId, orderStatus, page, limit);
 		return R.ok().put("data", pageResult);
 	}
 

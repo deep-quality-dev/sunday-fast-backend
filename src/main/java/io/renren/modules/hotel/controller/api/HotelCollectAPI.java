@@ -47,8 +47,8 @@ public class HotelCollectAPI extends BaseController {
 	@ApiOperation("收藏列表")
 	@GetMapping("/page")
 	@Login
-	public R page(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, int type) {
-		Page<CollectItemVo> pageResult = hotelMemberCollectService.collectList(page, limit);
+	public R page(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, int type) {
+		Page<CollectItemVo> pageResult = hotelMemberCollectService.collectList(new Page<CollectItemVo>(page, limit), userId, type);
 		return R.ok(pageResult);
 	}
 }

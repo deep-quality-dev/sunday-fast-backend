@@ -18,18 +18,13 @@ import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelCouponsBreakfastDao;
 import io.renren.modules.hotel.dao.HotelCouponsCashDao;
 import io.renren.modules.hotel.dao.HotelCouponsDao;
-import io.renren.modules.hotel.dao.HotelMemberCouponsDao;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
-import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.vo.UserCoupons;
 import io.renren.modules.hotel.vo.WalletDataVo;
 
 @Service("hotelCouponsService")
 public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelCouponsEntity> implements HotelCouponsService {
-
-	@Autowired
-	private HotelMemberCouponsDao hotelMemberCouponsDao;
 
 	@Autowired
 	private HotelCouponsCashDao hotelCouponsCashDao;
@@ -61,8 +56,8 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public Page<UserCoupons> userCoupons(Long userId, int page, int limit) {
-		return baseMapper.userCoupons(new Page<UserCoupons>(page, limit), userId);
+	public Page<UserCoupons> userCoupons(Long userId, Page<UserCoupons> page) {
+		return baseMapper.userCoupons(page, userId);
 	}
 
 	@Override
@@ -71,13 +66,13 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public Page<UserCoupons> userCashCoupons(Long userId, int page, int limit) {
-		return hotelCouponsCashDao.userCashCouponsPage(new Page<UserCoupons>(page, limit), userId);
+	public Page<UserCoupons> userCashCoupons(Long userId, Page<UserCoupons> page) {
+		return hotelCouponsCashDao.userCashCouponsPage(page, userId);
 	}
 
 	@Override
-	public Page<UserCoupons> userBreakfastCoupons(Long userId, int page, int limit) {
-		return hotelCouponsBreakfastDao.userBreakfastCoupons(new Page<UserCoupons>(page, limit),userId);
+	public Page<UserCoupons> userBreakfastCoupons(Long userId, Page<UserCoupons> page) {
+		return hotelCouponsBreakfastDao.userBreakfastCoupons(page, userId);
 	}
 
 }

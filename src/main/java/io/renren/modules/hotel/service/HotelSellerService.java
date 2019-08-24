@@ -7,6 +7,7 @@ import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
+import io.renren.modules.hotel.vo.HotelSearchVo;
 
 import java.util.Map;
 
@@ -31,10 +32,21 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 
 	/**
 	 * 酒店列表
+	 * 
 	 * @param userId
 	 * @param params
 	 * @param page
 	 * @return
 	 */
 	Page<HotelItemVo> hotelPage(Long userId, HotelSearchCondition params, Page<HotelItemVo> page);
+
+	/**
+	 * 酒店搜索
+	 * 
+	 * @param kw
+	 * @param page
+	 * @param limit
+	 * @return
+	 */
+	Page<HotelSearchVo> search(String kw, Page<HotelSearchVo> page);
 }

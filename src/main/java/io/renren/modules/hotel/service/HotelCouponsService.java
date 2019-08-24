@@ -38,7 +38,7 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @param params
 	 * @return
 	 */
-	Page<UserCoupons> userCoupons(Long userId, int page, int limit);
+	Page<UserCoupons> userCoupons(Long userId, Page<UserCoupons> page);
 
 	/**
 	 * 	钱包主页数据
@@ -54,7 +54,7 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @param limit
 	 * @return
 	 */
-	Page<UserCoupons> userCashCoupons(Long userId, int page, int limit);
+	Page<UserCoupons> userCashCoupons(Long userId, Page<UserCoupons> page);
 
 	/**
 	 * 用户早餐券
@@ -63,6 +63,6 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @param limit
 	 * @return
 	 */
-	Page<UserCoupons> userBreakfastCoupons(Long userId, int page, int limit);
+	Page<UserCoupons> userBreakfastCoupons(Long userId, Page<UserCoupons> page);
 	
 }

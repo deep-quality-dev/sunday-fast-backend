@@ -59,7 +59,7 @@ public class HotelRoomController extends AbstractController {
 	public R info(@PathVariable("id") Integer id) {
 		HotelRoomEntity hotelRoom = hotelRoomService.getById(id);
 
-		return R.ok().put("hotelRoom", hotelRoom);
+		return R.ok().put("hotelroom", hotelRoom);
 	}
 
 	/**

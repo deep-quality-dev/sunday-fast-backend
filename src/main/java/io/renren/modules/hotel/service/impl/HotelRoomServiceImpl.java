@@ -73,9 +73,10 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 		for (HotelRoomMoneyEntity hotelRoomMoneyEntity : moneyEntities) {
 			roomMoneyVo = new RoomMoneyVo();
 			// 先set会员价格
-			roomMoneyVo.setAmount(hotelRoomMoneyEntity.getMprice());
+			roomMoneyVo.setAmount(hotelRoomMoneyEntity.getPrice());
 			roomMoneyVo.setId(hotelRoomMoneyEntity.getId());
-			roomMoneyVo.setName(hotelRoomMoneyEntity.getMotitle());
+			roomMoneyVo.setName(hotelRoomMoneyEntity.getName());
+			roomMoneyVo.setVipPrice(hotelRoomMoneyEntity.getIsVip());
 			// 查询是否有设置特殊价格
 			log.info("查询特殊房价--start，moneyId:{},roomId:{},date:{}", hotelRoomMoneyEntity.getId(), roomId, startTime.getSeconds());
 			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", hotelRoomMoneyEntity.getId()).eq("room_id", roomId).eq("roomdate", startTime.getSeconds()));

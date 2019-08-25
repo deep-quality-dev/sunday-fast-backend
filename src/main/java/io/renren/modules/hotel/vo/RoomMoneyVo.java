@@ -14,13 +14,15 @@ import lombok.Data;
 @Data
 public class RoomMoneyVo {
 	
-	private Long id;
+	private Long id; //ID
 
-	private String name;
+	private String name; //价格名字
 
-	private String amount;
+	private String amount; //价格
 
-	private int hasRoom = 1;
+	private int hasRoom = 1; //是否有房 1-有 0-无
+	
+	private int vipPrice;
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = NumberUtil.decimalFormat("0.00", amount.doubleValue());

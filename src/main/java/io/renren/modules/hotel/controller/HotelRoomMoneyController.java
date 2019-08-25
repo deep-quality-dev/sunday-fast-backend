@@ -1,17 +1,17 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.renren.common.utils.PageUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
@@ -35,10 +35,9 @@ public class HotelRoomMoneyController extends AbstractController {
 	 */
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelroommoney:list")
-	public R list(@RequestParam Map<String, Object> params) {
-		PageUtils page = hotelRoomMoneyService.queryPage(params);
-
-		return R.ok().put("page", page);
+	public R list(Long roomId) {
+		List<HotelRoomMoneyEntity> list = hotelRoomMoneyService.list(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, roomId));
+		return R.ok(list);
 	}
 
 	/**

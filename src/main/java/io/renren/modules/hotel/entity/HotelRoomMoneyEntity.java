@@ -36,26 +36,20 @@ public class HotelRoomMoneyEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private String motitle;
+	private String name;
 	/**
-	 * 原价
+	 * 价格
 	 */
-	private BigDecimal oprice;
-	/**
-	 * 优惠价
-	 */
-	private BigDecimal cprice;
-	/**
-	 * 会员价
-	 */
-	private BigDecimal mprice;
+	private BigDecimal price;
+
+	private int num;
 	/**
 	 * 
 	 */
 	private Integer status;
 	/**
-	 * 是否热门推荐
+	 * 会员折扣
 	 */
-	private Integer isHot;
+	private Integer isVip;
 
 }

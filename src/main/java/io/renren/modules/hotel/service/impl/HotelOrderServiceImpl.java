@@ -160,7 +160,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				amount = NumberUtil.mul(roomNum, hotelRoomPriceEntity.getMprice().doubleValue());
 			} else {
 				// 使用原价--暂时取会员价
-				amount = NumberUtil.mul(roomNum, hotelRoomMoneyEntity.getMprice().doubleValue());
+				amount = NumberUtil.mul(roomNum, hotelRoomMoneyEntity.getPrice().doubleValue());
 			}
 			totalAmount = NumberUtil.add(totalAmount, amount);
 			orderDetail.setAmount(NumberUtil.decimalFormat("0.00", amount));
@@ -278,7 +278,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				amount = NumberUtil.mul(createOrderForm.getRoomNum(), hotelRoomPriceEntity.getMprice().doubleValue());
 			} else {
 				// 使用原价--暂时取会员价
-				amount = NumberUtil.mul(createOrderForm.getRoomNum(), hotelRoomMoneyEntity.getMprice().doubleValue());
+				amount = NumberUtil.mul(createOrderForm.getRoomNum(), hotelRoomMoneyEntity.getPrice().doubleValue());
 			}
 			hotelOrderRecordEntity = new HotelOrderRecordEntity();
 			hotelOrderRecordEntity.setAmount(new BigDecimal(amount));
@@ -287,7 +287,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelOrderRecordEntity.setOrderId(orderId);
 			hotelOrderRecordEntity.setPriceId(hotelRoomPriceEntity.getId());
 			hotelOrderRecordEntity.setSellerId(createOrderForm.getSellerId());
-			hotelOrderRecordEntity.setRoomType(hotelRoomEntity.getName() + "-" + hotelRoomMoneyEntity.getMotitle());
+			hotelOrderRecordEntity.setRoomType(hotelRoomEntity.getName() + "-" + hotelRoomMoneyEntity.getName());
 			orderRecordEntities.add(hotelOrderRecordEntity);
 		}
 		hotelOrderRecordService.saveBatch(orderRecordEntities);

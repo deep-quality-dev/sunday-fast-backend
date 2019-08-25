@@ -8,12 +8,11 @@
         <result property="id" column="id"/>
         <result property="sellerId" column="seller_id"/>
         <result property="roomId" column="room_id"/>
-        <result property="motitle" column="motitle"/>
-        <result property="oprice" column="oprice"/>
-        <result property="cprice" column="cprice"/>
-        <result property="mprice" column="mprice"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="num" column="num"/>
         <result property="status" column="status"/>
-        <result property="isHot" column="is_hot"/>
+        <result property="isVip" column="is_vip"/>
     </resultMap>
 
 

@@ -28,9 +28,10 @@
 		t.id,
 		t.content,
 		t.time,
+		t.img,
 		t.score,
-		t1.`name`,
-		t1.img
+		t1.`name`  as  nick,
+		t1.img as head_photo 
 		From t_hotel_assess t inner join t_hotel_member t1
 		on t.user_id = t1.id
 		where t.seller_id = #{sellerId} and t.type = 1

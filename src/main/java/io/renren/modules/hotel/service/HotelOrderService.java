@@ -31,12 +31,13 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param userId       用户ID
 	 * @param roomId       房型ID
 	 * @param moneyId      房价ID
+	 * @param contactsId 
 	 * @param roomNum      房间数量
 	 * @param checkOutDate 离店时间
 	 * @param checkInDate  入住时间
 	 * @return
 	 */
-	BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, int roomNum, String checkInDate, String checkOutDate);
+	BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId, int roomNum, String checkInDate, String checkOutDate);
 
 	/**
 	 * 创建订单

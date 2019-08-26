@@ -34,6 +34,17 @@ public class HotelRoomController extends AbstractController {
 	private HotelRoomService hotelRoomService;
 
 	/**
+	 * 房价数据
+	 * @return
+	 */
+	@RequestMapping("/roomPriceList")
+	@RequiresPermissions("hotel:hotelroom:roompricelist")
+	public R roomPriceList() {
+		
+		return R.ok();
+	}
+
+	/**
 	 * 列表
 	 */
 	@RequestMapping("/list")
@@ -47,7 +58,8 @@ public class HotelRoomController extends AbstractController {
 	@RequestMapping("/all")
 	@RequiresPermissions("hotel:hotelroom:list")
 	public R all() {
-		List<HotelRoomEntity> hotelRoomEntities = hotelRoomService.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", getSellerId()).eq("state", 1));
+		List<HotelRoomEntity> hotelRoomEntities = hotelRoomService
+				.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", getSellerId()).eq("state", 1));
 		return R.ok().put("data", hotelRoomEntities);
 	}
 

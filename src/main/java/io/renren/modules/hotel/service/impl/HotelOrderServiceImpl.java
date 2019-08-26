@@ -39,6 +39,7 @@ import io.renren.modules.constants.HotelWxMsgTemplate;
 import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelOrderDao;
+import io.renren.modules.hotel.entity.HotelContactsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
@@ -50,6 +51,7 @@ import io.renren.modules.hotel.entity.HotelWxConfigEntity;
 import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
 import io.renren.modules.hotel.form.BuildOrderForm;
 import io.renren.modules.hotel.form.CreateOrderForm;
+import io.renren.modules.hotel.service.HotelContactsService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
@@ -106,6 +108,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	@Autowired
 	private HotelWxTemplateService hotelWxTemplateService;
 
+	@Autowired
+	private HotelContactsService hotelContactsService;
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>());
@@ -114,7 +119,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, int roomNum, String checkInDate, String checkOutDate) {
+	public BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId, int roomNum, String checkInDate, String checkOutDate) {
 		log.info("构建订单信息--start,userId,{},roomId:{},moneyId:{},checkInDate:{},checkOutDate:{}", userId, roomId, moneyId, checkInDate, checkOutDate);
 		BuildOrderForm buildOrderForm = new BuildOrderForm();
 		// 总金额
@@ -131,12 +136,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		buildOrderForm.setCheckInDay(checkInDay);
 		buildOrderForm.setRoomName(hotelRoomEntity.getName());
 		buildOrderForm.setRoomNum(roomNum);
-		// 用户信息
-		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
-		if (null != hotelMemberEntity) {
-			buildOrderForm.setCheckInPerson(hotelMemberEntity.getZsName());
-			buildOrderForm.setMobile(hotelMemberEntity.getTel());
-		}
+		buildOrderForm.setContactsId(contactsId);
 		// 查询房价
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(moneyId);
 		HotelRoomPriceEntity hotelRoomPriceEntity = null;
@@ -180,13 +180,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	@Transactional
 	public WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException {
 		CreateOrderForm createOrderForm = new CreateOrderForm();
-		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
+		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
 		createOrderForm.setMoneyId(buildOrderForm.getMoneyId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(buildOrderForm.getRoomId());
 		createOrderForm.setSellerId(hotelRoomEntity.getSellerId());
 		createOrderForm.setUserId(userId);
+		HotelContactsEntity hotelContactsEntity = hotelContactsService.getById(buildOrderForm.getContactsId());
+		createOrderForm.setCheckInPerson(hotelContactsEntity.getName());
+		createOrderForm.setMobile(hotelContactsEntity.getMobile());
 		HotelOrderEntity hotelOrderEntity = this.createHotelOrder(createOrderForm);
 		log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
 		// 酒店信息

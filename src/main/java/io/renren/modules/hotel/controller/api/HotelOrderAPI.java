@@ -53,8 +53,8 @@ public class HotelOrderAPI extends BaseController {
 	@Login
 	@ApiOperation("获取订单信息")
 	@GetMapping("/buildOrder")
-	public R buildOrder(@RequestParam Long roomId, @RequestAttribute("userId") Long userId, @RequestParam Long moneyId, int roomNum, String checkInDate, String checkOutDate) {
-		BuildOrderForm buildOrderForm = hotelOrderService.buildOrder(userId, roomId, moneyId, roomNum, checkInDate, checkOutDate);
+	public R buildOrder(@RequestParam Long roomId, @RequestAttribute("userId") Long userId, @RequestParam Long moneyId, int roomNum, Long contactsId, String checkInDate, String checkOutDate) {
+		BuildOrderForm buildOrderForm = hotelOrderService.buildOrder(userId, roomId, moneyId, contactsId, roomNum, checkInDate, checkOutDate);
 		return R.ok().put("data", buildOrderForm);
 	}
 

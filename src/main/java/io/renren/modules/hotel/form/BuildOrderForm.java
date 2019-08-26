@@ -50,16 +50,9 @@ public class BuildOrderForm {
 	@NotNull(message = "房间数量不能为空")
 	private Integer roomNum;
 
-	// 入住人
-	@ApiModelProperty(value = "入住人")
-	@NotBlank(message = "入住人不能为空")
-	private String checkInPerson;
-
-	// 联系电话
-	@ApiModelProperty(value = "联系电话")
-	@NotBlank(message = "联系电话不能为空")
-	private String mobile;
-
+	@ApiModelProperty(value = "联系人ID")
+	@NotNull(message = "联系人ID")
+	private Long contactsId;
 	// 格式化总金额
 	private String totalAmount;
 
@@ -75,9 +68,9 @@ public class BuildOrderForm {
 	private String coordinates;
 
 	private String ip;
-	
+
 	private String hotelAddress;
-	
+
 	private String sellerName;
 
 	// 明细

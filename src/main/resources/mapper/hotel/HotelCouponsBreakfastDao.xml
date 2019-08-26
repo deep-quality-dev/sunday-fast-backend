@@ -26,6 +26,7 @@
 	<select id="userBreakfastCoupons"
 		resultType="io.renren.modules.hotel.vo.UserCoupons">
 		SELECT
+		t1.`id`,
 		t.coupons_type,
 		t1.`name`,
 		t1.cost,
@@ -36,7 +37,7 @@
 		t_hotel_coupons_breakfast t1 on
 		t.coupons_id = t1.id
 		where
-		t.coupons_type = 3 and t.user_id = #{userId};
+		t.coupons_type = 3 and t.user_id = #{userId}
 	</select>
 
 </mapper>

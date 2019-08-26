@@ -27,31 +27,41 @@
 		SELECT
 		t.id,
 		t.content,
-		t.time,
+		(SELECT from_unixtime(t.time,
+		'%Y-%m-%d %H:%i:%S')) as date,
 		t.img,
 		t.score,
-		t1.`name`  as  nick,
-		t1.img as head_photo 
+		t1.`name` as nick,
+		(SELECT
+		from_unixtime(t.time, '%Y-%m-%d %H:%i:%S'))
+		as date,
+		t1.img as
+		head_photo
 		From t_hotel_assess t inner join t_hotel_member t1
-		on t.user_id = t1.id
+		on
+		t.user_id = t1.id
 		where t.seller_id = #{sellerId} and t.type = 1
-		order by t.time desc
+		order
+		by t.time desc
 	</select>
-	
+
 	<select id="goodsCommnetList"
 		resultType="io.renren.modules.hotel.vo.CommentItemVo">
 		SELECT
 		t.id,
 		t.content,
-		t.time,
+		(SELECT from_unixtime(t.time, '%Y-%m-%d %H:%i:%S')) as date,
 		t.score,
 		t1.`name`,
 		t1.img
-		From t_hotel_assess t inner join t_hotel_member t1
-		on t.user_id = t1.id
+		From
+		t_hotel_assess t inner join t_hotel_member t1
+		on
+		t.user_id = t1.id
 		where t.goods_id = #{goodsId} and t.type = 2
-		order by t.time desc
+		order by
+		t.time desc
 	</select>
-	
+
 
 </mapper>

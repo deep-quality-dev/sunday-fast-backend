@@ -90,7 +90,7 @@ public class HotelMemberLevelAPI extends BaseController {
 	 * @return
 	 */
 	@Login
-	@ApiOperation("会员卡信息")
+	@ApiOperation("用户会员卡信息")
 	@GetMapping("/info")
 	public R info(@RequestAttribute("userId") Long userId, @RequestParam(required = true) Long sellerId) {
 		VipCardInfoVo cardInfoVo = hotelMemberLevelService.vipCardInfo(userId, sellerId);
@@ -109,6 +109,20 @@ public class HotelMemberLevelAPI extends BaseController {
 	@GetMapping("/list")
 	public R list(@RequestAttribute("userId") Long userId, @RequestParam(required = true) Long sellerId) {
 		List<VipCardItemVo> cardItemVos = hotelMemberLevelService.vipCardList(userId, sellerId);
+		return R.ok(cardItemVos);
+	}
+
+	/**
+	 * 用户会员列表
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	@Login
+	@ApiOperation("用户会员列表")
+	@GetMapping("/userCardlist")
+	public R userCardlist(@RequestAttribute("userId") Long userId) {
+		List<VipCardItemVo> cardItemVos = hotelMemberLevelService.userCardlist(userId);
 		return R.ok(cardItemVos);
 	}
 }

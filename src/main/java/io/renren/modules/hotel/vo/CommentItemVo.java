@@ -24,4 +24,9 @@ public class CommentItemVo {
 	private String nick;
 
 	private String headPhoto;
+
+	/**
+	 * 评论时间
+	 */
+	private String date;
 }

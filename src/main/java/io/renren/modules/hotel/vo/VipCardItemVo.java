@@ -6,6 +6,7 @@ import lombok.Data;
 
 /**
  * 会员卡列表
+ * 
  * @author taoz
  *
  */
@@ -19,6 +20,8 @@ public class VipCardItemVo {
 	private String conetnt;
 
 	private String discount;
+
+	private String sellerName;
 
 	/**
 	 * 支付金额

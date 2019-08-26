@@ -65,4 +65,11 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @return
 	 */
 	List<VipCardItemVo> vipCardList(Long userId, Long sellerId);
+
+	/**
+	 * 用户会员卡列表
+	 * @param userId
+	 * @return
+	 */
+	List<VipCardItemVo> userCardlist(Long userId);
 }

@@ -17,6 +17,7 @@
 		<result property="orderby" column="orderby" />
 		<result property="payFlag" column="pay_flag" />
 		<result property="content" column="content" />
+		<result property="bgImage" column="bg_image" />
 	</resultMap>
 
 	<select id="userCardList" resultMap="hotelMemberLevelMap">

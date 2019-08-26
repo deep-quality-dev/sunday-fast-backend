@@ -18,48 +18,53 @@ import lombok.Data;
 @Data
 @TableName("t_hotel_member_level")
 public class HotelMemberLevelEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-     *
-     */
-    @TableId
-    private Integer id;
-    /**
-     * 商家ID
-     */
-    private Integer sellerId;
-    /**
-     * 会员名称
-     */
-    private String name;
+	/**
+	 *
+	 */
+	@TableId
+	private Long id;
+	/**
+	 * 商家ID
+	 */
+	private Long sellerId;
+	/**
+	 * 会员名称
+	 */
+	private String name;
 
-    /**
-     * 图标
-     */
-    private String icon;
-    /**
-     * 折扣
-     */
-    private String discount;
-    /**
-     * 排序
-     */
-    private Integer orderby;
+	/**
+	 * 图标
+	 */
+	private String icon;
+	/**
+	 * 折扣
+	 */
+	private String discount;
+	/**
+	 * 排序
+	 */
+	private Integer orderby;
 
-    /**
-     * 描述
-     */
-    private String content;
+	/**
+	 * 描述
+	 */
+	private String content;
 
-    /**
-     * 支付金额
-     */
-    private BigDecimal payAmount;
+	/**
+	 * 支付金额
+	 */
+	private BigDecimal payAmount;
 
-    /**
-     * 是否需要支付
-     */
-    private int payFlag = 0;
+	/**
+	 * 是否需要支付
+	 */
+	private int payFlag = 0;
+
+	/**
+	 * 卡片背景图
+	 */
+	private String bgImage;
 
 }

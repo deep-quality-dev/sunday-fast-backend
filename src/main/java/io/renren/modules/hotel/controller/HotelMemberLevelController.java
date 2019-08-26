@@ -57,6 +57,7 @@ public class HotelMemberLevelController {
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelmemberlevel:save")
 	public R save(@RequestBody HotelMemberLevelEntity hotelMemberLevel) {
+		hotelMemberLevel.setSellerId(1L);
 		hotelMemberLevelService.save(hotelMemberLevel);
 
 		return R.ok();

@@ -75,8 +75,9 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 
 	/**
 	 * 绑定微信手机
+	 * @param openId 
 	 * @param phoneNoInfo
 	 */
-	void bindWxPhone(WxMaPhoneNumberInfo phoneNoInfo);
+	void bindWxPhone(String openId, WxMaPhoneNumberInfo phoneNoInfo);
 
 }

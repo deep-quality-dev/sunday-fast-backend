@@ -2,10 +2,12 @@ package io.renren.modules.hotel.service;
 
 import java.util.Map;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelScoreEntity;
+import io.renren.modules.hotel.vo.HotelScore;
 
 /**
  * 积分明细表
@@ -44,4 +46,9 @@ public interface HotelScoreService extends IService<HotelScoreEntity> {
 	 * @return
 	 */
 	PageUtils signInList(Long userId, Map<String, Object> params);
+
+	/**
+	 * 卡片积分列表
+	 */
+	Page<HotelScore> scoreList(Long userId, Long cardId, Page<HotelScore> page);
 }

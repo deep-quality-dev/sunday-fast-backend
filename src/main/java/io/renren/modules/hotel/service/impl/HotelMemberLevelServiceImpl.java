@@ -20,12 +20,14 @@ import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelMemberLevelDao;
+import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.form.BecomeVipForm;
 import io.renren.modules.hotel.form.BindVipCardForm;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberLevelService;
+import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.vo.VipCardInfoVo;
 import io.renren.modules.hotel.vo.VipCardItemVo;
@@ -39,7 +41,13 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	private HotelMemberLevelDetailService hotelMemberLevelDetailService;
 
 	@Autowired
+	private HotelMemberLevelService hotelMemberLevelService;
+
+	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	@Autowired
+	private HotelMemberService hotelMemberService;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -57,7 +65,9 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void becomeVip(Long userId, BecomeVipForm becomeVipForm) {
-		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>query().lambda().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, becomeVipForm.getSellerId()));
+		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
+		HotelMemberLevelEntity hotelMemberLevelEntity = hotelMemberLevelService.getById(becomeVipForm.getLevelId());
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>query().lambda().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, hotelMemberLevelEntity.getId()));
 		if (null != hotelMemberLevelDetailEntity) {
 			log.error("重复办理会员卡，userId:{},parms:{}", userId, JSON.toJSONString(becomeVipForm));
 			throw new RRException("请勿重复办理");
@@ -66,10 +76,11 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		BeanUtil.copyProperties(becomeVipForm, hotelMemberLevelDetailEntity);
 		hotelMemberLevelDetailEntity.setMemberId(userId);
 		hotelMemberLevelDetailEntity.setStatus(1);
-		HotelMemberLevelEntity hotelMemberLevelEntity = baseMapper.selectById(becomeVipForm.getLevelId());
-		if (1 == hotelMemberLevelEntity.getPayFlag()) {
-			hotelMemberLevelDetailEntity.setStatus(-1);
-		}
+//		if (1 == hotelMemberLevelEntity.getPayFlag()) {
+//			hotelMemberLevelDetailEntity.setStatus(-1);
+//		}
+		hotelMemberLevelDetailEntity.setSellerId(hotelMemberLevelEntity.getSellerId());
+		hotelMemberLevelDetailEntity.setMobile(hotelMemberEntity.getTel());
 		hotelMemberLevelDetailService.save(hotelMemberLevelDetailEntity);
 	}
 
@@ -110,6 +121,7 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		List<HotelMemberLevelEntity> hotelMemberLevelEntities = baseMapper.userCardList(userId);
 		cardItemVos = hotelMemberLevelEntities.stream().map((HotelMemberLevelEntity item) -> {
 			VipCardItemVo cardItemVo = new VipCardItemVo();
+			cardItemVo.setSellerName(hotelSellerService.getById(item.getSellerId()).getName());
 			BeanUtil.copyProperties(item, cardItemVo);
 			return cardItemVo;
 		}).collect(Collectors.toList());

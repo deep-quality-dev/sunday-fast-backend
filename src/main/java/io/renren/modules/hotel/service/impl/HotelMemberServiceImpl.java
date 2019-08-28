@@ -13,6 +13,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
@@ -167,11 +168,13 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-
-	public void bindWxPhone(WxMaPhoneNumberInfo phoneNoInfo) {
-		HotelMemberEntity hotelMemberEntity = null;
-//		hotelMemberEntity = this.getOne(new QueryWrapper<HotelMemberEntity>().eq("openid", ));
-
+	public void bindWxPhone(String openId, WxMaPhoneNumberInfo phoneNoInfo) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectOne(Wrappers.<HotelMemberEntity>lambdaQuery().eq(HotelMemberEntity::getOpenid, openId));
+		if (null == hotelMemberEntity) {
+			throw new RRException("用户信息未找到");
+		}
+		hotelMemberEntity.setTel(phoneNoInfo.getPhoneNumber());
+		baseMapper.updateById(hotelMemberEntity);
 	}
 
 }

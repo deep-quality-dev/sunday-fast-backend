@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -107,6 +109,24 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 		}
 		log.info("用户积分列表--end");
 		return new PageUtils(hotelScores, page.getTotal(), page.getSize(), page.getCurrent());
+	}
+
+	@Override
+	public Page<HotelScore> scoreList(Long userId, Long cardId, Page<HotelScore> page) {
+		List<HotelScore> hotelScores = new ArrayList<HotelScore>();
+		IPage<HotelScoreEntity> pageParams = new Page<HotelScoreEntity>(page.getCurrent(), page.getSize());
+		IPage<HotelScoreEntity> pageResult = this.page(pageParams, Wrappers.<HotelScoreEntity>lambdaQuery().eq(HotelScoreEntity::getCardId, cardId).eq(HotelScoreEntity::getUserId, userId));
+		HotelScore hotelScore = null;
+		List<HotelScoreEntity> hotelScoreEntities = pageResult.getRecords();
+		for (HotelScoreEntity hotelScoreEntity : hotelScoreEntities) {
+			hotelScore = new HotelScore();
+			BeanUtil.copyProperties(hotelScoreEntity, hotelScore);
+			hotelScores.add(hotelScore);
+		}
+		Page<HotelScore> scorePageResult = new Page<HotelScore>(page.getCurrent(), page.getSize());
+		scorePageResult.setRecords(hotelScores);
+		scorePageResult.setTotal(pageResult.getTotal());
+		return scorePageResult;
 	}
 
 }

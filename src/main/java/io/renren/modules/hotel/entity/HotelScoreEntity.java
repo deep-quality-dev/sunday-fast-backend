@@ -64,5 +64,10 @@ public class HotelScoreEntity implements Serializable {
 	 * 类型 1 签到，2 订房
 	 */
 	private Integer type;
+	
+	/**
+	 * 会员卡ID
+	 */
+	private Long cardId;
 
 }

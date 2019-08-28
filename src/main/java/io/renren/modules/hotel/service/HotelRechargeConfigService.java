@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelRechargeConfigEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,13 @@ import java.util.Map;
 public interface HotelRechargeConfigService extends IService<HotelRechargeConfigEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 充值配置列表
+     * @param userId
+     * @param cardId
+     * @return
+     */
+	List<HotelRechargeConfigEntity> rechargeConfigList(Long userId, Long cardId);
 }
 

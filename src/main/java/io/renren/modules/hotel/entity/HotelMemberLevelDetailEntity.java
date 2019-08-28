@@ -81,5 +81,10 @@ public class HotelMemberLevelDetailEntity implements Serializable {
 	 * 状态，当为1的时候才有效
 	 */
 	private int status;
+	
+	/**
+	 * 推销员
+	 */
+	private String  salesman; 
 
 }

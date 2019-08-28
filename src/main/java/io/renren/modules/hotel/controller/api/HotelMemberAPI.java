@@ -73,13 +73,6 @@ public class HotelMemberAPI extends BaseController {
 		return R.ok().put("data", result);
 	}
 
-	@Login
-	@ApiOperation("用户积分列表")
-	@GetMapping("/scoreList")
-	public R scoreList(@RequestAttribute("userId") Long userId, @RequestParam Map<String, Object> params) {
-		PageUtils page = hotelScoreService.signInList(userId, params);
-		return R.ok().put("data", page);
-	}
 
 	/**
 	 * 用户优惠券

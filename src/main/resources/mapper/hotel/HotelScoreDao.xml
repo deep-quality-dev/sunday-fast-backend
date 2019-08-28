@@ -18,6 +18,7 @@
 		<result property="goodsId" column="goods_id" />
 		<result property="type" column="type" />
 		<result property="time" column="time" />
+		<result property="cardId" column="card_id" />
 	</resultMap>
 
 

@@ -24,7 +24,7 @@ public class BecomeVipForm {
 	/**
 	 * 证件类型
 	 */
-	@ApiModelProperty(value = "证件类型")
+	@ApiModelProperty(value = "证件类型 1-身份证 先这样传")
 	@NotBlank(message = "证件类型不能为空")
 	private Integer certificate;
 	/**
@@ -39,24 +39,30 @@ public class BecomeVipForm {
 	@ApiModelProperty(value = "姓名")
 	@NotBlank(message = "姓名不能为空")
 	private String name;
+	
 	/**
-	 * 手机
+	 * 推销员
 	 */
-	@ApiModelProperty(value = "手机")
-	@NotBlank(message = "手机不能为空")
-	private String mobile;
-	/**
-	 * 性别
-	 */
-	@ApiModelProperty(value = "性别")
-	private Integer gender;
-	/**
-	 * 联系地址
-	 */
-	@ApiModelProperty(value = "联系地址")
-	private String address;
-
-	@ApiModelProperty(value = "商家ID")
-	@NotBlank(message = "商家不能为空")
-	private Long sellerId;
+	@ApiModelProperty(value = "推销员")
+	private String  salesman; 
+//	/**
+//	 * 手机
+//	 */
+//	@ApiModelProperty(value = "手机")
+//	@NotBlank(message = "手机不能为空")
+//	private String mobile;
+//	/**
+//	 * 性别
+//	 */
+//	@ApiModelProperty(value = "性别")
+//	private Integer gender;
+//	/**
+//	 * 联系地址
+//	 */
+//	@ApiModelProperty(value = "联系地址")
+//	private String address;
+//
+//	@ApiModelProperty(value = "商家ID")
+//	@NotBlank(message = "商家不能为空")
+//	private Long sellerId;
 }

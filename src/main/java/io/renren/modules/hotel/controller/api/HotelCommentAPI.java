@@ -41,8 +41,8 @@ public class HotelCommentAPI {
 	 */
 	@ApiOperation("酒店评论列表")
 	@GetMapping("/hotelList")
-	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limie", required = false, defaultValue = "10") int limie, Long sellerId) {
-		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page,limie), sellerId);
+	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long sellerId) {
+		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page,limit), sellerId);
 		return R.ok(pageResult);
 	}
 

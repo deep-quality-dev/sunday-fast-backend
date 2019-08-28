@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelRechargeEntity;
+import io.renren.modules.hotel.form.CardRechargeForm;
 
 /**
  * 充值表
@@ -17,4 +18,11 @@ import io.renren.modules.hotel.entity.HotelRechargeEntity;
 public interface HotelRechargeService extends IService<HotelRechargeEntity> {
 
 	PageUtils queryPage(Map<String, Object> params);
+
+	/**
+	 * 卡片充值
+	 * @param userId
+	 * @param cardRechargeForm
+	 */
+	void cardRecharge(Long userId, CardRechargeForm cardRechargeForm);
 }

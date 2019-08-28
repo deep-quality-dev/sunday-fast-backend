@@ -93,7 +93,6 @@ public class WxMaUserController {
 
 		// 解密用户信息
 		WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
-
 		return R.ok(userInfo);
 	}
 
@@ -111,10 +110,10 @@ public class WxMaUserController {
 		if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
 			return R.ok("user check failed");
 		}
-
+		WxMaUserInfo userInfo = wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
 		// 解密
 		WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
-//		hotelMemberService.bindWxPhone(phoneNoInfo);
+//		hotelMemberService.bindWxPhone(userInfo.getOpenId(), phoneNoInfo);
 		return R.ok(phoneNoInfo);
 	}
 

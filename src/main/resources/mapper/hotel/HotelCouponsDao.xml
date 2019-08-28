@@ -31,7 +31,8 @@
 		t1.start_time,
 		t1.end_time,
 		t1.conditions
-		from t_hotel_member_coupons t inner join
+		from t_hotel_member_coupons t
+		inner join
 		t_hotel_coupons t1 on
 		t.coupons_id = t1.id
 		where
@@ -40,39 +41,45 @@
 
 	<select id="walletData"
 		resultType="io.renren.modules.hotel.vo.WalletDataVo">
-		SELECT
-		count( * ) as discountoupns_num
+		select
+		(SELECT
+		count( * )
 		FROM
 		t_hotel_member_coupons t
 		INNER JOIN t_hotel_coupons t1 ON t.coupons_id
 		= t1.id
 		WHERE
 		t.coupons_type = 1
-		AND t.user_id = #{userId} UNION ALL
-		SELECT
-		count( * ) as cash_coupon_num
+		AND t.user_id = #{userId}) as
+		discountoupns_num,
+		(SELECT
+		count( * )
 		FROM
 		t_hotel_member_coupons t
 		INNER
-		JOIN t_hotel_coupons_cash t1 ON t.coupons_id = t1.id
+		JOIN t_hotel_coupons_cash t1 ON
+		t.coupons_id = t1.id
 		WHERE
 		t.coupons_type = 2
-		AND t.user_id = #{userId} UNION ALL
-		SELECT
+		AND t.user_id = #{userId}) as
+		cash_coupon_num,
+		(SELECT
 		count( * )
-		as breakfast_coupon_num
 		FROM
 		t_hotel_member_coupons t
-		INNER JOIN
+		INNER
+		JOIN
 		t_hotel_coupons_breakfast t1 ON t.coupons_id = t1.id
 		WHERE
 		t.coupons_type = 3
-		AND t.user_id = #{userId} UNION ALL
-		SELECT
+		AND t.user_id = #{userId}) as breakfast_coupon_num,
+		(SELECT
 		count( * )
-		as vip_card_num
 		FROM
 		t_hotel_member_level_detail t where t.member_id =
-		#{userId}
+		#{userId}) as
+		vip_card_num
+		from
+		DUAL
 	</select>
 </mapper>

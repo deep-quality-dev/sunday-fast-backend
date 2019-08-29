@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
+import io.renren.modules.hotel.vo.VipCardItemVo;
 
 /**
  * 会员等级表
@@ -20,9 +21,10 @@ public interface HotelMemberLevelDao extends BaseMapper<HotelMemberLevelEntity> 
 
 	/**
 	 * 用户会员卡列表
+	 * 
 	 * @param userId
 	 * @return
 	 */
-	List<HotelMemberLevelEntity>  userCardList(Long userId);
+	List<VipCardItemVo> userCardList(Long userId);
 
 }

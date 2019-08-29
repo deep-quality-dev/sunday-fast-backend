@@ -3,5 +3,25 @@
 
 <mapper namespace="io.renren.modules.app.dao.UserDao">
 
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.app.entity.UserEntity" id="userMap">
+        <result property="id" column="id"/>
+        <result property="pid" column="pid"/>
+        <result property="nickname" column="nickname"/>
+        <result property="head" column="head"/>
+        <result property="money" column="money"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="regTime" column="reg_time"/>
+        <result property="openid" column="openid"/>
+        <result property="token" column="token"/>
+        <result property="tokenTime" column="token_time"/>
+        <result property="moneyFrozen" column="money_frozen"/>
+        <result property="moneyCash" column="money_cash"/>
+        <result property="moneyCashed" column="money_cashed"/>
+        <result property="firstMember" column="first_member"/>
+        <result property="secondMember" column="second_member"/>
+        <result property="thirdMember" column="third_member"/>
+    </resultMap>
+
 
 </mapper>

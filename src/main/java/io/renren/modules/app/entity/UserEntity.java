@@ -1,14 +1,7 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package io.renren.modules.app.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -17,35 +10,79 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * 用户
- *
- * @author Mark sunlightcs@gmail.com
+ * @author taoz
+ * @email 18819175397@gmail.com
+ * @date 2019-05-20 16:07:41
  */
 @Data
-@TableName("tb_user")
+@TableName("t_user")
 public class UserEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 用户ID
+	 *
 	 */
 	@TableId
-	private Long userId;
+	private Integer id;
 	/**
-	 * 用户名
+	 * 父ID
 	 */
-	private String username;
+	private Integer pid;
 	/**
-	 * 手机号
+	 * 昵称
 	 */
-	private String mobile;
+	private String nickname;
 	/**
-	 * 密码
+	 * 头像 从小程序获取
 	 */
-	private String password;
+	private String head;
 	/**
-	 * 创建时间
+	 * 用户金额
 	 */
-	private Date createTime;
+	private BigDecimal money;
+	/**
+	 * 消费累计
+	 */
+	private BigDecimal totalAmount;
+	/**
+	 * 注册时间
+	 */
+	private Date regTime;
+	/**
+	 * 微信验证后返回openid
+	 */
+	private String openid;
+	/**
+	 *
+	 */
+	private String token;
+	/**
+	 *
+	 */
+	private Integer tokenTime;
+	/**
+	 * 冻结佣金
+	 */
+	private BigDecimal moneyFrozen;
+	/**
+	 * 可提现佣金
+	 */
+	private BigDecimal moneyCash;
+	/**
+	 * 已提现佣金
+	 */
+	private BigDecimal moneyCashed;
+	/**
+	 * 一级会员
+	 */
+	private Integer firstMember;
+	/**
+	 * 二级会员
+	 */
+	private Integer secondMember;
+	/**
+	 * 三级会员
+	 */
+	private Integer thirdMember;
 
 }

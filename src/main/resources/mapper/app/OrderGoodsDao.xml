@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.app.dao.OrderGoodsDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<resultMap
+		type="io.renren.modules.app.entity.OrderGoodsEntity"
+		id="orderGoodsMap">
+		<result property="id" column="id" />
+		<result property="oid" column="oid" />
+		<result property="gid" column="gid" />
+		<result property="num" column="num" />
+		<result property="price" column="price" />
+		<result property="specKey" column="spec_key" />
+		<result property="specKeyValue" column="spec_key_value" />
+		<result property="commentStatus" column="comment_status" />
+		<result property="submitTime" column="submit_time" />
+		<result property="img" column="img" />
+	</resultMap>
+	<resultMap type="io.renren.modules.app.vo.OrderItemVo"
+		id="orderItemMap">
+		<result property="id" column="id" />
+		<result property="oid" column="oid" />
+		<result property="gid" column="gid" />
+		<result property="num" column="num" />
+		<result property="price" column="price" />
+		<result property="specKey" column="spec_key" />
+		<result property="specKeyValue" column="spec_key_value" />
+		<result property="img" column="img" />
+	</resultMap>
+	<select id="getOrderGoods" resultMap="orderItemMap">
+		select * from t_order_goods t where t.oid = #{orderId}
+	</select>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.app.dao.SpecItemDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.app.entity.SpecItemEntity" id="specItemMap">
+        <result property="id" column="id"/>
+        <result property="specId" column="spec_id"/>
+        <result property="item" column="item"/>
+    </resultMap>
+
+    <select id="getSpecListByGoodsId" resultMap="specItemMap">
+            select t.* from t_spec_item t  left join t_goods_spec_rel t1 on t.id = t1.spec_value_id where t1.goods_id =#{goodsId} and t1.spec_id = #{specId}
+    </select>
+</mapper>

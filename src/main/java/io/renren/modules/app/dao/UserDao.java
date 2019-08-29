@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package io.renren.modules.app.dao;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -15,9 +7,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.renren.modules.app.entity.UserEntity;
 
 /**
- * 用户
- *
- * @author Mark sunlightcs@gmail.com
+ * @author taoz
+ * @email 18819175397@gmail.com
+ * @date 2019-05-20 16:07:41
  */
 @Mapper
 public interface UserDao extends BaseMapper<UserEntity> {

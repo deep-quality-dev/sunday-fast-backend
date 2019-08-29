@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.vo;
 
+import java.math.BigDecimal;
+
 import lombok.Data;
 
 /**
@@ -23,6 +25,16 @@ public class VipCardItemVo {
 
 	private String icon;
 	private String bgImage;
+
+	/**
+	 * 积分
+	 */
+	private BigDecimal score;
+
+	/**
+	 * 余额
+	 */
+	private BigDecimal balance;
 
 //	/**
 //	 * 支付金额

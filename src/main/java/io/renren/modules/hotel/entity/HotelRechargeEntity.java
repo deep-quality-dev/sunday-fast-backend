@@ -24,11 +24,11 @@ public class HotelRechargeEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 用户id
 	 */
-	private Integer userId;
+	private Long userId;
 	/**
 	 * 充值金额
 	 */
@@ -56,6 +56,6 @@ public class HotelRechargeEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Integer uniacid;
+	private Long cardId;
 
 }

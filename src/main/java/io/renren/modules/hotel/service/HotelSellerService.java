@@ -26,9 +26,10 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	 * 获取酒店信息
 	 * 
 	 * @param sellerId
+	 * @param sellerId2
 	 * @return
 	 */
-	HotelInfo sellerInfo(Long sellerId);
+	HotelInfo sellerInfo(Long sellerId, Long sellerId2);
 
 	/**
 	 * 酒店列表

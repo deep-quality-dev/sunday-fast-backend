@@ -38,4 +38,9 @@ public class UserCoupons {
 	 * 金额
 	 */
 	private BigDecimal cost;
+
+	/**
+	 * 商家ID
+	 */
+	private Long sellerId;
 }

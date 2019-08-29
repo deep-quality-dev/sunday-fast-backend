@@ -118,4 +118,6 @@ public class HotelInfo {
 	 * 到店支付
 	 */
 	private Integer ddOpen;
+
+	private int collect = 0;
 }

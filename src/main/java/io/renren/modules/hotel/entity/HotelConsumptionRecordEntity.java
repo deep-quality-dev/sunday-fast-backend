@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -23,19 +24,19 @@ public class HotelConsumptionRecordEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 金额
 	 */
-	private String amount;
+	private BigDecimal amount;
 	/**
 	 * 卡片ID
 	 */
-	private Integer cardId;
+	private Long cardId;
 	/**
 	 * 用户ID
 	 */
-	private Integer userId;
+	private Long userId;
 	/**
 	 * 备注
 	 */
@@ -47,7 +48,7 @@ public class HotelConsumptionRecordEntity implements Serializable {
 	/**
 	 * 商家ID
 	 */
-	private Integer sellerId;
+	private Long sellerId;
 	/**
 	 * 类型，备用字段
 	 */

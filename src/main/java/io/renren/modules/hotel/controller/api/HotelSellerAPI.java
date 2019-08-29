@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.renren.common.utils.R;
+import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
@@ -37,10 +39,11 @@ public class HotelSellerAPI extends BaseController {
 	 *
 	 * @param appId
 	 */
+	@Login
 	@ApiOperation("酒店信息")
-	@GetMapping("/info{sellerId}")
-	public R info(@PathVariable Long sellerId) {
-		HotelInfo hotelInfo = hotelSellerService.sellerInfo(sellerId);
+	@GetMapping("/info/{sellerId}")
+	public R info(@RequestAttribute("userId") Long userId,@PathVariable Long sellerId) {
+		HotelInfo hotelInfo = hotelSellerService.sellerInfo(userId,sellerId);
 		return R.ok(hotelInfo);
 	}
 

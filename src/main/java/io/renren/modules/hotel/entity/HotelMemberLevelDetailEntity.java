@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -76,15 +77,25 @@ public class HotelMemberLevelDetailEntity implements Serializable {
 	 * 商家ID
 	 */
 	private Long sellerId;
-	
+
 	/**
 	 * 状态，当为1的时候才有效
 	 */
 	private int status;
-	
+
 	/**
 	 * 推销员
 	 */
-	private String  salesman; 
+	private String salesman;
+
+	/**
+	 * 积分
+	 */
+	private BigDecimal score;
+
+	/**
+	 * 余额
+	 */
+	private BigDecimal balance;
 
 }

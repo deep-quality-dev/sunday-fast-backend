@@ -121,8 +121,8 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		List<HotelMemberLevelEntity> hotelMemberLevelEntities = baseMapper.userCardList(userId);
 		cardItemVos = hotelMemberLevelEntities.stream().map((HotelMemberLevelEntity item) -> {
 			VipCardItemVo cardItemVo = new VipCardItemVo();
-			cardItemVo.setSellerName(hotelSellerService.getById(item.getSellerId()).getName());
 			BeanUtil.copyProperties(item, cardItemVo);
+			cardItemVo.setSellerName(hotelSellerService.getById(item.getSellerId()).getName());
 			return cardItemVo;
 		}).collect(Collectors.toList());
 		return cardItemVos;

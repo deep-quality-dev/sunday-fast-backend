@@ -27,4 +27,6 @@ public class CardRechargeForm {
 
 	@ApiModelProperty(value = "充值金额，当选择其他金额的时候传该参数")
 	private BigDecimal amount;
+	
+	private String ip;
 }

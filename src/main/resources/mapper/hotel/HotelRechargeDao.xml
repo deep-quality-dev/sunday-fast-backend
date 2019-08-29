@@ -4,17 +4,27 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelRechargeDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelRechargeEntity" id="hotelRechargeMap">
-        <result property="id" column="id"/>
-        <result property="userId" column="user_id"/>
-        <result property="czMoney" column="cz_money"/>
-        <result property="zsMoney" column="zs_money"/>
-        <result property="note" column="note"/>
-        <result property="outTradeNo" column="out_trade_no"/>
-        <result property="state" column="state"/>
-        <result property="time" column="time"/>
-        <result property="uniacid" column="uniacid"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelRechargeEntity"
+		id="hotelRechargeMap">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="czMoney" column="cz_money" />
+		<result property="zsMoney" column="zs_money" />
+		<result property="note" column="note" />
+		<result property="outTradeNo" column="out_trade_no" />
+		<result property="state" column="state" />
+		<result property="time" column="time" />
+		<result property="cardId" column="card_id" />
+	</resultMap>
 
-
+	<select id="consumptionRecord"
+		resultType="io.renren.modules.hotel.vo.CardConsumptionVo">
+		SELECT
+		t.amount,
+		t.note,
+		t.create_date
+		From t_hotel_consumption_record t where t.card_id =#{cardId} and t.user_id
+		= #{userId} order by create_date desc
+	</select>
 </mapper>

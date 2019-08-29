@@ -32,8 +32,10 @@
 		t1.cost,
 		t1.start_time,
 		t1.end_time,
+		t1.seller_id,
 		t1.conditions
-		from t_hotel_member_coupons t inner join
+		from
+		t_hotel_member_coupons t inner join
 		t_hotel_coupons_breakfast t1 on
 		t.coupons_id = t1.id
 		where

@@ -74,6 +74,6 @@
 		t.`name`,
 		t.address
 		from t_hotel_seller t where
-		t.`name` like '%'|| #{kw} ||'%'
+		t.`name` like CONCAT('%',#{kw},'%')
 	</select>
 </mapper>

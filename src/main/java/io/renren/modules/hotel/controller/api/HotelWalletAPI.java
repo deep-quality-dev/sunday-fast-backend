@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
@@ -21,6 +22,7 @@ import io.renren.modules.hotel.service.HotelRechargeConfigService;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelScoreService;
 import io.renren.modules.hotel.service.HotelWalletService;
+import io.renren.modules.hotel.vo.CardConsumptionVo;
 import io.renren.modules.hotel.vo.HotelScore;
 import io.renren.modules.hotel.vo.WalletDataVo;
 import io.swagger.annotations.Api;
@@ -63,6 +65,7 @@ public class HotelWalletAPI {
 	@ApiOperation("用户卡片消费记录")
 	@PostMapping("/consumptionRecord")
 	public R consumptionRecord(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long cardId) {
+		Page<CardConsumptionVo> pageRessult = hotelRechargeService.consumptionRecord(new Page<CardConsumptionVo>(page, limit),userId,cardId);
 		return R.ok();
 	}
 
@@ -78,8 +81,8 @@ public class HotelWalletAPI {
 	@ApiOperation("卡片充值")
 	@PostMapping("/cardRecharge")
 	public R cardRecharge(@RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {
-		hotelRechargeService.cardRecharge(userId, cardRechargeForm);
-		return R.ok();
+		WxPayMpOrderResult mpOrderResult =hotelRechargeService.cardRecharge(userId, cardRechargeForm);
+		return R.ok(mpOrderResult);
 	}
 
 }

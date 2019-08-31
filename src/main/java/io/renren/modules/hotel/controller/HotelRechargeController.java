@@ -15,6 +15,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRechargeEntity;
 import io.renren.modules.hotel.service.HotelRechargeService;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 充值表
@@ -25,7 +26,7 @@ import io.renren.modules.hotel.service.HotelRechargeService;
  */
 @RestController
 @RequestMapping("hotel/hotelrecharge")
-public class HotelRechargeController {
+public class HotelRechargeController extends AbstractController {
 	@Autowired
 	private HotelRechargeService hotelRechargeService;
 
@@ -35,6 +36,9 @@ public class HotelRechargeController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelrecharge:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelRechargeService.queryPage(params);
 
 		return R.ok().put("page", page);

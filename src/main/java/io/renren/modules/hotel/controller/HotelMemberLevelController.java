@@ -15,6 +15,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.service.HotelMemberLevelService;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 会员等级表
@@ -25,7 +26,7 @@ import io.renren.modules.hotel.service.HotelMemberLevelService;
  */
 @RestController
 @RequestMapping("hotel/hotelmemberlevel")
-public class HotelMemberLevelController {
+public class HotelMemberLevelController extends AbstractController {
 	@Autowired
 	private HotelMemberLevelService hotelMemberLevelService;
 
@@ -35,6 +36,9 @@ public class HotelMemberLevelController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelmemberlevel:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelMemberLevelService.queryPage(params);
 
 		return R.ok().put("page", page);

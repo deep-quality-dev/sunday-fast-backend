@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity;
 import io.renren.modules.hotel.service.HotelCouponsBreakfastService;
+import io.renren.modules.sys.controller.AbstractController;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
-
 
 /**
  * 早餐券
@@ -27,65 +26,67 @@ import io.renren.common.utils.R;
  */
 @RestController
 @RequestMapping("hotel/hotelcouponsbreakfast")
-public class HotelCouponsBreakfastController {
-    @Autowired
-    private HotelCouponsBreakfastService hotelCouponsBreakfastService;
+public class HotelCouponsBreakfastController extends AbstractController {
+	@Autowired
+	private HotelCouponsBreakfastService hotelCouponsBreakfastService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    @RequiresPermissions("hotel:hotelcouponsbreakfast:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = hotelCouponsBreakfastService.queryPage(params);
+	/**
+	 * 列表
+	 */
+	@RequestMapping("/list")
+	@RequiresPermissions("hotel:hotelcouponsbreakfast:list")
+	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
+		PageUtils page = hotelCouponsBreakfastService.queryPage(params);
 
-        return R.ok().put("page", page);
-    }
+		return R.ok().put("page", page);
+	}
 
-
-    /**
-     * 信息
-     */
-    @RequestMapping("/info/{id}")
-    @RequiresPermissions("hotel:hotelcouponsbreakfast:info")
-    public R info(@PathVariable("id") Long id){
+	/**
+	 * 信息
+	 */
+	@RequestMapping("/info/{id}")
+	@RequiresPermissions("hotel:hotelcouponsbreakfast:info")
+	public R info(@PathVariable("id") Long id) {
 		HotelCouponsBreakfastEntity hotelCouponsBreakfast = hotelCouponsBreakfastService.getById(id);
 
-        return R.ok().put("hotelCouponsBreakfast", hotelCouponsBreakfast);
-    }
+		return R.ok().put("hotelCouponsBreakfast", hotelCouponsBreakfast);
+	}
 
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    @RequiresPermissions("hotel:hotelcouponsbreakfast:save")
-    public R save(@RequestBody HotelCouponsBreakfastEntity hotelCouponsBreakfast){
-    	hotelCouponsBreakfast.setSellerId(1L);
+	/**
+	 * 保存
+	 */
+	@RequestMapping("/save")
+	@RequiresPermissions("hotel:hotelcouponsbreakfast:save")
+	public R save(@RequestBody HotelCouponsBreakfastEntity hotelCouponsBreakfast) {
+		hotelCouponsBreakfast.setSellerId(1L);
 		hotelCouponsBreakfastService.save(hotelCouponsBreakfast);
 
-        return R.ok();
-    }
+		return R.ok();
+	}
 
-    /**
-     * 修改
-     */
-    @RequestMapping("/update")
-    @RequiresPermissions("hotel:hotelcouponsbreakfast:update")
-    public R update(@RequestBody HotelCouponsBreakfastEntity hotelCouponsBreakfast){
+	/**
+	 * 修改
+	 */
+	@RequestMapping("/update")
+	@RequiresPermissions("hotel:hotelcouponsbreakfast:update")
+	public R update(@RequestBody HotelCouponsBreakfastEntity hotelCouponsBreakfast) {
 		hotelCouponsBreakfastService.updateById(hotelCouponsBreakfast);
 
-        return R.ok();
-    }
+		return R.ok();
+	}
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    @RequiresPermissions("hotel:hotelcouponsbreakfast:delete")
-    public R delete(@RequestBody Long[] ids){
+	/**
+	 * 删除
+	 */
+	@RequestMapping("/delete")
+	@RequiresPermissions("hotel:hotelcouponsbreakfast:delete")
+	public R delete(@RequestBody Long[] ids) {
 		hotelCouponsBreakfastService.removeByIds(Arrays.asList(ids));
 
-        return R.ok();
-    }
+		return R.ok();
+	}
 
 }

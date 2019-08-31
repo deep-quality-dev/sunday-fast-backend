@@ -113,8 +113,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>());
-
+		Object sellerId = params.get("seller_id");
+		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>().eq(null != sellerId, "seller_id", sellerId));
 		return new PageUtils(page);
 	}
 

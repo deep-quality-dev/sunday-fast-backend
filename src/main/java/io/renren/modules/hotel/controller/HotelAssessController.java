@@ -15,6 +15,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.service.HotelAssessService;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 评价表
@@ -25,7 +26,7 @@ import io.renren.modules.hotel.service.HotelAssessService;
  */
 @RestController
 @RequestMapping("hotel/hotelassess")
-public class HotelAssessController {
+public class HotelAssessController extends AbstractController {
 	@Autowired
 	private HotelAssessService hotelAssessService;
 
@@ -35,6 +36,9 @@ public class HotelAssessController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelassess:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelAssessService.queryPage(params);
 
 		return R.ok().put("page", page);

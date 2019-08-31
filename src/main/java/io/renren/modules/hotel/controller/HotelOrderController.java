@@ -15,6 +15,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.service.HotelOrderService;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 
@@ -25,7 +26,7 @@ import io.renren.modules.hotel.service.HotelOrderService;
  */
 @RestController
 @RequestMapping("hotel/hotelorder")
-public class HotelOrderController {
+public class HotelOrderController extends AbstractController {
 	@Autowired
 	private HotelOrderService hotelOrderService;
 
@@ -35,6 +36,9 @@ public class HotelOrderController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelorder:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelOrderService.queryPage(params);
 
 		return R.ok().put("page", page);

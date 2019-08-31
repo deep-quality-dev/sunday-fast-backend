@@ -36,6 +36,9 @@ public class HotelCouponsController extends AbstractController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelcoupons:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelCouponsService.queryPage(params);
 
 		return R.ok().put("page", page);

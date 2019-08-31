@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
+import io.renren.modules.sys.controller.AbstractController;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
@@ -25,7 +26,7 @@ import io.renren.common.utils.R;
  */
 @RestController
 @RequestMapping("hotel/hotelcouponscash")
-public class HotelCouponsCashController {
+public class HotelCouponsCashController extends AbstractController{
 	@Autowired
 	private HotelCouponsCashService hotelCouponsCashService;
 
@@ -35,6 +36,9 @@ public class HotelCouponsCashController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelcouponscash:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelCouponsCashService.queryPage(params);
 
 		return R.ok().put("page", page);

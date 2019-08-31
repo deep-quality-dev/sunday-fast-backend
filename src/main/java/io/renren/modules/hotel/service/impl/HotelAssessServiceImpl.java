@@ -30,7 +30,8 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelAssessEntity> page = this.page(new Query<HotelAssessEntity>().getPage(params), new QueryWrapper<HotelAssessEntity>());
+		Object sellerId = params.get("seller_id");
+		IPage<HotelAssessEntity> page = this.page(new Query<HotelAssessEntity>().getPage(params), new QueryWrapper<HotelAssessEntity>().eq(sellerId != null, "seller_id", sellerId));
 
 		return new PageUtils(page);
 	}

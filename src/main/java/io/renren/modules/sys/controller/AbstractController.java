@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import io.renren.common.utils.Constant;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.sys.entity.SysUserEntity;
@@ -37,6 +38,10 @@ public abstract class AbstractController {
 
 	protected Long getUserId() {
 		return getUser().getUserId();
+	}
+
+	protected boolean isAdmin() {
+		return getUserId() == Constant.SUPER_ADMIN;
 	}
 
 	protected Long getSellerId() {

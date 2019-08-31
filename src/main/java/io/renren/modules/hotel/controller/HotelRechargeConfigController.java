@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.renren.modules.hotel.entity.HotelRechargeConfigEntity;
 import io.renren.modules.hotel.service.HotelRechargeConfigService;
+import io.renren.modules.sys.controller.AbstractController;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
@@ -25,7 +26,7 @@ import io.renren.common.utils.R;
  */
 @RestController
 @RequestMapping("hotel/hotelrechargeconfig")
-public class HotelRechargeConfigController {
+public class HotelRechargeConfigController extends AbstractController{
 	@Autowired
 	private HotelRechargeConfigService hotelRechargeConfigService;
 
@@ -35,6 +36,9 @@ public class HotelRechargeConfigController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelrechargeconfig:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelRechargeConfigService.queryPage(params);
 
 		return R.ok().put("page", page);

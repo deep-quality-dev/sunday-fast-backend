@@ -35,6 +35,9 @@ public class HotelSellerController extends AbstractController {
 	@RequestMapping("/store")
 	@RequiresPermissions("hotel:hotelseller:store")
 	public R store() {
+		if (isAdmin()) {
+			return R.ok().put("hotelSeller", new HotelSellerEntity());
+		}
 		HotelSellerEntity hotelSeller = hotelSellerService.getOne(new QueryWrapper<HotelSellerEntity>().eq("user_id", getUserId()).eq("state", 2));
 		return R.ok().put("hotelSeller", hotelSeller);
 	}
@@ -45,8 +48,19 @@ public class HotelSellerController extends AbstractController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelseller:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		params.put("state", 2);
 		PageUtils page = hotelSellerService.queryPage(params);
+		return R.ok().put("page", page);
+	}
 
+	/**
+	 * 入住申请列表
+	 */
+	@RequestMapping("/applyList")
+	@RequiresPermissions("hotel:hotelseller:apply:list")
+	public R applyList(@RequestParam Map<String, Object> params) {
+		params.put("state", 1);
+		PageUtils page = hotelSellerService.queryPage(params);
 		return R.ok().put("page", page);
 	}
 

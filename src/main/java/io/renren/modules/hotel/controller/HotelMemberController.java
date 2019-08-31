@@ -30,7 +30,7 @@ public class HotelMemberController {
 	private HotelMemberService hotelMemberService;
 
 	/**
-	 * 列表
+	 * 用户列表列表
 	 */
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelmember:list")

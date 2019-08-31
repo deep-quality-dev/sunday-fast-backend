@@ -69,8 +69,8 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelRechargeEntity> page = this.page(new Query<HotelRechargeEntity>().getPage(params), new QueryWrapper<HotelRechargeEntity>());
-
+		Object sellerId = params.get("seller_id");
+		IPage<HotelRechargeEntity> page = this.page(new Query<HotelRechargeEntity>().getPage(params), new QueryWrapper<HotelRechargeEntity>().eq(sellerId != null, "seller_id", sellerId));
 		return new PageUtils(page);
 	}
 
@@ -80,7 +80,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	public WxPayMpOrderResult cardRecharge(Long userId, CardRechargeForm cardRechargeForm) {
 		BigDecimal amount = new BigDecimal(0);
 		HotelRechargeEntity hotelRechargeEntity = new HotelRechargeEntity();
-		hotelRechargeEntity.setZsMoney(new BigDecimal(0) );
+		hotelRechargeEntity.setZsMoney(new BigDecimal(0));
 		if (null == cardRechargeForm.getRechargeConfigId() || -1 == cardRechargeForm.getRechargeConfigId()) {
 			if (null == cardRechargeForm.getAmount() || cardRechargeForm.getAmount() == BigDecimal.ZERO) {
 				throw new RRException("充值金额不能为空");

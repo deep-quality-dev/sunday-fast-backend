@@ -12,18 +12,14 @@ import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 
-
 @Service("hotelMemberLevelDetailService")
 public class HotelMemberLevelDetailServiceImpl extends ServiceImpl<HotelMemberLevelDetailDao, HotelMemberLevelDetailEntity> implements HotelMemberLevelDetailService {
 
-    @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-        IPage<HotelMemberLevelDetailEntity> page = this.page(
-                new Query<HotelMemberLevelDetailEntity>().getPage(params),
-                new QueryWrapper<HotelMemberLevelDetailEntity>()
-        );
+	@Override
+	public PageUtils queryPage(Map<String, Object> params) {
+		IPage<HotelMemberLevelDetailEntity> page = this.page(new Query<HotelMemberLevelDetailEntity>().getPage(params), new QueryWrapper<HotelMemberLevelDetailEntity>());
 
-        return new PageUtils(page);
-    }
+		return new PageUtils(page);
+	}
 
 }

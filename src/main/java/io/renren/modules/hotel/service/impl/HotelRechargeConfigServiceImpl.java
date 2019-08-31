@@ -25,7 +25,8 @@ public class HotelRechargeConfigServiceImpl extends ServiceImpl<HotelRechargeCon
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelRechargeConfigEntity> page = this.page(new Query<HotelRechargeConfigEntity>().getPage(params), new QueryWrapper<HotelRechargeConfigEntity>());
+		Object sellerId = params.get("seller_id");
+		IPage<HotelRechargeConfigEntity> page = this.page(new Query<HotelRechargeConfigEntity>().getPage(params), new QueryWrapper<HotelRechargeConfigEntity>().eq(sellerId != null, "seller_id", sellerId));
 
 		return new PageUtils(page);
 	}

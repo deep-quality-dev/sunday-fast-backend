@@ -27,7 +27,6 @@ import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberLevelService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelSellerService;
-import io.renren.modules.hotel.vo.VipCardInfoVo;
 import io.renren.modules.hotel.vo.VipCardItemVo;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +48,8 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelMemberLevelEntity> page = this.page(new Query<HotelMemberLevelEntity>().getPage(params), new QueryWrapper<HotelMemberLevelEntity>());
+		Object sellerId = params.get("seller_id");
+		IPage<HotelMemberLevelEntity> page = this.page(new Query<HotelMemberLevelEntity>().getPage(params), new QueryWrapper<HotelMemberLevelEntity>().eq(sellerId != null, "seller_id", sellerId));
 
 		return new PageUtils(page);
 	}
@@ -119,7 +119,7 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	public BecomeVipForm getSellerCardInfo(Long userId, Long sellerId) {
 		BecomeVipForm becomeVipForm = new BecomeVipForm();
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, sellerId));
-		if(null == hotelMemberLevelDetailEntity) {
+		if (null == hotelMemberLevelDetailEntity) {
 			return null;
 		}
 		becomeVipForm.setCertificate(hotelMemberLevelDetailEntity.getCertificate());

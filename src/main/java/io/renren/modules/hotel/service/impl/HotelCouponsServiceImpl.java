@@ -34,7 +34,8 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelCouponsEntity> page = this.page(new Query<HotelCouponsEntity>().getPage(params), new QueryWrapper<HotelCouponsEntity>());
+		Object sellerId = params.get("seller_id");
+		IPage<HotelCouponsEntity> page = this.page(new Query<HotelCouponsEntity>().getPage(params), new QueryWrapper<HotelCouponsEntity>().eq(sellerId != null, "seller_id", sellerId));
 
 		return new PageUtils(page);
 	}

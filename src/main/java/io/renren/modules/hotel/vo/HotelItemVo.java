@@ -13,12 +13,12 @@ public class HotelItemVo {
 
 	private String name;
 
-	private String score;
+	private double score;
 
 	private List<String> labelds;
 
 	private int commentCount;
-	
+
 	private String lonLat;
 
 	private float km;

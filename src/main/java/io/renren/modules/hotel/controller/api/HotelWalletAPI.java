@@ -81,6 +81,7 @@ public class HotelWalletAPI {
 	@ApiOperation("卡片充值")
 	@PostMapping("/cardRecharge")
 	public R cardRecharge(@RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {
+		cardRechargeForm.setIp("127.0.0.1");
 		WxPayMpOrderResult mpOrderResult = hotelRechargeService.cardRecharge(userId, cardRechargeForm);
 		return R.ok(mpOrderResult);
 	}

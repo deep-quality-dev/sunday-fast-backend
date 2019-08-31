@@ -6,6 +6,8 @@ import io.renren.modules.hotel.vo.UserCoupons;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -26,5 +28,14 @@ public interface HotelCouponsCashDao extends BaseMapper<HotelCouponsCashEntity> 
 	 * @return
 	 */
 	Page<UserCoupons> userCashCouponsPage(Page<UserCoupons> page, Long userId);
+
+	/**
+	 * 商家可用优惠券
+	 * 
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	List<UserCoupons> canUseCoupons(Long userId, Long sellerId);
 
 }

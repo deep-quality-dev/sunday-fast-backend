@@ -12,7 +12,6 @@ public class HotelInfo {
 	/**
 	 * 
 	 */
-	@TableId
 	private Long id;
 	/**
 	 * 名字
@@ -63,7 +62,7 @@ public class HotelInfo {
 	 */
 	private Integer boardroom;
 	/**
-	 * 
+	 * 热水
 	 */
 	private Integer water;
 	/**
@@ -119,5 +118,19 @@ public class HotelInfo {
 	 */
 	private Integer ddOpen;
 
+	/**
+	 * 是否收藏
+	 */
 	private int collect = 0;
+
+	/**
+	 * 评论数
+	 */
+	private int commentCount;
+
+	/**
+	 * 好评率
+	 */
+	private double commentRate;
+
 }

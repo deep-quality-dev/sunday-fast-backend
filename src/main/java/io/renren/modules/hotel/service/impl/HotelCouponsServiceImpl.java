@@ -75,4 +75,9 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 		return hotelCouponsBreakfastDao.userBreakfastCoupons(page, userId);
 	}
 
+	@Override
+	public List<UserCoupons> canUseCoupons(Long userId, Long sellerId) {
+		return hotelCouponsCashDao.canUseCoupons(userId, sellerId);
+	}
+
 }

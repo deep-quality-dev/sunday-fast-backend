@@ -46,7 +46,7 @@ public class HotelMemberCollectServiceImpl extends ServiceImpl<HotelMemberCollec
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void delCollect(Long userId, AddCollectForm addCollectForm) {
-		int result = baseMapper.delete(Wrappers.<HotelMemberCollectEntity>lambdaQuery().eq(HotelMemberCollectEntity::getBizId, addCollectForm.getBizId()).eq(HotelMemberCollectEntity::getBizType, addCollectForm.getBizType()).eq(HotelMemberCollectEntity::getUserId, userId));
+		int result = baseMapper.delete(Wrappers.<HotelMemberCollectEntity>lambdaQuery().eq(HotelMemberCollectEntity::getId, addCollectForm.getBizId()).eq(HotelMemberCollectEntity::getBizType, addCollectForm.getBizType()).eq(HotelMemberCollectEntity::getUserId, userId));
 		if (result < 1) {
 			throw new RRException("取消收藏失败");
 		}

@@ -63,6 +63,7 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		List<HotelItemVo> hotelItemVos = pageResult.getRecords();
 		for (HotelItemVo hotelItemVo : hotelItemVos) {
 			hotelItemVo.setKm(GaodeAPI.getDistance(hotelItemVo.getLonLat(), params.getLonLat()));
+			hotelItemVo.setScore(5.5);
 		}
 		pageResult.setRecords(hotelItemVos);
 		return pageResult;

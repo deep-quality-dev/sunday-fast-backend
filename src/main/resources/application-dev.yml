@@ -57,15 +57,15 @@ wx:
         aesKey: 111
   miniapp:
     configs:
-      - appid: wx126f4073ab229daa #微信小程序的appid
-        secret: 3da39248911c5c00526344b9a3905810 #微信小程序的Secret
+      - appid: wx2fc4acedc3bc2391 #微信小程序的appid
+        secret: eedf4f808f1eaa7ce42851ba3508a39f #微信小程序的Secret
         token: #微信小程序消息服务器配置的token
         aesKey: #微信小程序消息服务器配置的EncodingAESKey
         msgDataFormat: JSON
   pay:
-    appId: wxeddf8532f51bcbf9
-    mchId: 1529134941
-    mchKey: 930464364F4B4C399C87ABAE48858154
+    appId: wx2fc4acedc3bc2391
+    mchId: 1554061791
+    mchKey: 2284A878E2224B7B8786DD58F9D14819
     subAppId: #服务商模式下的子商户公众账号ID
     subMchId: #服务商模式下的子商户号
     keyPath: # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）

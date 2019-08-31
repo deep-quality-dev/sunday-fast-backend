@@ -118,7 +118,10 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	@Override
 	public BecomeVipForm getSellerCardInfo(Long userId, Long sellerId) {
 		BecomeVipForm becomeVipForm = new BecomeVipForm();
-		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, sellerId));
+		if(null == hotelMemberLevelDetailEntity) {
+			return null;
+		}
 		becomeVipForm.setCertificate(hotelMemberLevelDetailEntity.getCertificate());
 		becomeVipForm.setCertificateNo(hotelMemberLevelDetailEntity.getCertificateNo());
 		becomeVipForm.setName(hotelMemberLevelDetailEntity.getName());

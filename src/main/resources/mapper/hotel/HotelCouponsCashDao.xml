@@ -35,10 +35,31 @@
 		t1.seller_id,
 		t1.end_time,
 		t1.conditions
-		from t_hotel_member_coupons t inner join
+		from
+		t_hotel_member_coupons t inner join
 		t_hotel_coupons_cash t1 on
 		t.coupons_id = t1.id
 		where
 		t.coupons_type = 2 and t.user_id = #{userId}
+	</select>
+
+	<select id="canUseCoupons"
+		resultType="io.renren.modules.hotel.vo.UserCoupons">
+		SELECT
+		t1.`id`,
+		t.coupons_type,
+		t1.`name`,
+		t1.cost,
+		t1.start_time,
+		t1.seller_id,
+		t1.end_time,
+		t1.conditions
+		from
+		t_hotel_member_coupons t inner join
+		t_hotel_coupons_cash t1 on
+		t.coupons_id = t1.id
+		where
+		t.coupons_type = 2 and t.user_id = #{userId}
+		and t1.seller_id = #{sellerId}
 	</select>
 </mapper>

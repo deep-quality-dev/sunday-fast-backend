@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -64,5 +65,13 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * @return
 	 */
 	Page<UserCoupons> userBreakfastCoupons(Long userId, Page<UserCoupons> page);
+
+	/**
+	 * 商家可用优惠券
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	List<UserCoupons> canUseCoupons(Long userId, Long sellerId);
 	
 }

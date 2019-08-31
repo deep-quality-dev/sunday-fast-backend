@@ -63,10 +63,10 @@ public class HotelWalletAPI {
 
 	@Login
 	@ApiOperation("用户卡片消费记录")
-	@PostMapping("/consumptionRecord")
+	@GetMapping("/consumptionRecord")
 	public R consumptionRecord(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long cardId) {
-		Page<CardConsumptionVo> pageRessult = hotelRechargeService.consumptionRecord(new Page<CardConsumptionVo>(page, limit),userId,cardId);
-		return R.ok();
+		Page<CardConsumptionVo> pageRessult = hotelRechargeService.consumptionRecord(new Page<CardConsumptionVo>(page, limit), userId, cardId);
+		return R.ok(pageRessult);
 	}
 
 	@Login
@@ -81,7 +81,7 @@ public class HotelWalletAPI {
 	@ApiOperation("卡片充值")
 	@PostMapping("/cardRecharge")
 	public R cardRecharge(@RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {
-		WxPayMpOrderResult mpOrderResult =hotelRechargeService.cardRecharge(userId, cardRechargeForm);
+		WxPayMpOrderResult mpOrderResult = hotelRechargeService.cardRecharge(userId, cardRechargeForm);
 		return R.ok(mpOrderResult);
 	}
 

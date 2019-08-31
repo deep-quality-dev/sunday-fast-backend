@@ -80,7 +80,8 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	public WxPayMpOrderResult cardRecharge(Long userId, CardRechargeForm cardRechargeForm) {
 		BigDecimal amount = new BigDecimal(0);
 		HotelRechargeEntity hotelRechargeEntity = new HotelRechargeEntity();
-		if (-1 == cardRechargeForm.getRechargeConfigId()) {
+		hotelRechargeEntity.setZsMoney(new BigDecimal(0) );
+		if (null == cardRechargeForm.getRechargeConfigId() || -1 == cardRechargeForm.getRechargeConfigId()) {
 			if (null == cardRechargeForm.getAmount() || cardRechargeForm.getAmount() == BigDecimal.ZERO) {
 				throw new RRException("充值金额不能为空");
 			}
@@ -93,6 +94,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		hotelRechargeEntity.setCzMoney(amount);
 		hotelRechargeEntity.setUserId(userId);
 		hotelRechargeEntity.setCardId(cardRechargeForm.getCardId());
+		hotelRechargeEntity.setTime(DateUtil.currentSeconds());
 		hotelRechargeEntity.setState(0);
 		hotelRechargeEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS"));
 		baseMapper.insert(hotelRechargeEntity);
@@ -102,17 +104,17 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		HotelSellerEntity hotelSellerEntity = hotelSellerDao.selectById(hotelMemberLevelEntity.getSellerId());
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelMemberLevelEntity.getSellerId()));
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
-		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(在线充值)");
-		wxPayUnifiedOrderRequest.setOutTradeNo(hotelRechargeEntity.getOutTradeNo());
-		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
-		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
-		wxPayUnifiedOrderRequest.setTotalFee(1);
-		wxPayUnifiedOrderRequest.setSpbillCreateIp(cardRechargeForm.getIp());
-		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
-		log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
-		return mpOrderResult;
+//		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
+//		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(在线充值)");
+//		wxPayUnifiedOrderRequest.setOutTradeNo(hotelRechargeEntity.getOutTradeNo());
+//		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
+//		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
+//		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+//		wxPayUnifiedOrderRequest.setTotalFee(1);
+//		wxPayUnifiedOrderRequest.setSpbillCreateIp(cardRechargeForm.getIp());
+//		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+//		log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
+		return null;
 
 	}
 

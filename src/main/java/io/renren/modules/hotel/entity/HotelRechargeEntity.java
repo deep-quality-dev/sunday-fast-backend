@@ -52,7 +52,7 @@ public class HotelRechargeEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Integer time;
+	private Long time;
 	/**
 	 * 
 	 */

@@ -58,10 +58,14 @@
 		t.id,
 		t.name,
 		t.ewm_logo as logo,
-		t1.price
+		t1.price,
+		t.coordinates as lonLat,
+		(SELECT count(*) From t_hotel_assess a where
+		a.seller_id=t.id) as comment_count
 		From
 		t_hotel_seller t INNER JOIN
-		(SELECT t.seller_id,MIN(t.price) as price
+		(SELECT
+		t.seller_id,MIN(t.price) as price
 		from t_hotel_room t GROUP BY
 		t.seller_id ) t1
 		on t.id = t1.seller_id

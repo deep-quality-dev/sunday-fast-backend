@@ -27,4 +27,22 @@ public interface HotelMemberLevelDao extends BaseMapper<HotelMemberLevelEntity> 
 	 */
 	List<VipCardItemVo> userCardList(Long userId);
 
+	/**
+	 * 商家会员卡列表
+	 * 
+	 * @param levelId
+	 * @param sellerId
+	 * @return
+	 */
+	List<VipCardItemVo> seletSellerVipsList(Long levelId, Long sellerId);
+
+	/**
+	 * 用户卡片详情
+	 * 
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	VipCardItemVo userCardDetailById(Long userId, Long sellerId);
+
 }

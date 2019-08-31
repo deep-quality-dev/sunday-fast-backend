@@ -28,7 +28,7 @@ public interface HotelSellerDao extends BaseMapper<HotelSellerEntity> {
 	 * @param params
 	 * @return
 	 */
-	Page hotelPage(Page<HotelItemVo> page, HotelSearchCondition params);
+	Page<HotelItemVo> hotelPage(Page<HotelItemVo> page, HotelSearchCondition params);
 
 	/**
 	 * 酒店搜索

@@ -1,6 +1,8 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,8 +95,8 @@ public class HotelMemberLevelAPI extends BaseController {
 	@ApiOperation("用户会员卡信息")
 	@GetMapping("/info")
 	public R info(@RequestAttribute("userId") Long userId, @RequestParam(required = true) Long sellerId) {
-		VipCardInfoVo cardInfoVo = hotelMemberLevelService.vipCardInfo(userId, sellerId);
-		return R.ok(cardInfoVo);
+		VipCardItemVo cardItemVo = hotelMemberLevelService.vipCardInfo(userId, sellerId);
+		return R.ok(cardItemVo);
 	}
 
 	/**
@@ -109,7 +111,11 @@ public class HotelMemberLevelAPI extends BaseController {
 	@GetMapping("/list")
 	public R list(@RequestAttribute("userId") Long userId, @RequestParam(required = true) Long sellerId) {
 		List<VipCardItemVo> cardItemVos = hotelMemberLevelService.vipCardList(userId, sellerId);
-		return R.ok(cardItemVos);
+		BecomeVipForm becomeVipForm = hotelMemberLevelService.getSellerCardInfo(userId, sellerId);
+		Map<String, Object> date = new HashMap<String, Object>();
+		date.put("cards", cardItemVos);
+		date.put("userCardInfo", becomeVipForm);
+		return R.ok().put("data", date);
 	}
 
 	/**

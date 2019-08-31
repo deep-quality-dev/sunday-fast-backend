@@ -55,7 +55,7 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @param sellerId
 	 * @return
 	 */
-	VipCardInfoVo vipCardInfo(Long userId, Long sellerId);
+	VipCardItemVo vipCardInfo(Long userId, Long sellerId);
 
 	/**
 	 * 会员卡列表
@@ -72,4 +72,12 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @return
 	 */
 	List<VipCardItemVo> userCardlist(Long userId);
+
+	/**
+	 * 已办理会员卡信息
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	BecomeVipForm getSellerCardInfo(Long userId, Long sellerId);
 }

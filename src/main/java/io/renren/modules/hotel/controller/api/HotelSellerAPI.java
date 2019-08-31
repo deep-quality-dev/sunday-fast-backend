@@ -42,8 +42,8 @@ public class HotelSellerAPI extends BaseController {
 	@Login
 	@ApiOperation("酒店信息")
 	@GetMapping("/info/{sellerId}")
-	public R info(@RequestAttribute("userId") Long userId,@PathVariable Long sellerId) {
-		HotelInfo hotelInfo = hotelSellerService.sellerInfo(userId,sellerId);
+	public R info(@RequestAttribute("userId") Long userId, @PathVariable Long sellerId) {
+		HotelInfo hotelInfo = hotelSellerService.sellerInfo(userId, sellerId);
 		return R.ok(hotelInfo);
 	}
 
@@ -56,8 +56,9 @@ public class HotelSellerAPI extends BaseController {
 	 */
 	@ApiOperation("酒店列表")
 	@GetMapping("/page")
-	public R page(@ModelAttribute HotelSearchCondition params, Page page) {
-		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(1L, params, page);
+	@Login
+	public R page(@RequestAttribute("userId") Long userId, @ModelAttribute HotelSearchCondition params, Page<HotelItemVo> page) {
+		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(userId, params, page);
 		return R.ok(pageResult);
 	}
 

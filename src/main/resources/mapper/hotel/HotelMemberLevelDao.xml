@@ -31,12 +31,62 @@
 		t1.bg_image,
 		t.score,
 		t.balance,
-		t2.`name` as seller_name
+		t2.id as seller_id,
+		t2.`name` as
+		seller_name
 		from
-		t_hotel_member_level_detail t inner join t_hotel_member_level t1
+		t_hotel_member_level_detail t inner join
+		t_hotel_member_level t1
 		on
 		t.level_id = t1.id
-		inner join t_hotel_seller t2 on t1.seller_id = t2.id
+		inner join t_hotel_seller
+		t2 on t1.seller_id = t2.id
 		where t.member_id = #{userId}
+	</select>
+	
+	<select id="userCardDetailById"
+		resultType="io.renren.modules.hotel.vo.VipCardItemVo">
+		SELECT
+		t1.id,
+		t1.name,
+		t1.content,
+		t1.discount,
+		t1.icon,
+		t1.bg_image,
+		t.score,
+		t.balance,
+		t2.id as seller_id,
+		t2.`name` as
+		seller_name
+		from
+		t_hotel_member_level_detail t inner join
+		t_hotel_member_level t1
+		on
+		t.level_id = t1.id
+		inner join t_hotel_seller
+		t2 on t1.seller_id = t2.id
+		where t.member_id = #{userId} and t.seller_id = #{sellerId}
+	</select>
+
+	<select resultType="io.renren.modules.hotel.vo.VipCardItemVo"
+		id="seletSellerVipsList">
+		SELECT
+		t.id,
+		t.`name`,
+		t.content,
+		t.discount,
+		t.icon,
+		t.bg_image,
+		t1.`name`
+		as seller_name,
+		t1.id as seller_id
+		From t_hotel_member_level t
+		inner JOIN
+		t_hotel_seller t1 on t.seller_id = t1.id
+		where t.seller_id =
+		#{sellerId}
+		<if test='levelId !=null'>
+			and t.id !=#{levelId}
+		</if>
 	</select>
 </mapper>

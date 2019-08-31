@@ -22,6 +22,8 @@ public class VipCardItemVo {
 	private String discount;
 
 	private String sellerName;
+	
+	private Long sellerId;
 
 	private String icon;
 	private String bgImage;

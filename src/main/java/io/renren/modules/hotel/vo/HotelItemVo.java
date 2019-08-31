@@ -7,17 +7,21 @@ import java.util.List;
 @Data
 public class HotelItemVo {
 
-    private Long id;
+	private Long id;
 
-    private String logo;
+	private String logo;
 
-    private String name;
+	private String name;
 
-    private String score;
+	private String score;
 
-    private int commendNum;
+	private List<String> labelds;
 
-    private List<String> labelds;
+	private int commentCount;
+	
+	private String lonLat;
 
-    private String price;
+	private float km;
+
+	private String price;
 }

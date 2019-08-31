@@ -15,6 +15,7 @@ import cn.hutool.http.HttpUtil;
 public class GaodeAPI {
 	public static String key = "61da46f8202196bd6a794a0fd70d8a9b";
 
+	// 22.544269,114.051819 114.05926,22.5429819
 	public static float getDistance(String startLonLat, String endLonLat) {
 		// 返回起始地startAddr与目的地endAddr之间的距离，单位：米
 		Long result = 0L;
@@ -40,8 +41,9 @@ public class GaodeAPI {
 	}
 
 	public static void main(String[] args) {
-		String startLonLat = "116.413731,39.979324";
-		String endLonLat = "116.417537,39.97722";
+		// 22.544269,114.051819 114.05926,22.5429819
+		String startLonLat = "113.849945,22.787577";
+		String endLonLat = "114.216614,22.572170";
 		System.out.println(GaodeAPI.getDistance(startLonLat, endLonLat) + " 公里");// 1.1公里
 	}
 }

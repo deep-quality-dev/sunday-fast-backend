@@ -6,6 +6,12 @@ import java.util.Map;
 
 import lombok.Data;
 
+/**
+ * admin 房价维护
+ * 
+ * @author taoz
+ *
+ */
 @Data
 public class RoomPriceVo {
 
@@ -17,5 +23,5 @@ public class RoomPriceVo {
 	/**
 	 * 价格数据
 	 */
-	private List<Map<String, String>> dataList = new ArrayList<Map<String, String>>();
+	private List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
 }

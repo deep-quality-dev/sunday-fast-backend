@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.form.BecomeVipForm;
@@ -65,8 +67,8 @@ public class HotelMemberLevelAPI extends BaseController {
 	@ApiOperation("注册会员卡")
 	@PostMapping("/becomeVip")
 	public R becomeVip(@RequestAttribute("userId") Long userId, @RequestBody BecomeVipForm becomeVipForm) {
-		hotelMemberLevelService.becomeVip(userId, becomeVipForm);
-		return R.ok();
+		WxPayMpOrderResult mpOrderResult = hotelMemberLevelService.becomeVip(userId, becomeVipForm);
+		return R.ok(mpOrderResult);
 	}
 
 	/**

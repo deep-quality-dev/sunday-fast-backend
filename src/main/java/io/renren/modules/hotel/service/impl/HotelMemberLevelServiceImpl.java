@@ -13,21 +13,30 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelMemberLevelDao;
+import io.renren.modules.hotel.dao.HotelSellerDao;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
+import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.entity.HotelWxConfigEntity;
 import io.renren.modules.hotel.form.BecomeVipForm;
 import io.renren.modules.hotel.form.BindVipCardForm;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberLevelService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelSellerService;
+import io.renren.modules.hotel.service.HotelWxConfigService;
 import io.renren.modules.hotel.vo.VipCardItemVo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -46,6 +55,12 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	@Autowired
 	private HotelMemberService hotelMemberService;
 
+	@Autowired
+	private HotelSellerDao hotelSellerDao;
+
+	@Autowired
+	private HotelWxConfigService hotelWxConfigService;
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		Object sellerId = params.get("seller_id");
@@ -61,8 +76,9 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	}
 
 	@Override
+	@SneakyThrows
 	@Transactional(rollbackFor = Exception.class)
-	public void becomeVip(Long userId, BecomeVipForm becomeVipForm) {
+	public WxPayMpOrderResult becomeVip(Long userId, BecomeVipForm becomeVipForm) {
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		HotelMemberLevelEntity hotelMemberLevelEntity = hotelMemberLevelService.getById(becomeVipForm.getLevelId());
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>query().lambda().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, hotelMemberLevelEntity.getSellerId()));
@@ -83,6 +99,20 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 			hotelMemberLevelDetailEntity.setMobile(hotelMemberEntity.getTel());
 			hotelMemberLevelDetailService.save(hotelMemberLevelDetailEntity);
 		}
+		HotelSellerEntity hotelSellerEntity = hotelSellerDao.selectById(hotelMemberLevelEntity.getSellerId());
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelMemberLevelEntity.getSellerId()));
+		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
+		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(办卡)");
+		wxPayUnifiedOrderRequest.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS"));
+		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
+		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
+		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+		wxPayUnifiedOrderRequest.setTotalFee(1);
+		wxPayUnifiedOrderRequest.setSpbillCreateIp("127.0.0.1");
+		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+		log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
+		return mpOrderResult;
 	}
 
 	@Override

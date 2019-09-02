@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,45 +50,42 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	@Override
 	public List<RoomVO> roomList(Long sellerId, String startTime, String endTime) {
 		log.info("获取酒店房型列表--start，sellerId:{},startTime:{},endTime:{}", sellerId, startTime, endTime);
-		List<RoomVO> roomVOs = new ArrayList<RoomVO>();
 		List<HotelRoomEntity> hotelRoomEntities = this.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", sellerId));
-		RoomVO roomVO = null;
-		for (HotelRoomEntity hotelRoomEntity : hotelRoomEntities) {
-			roomVO = new RoomVO();
-			BeanUtil.copyProperties(hotelRoomEntity, roomVO);
-			roomVO.setPrice(NumberUtil.decimalFormat("0.00", hotelRoomEntity.getPrice().doubleValue()));
+		List<RoomVO> roomVOs =  hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
+			RoomVO roomVO = new RoomVO();
+			BeanUtil.copyProperties(item, roomVO);
+			roomVO.setPrice(NumberUtil.decimalFormat("0.00", item.getPrice().doubleValue()));
 			// 获取房价列表
-			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(hotelRoomEntity.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
+			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);
-			roomVOs.add(roomVO);
-		}
+			return roomVO;
+		}).collect(Collectors.toList());
 		log.info("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomVOs));
 		return roomVOs;
 	}
 
 	@Override
 	public List<RoomMoneyVo> roomMoneys(Long roomId, Date startTime, Date endTime) {
-		log.info("查询酒店房价列表--start，roomId:{},startTime:{},endTime:{}", roomId, startTime, endTime);
+		log.debug("查询酒店房价列表--start，roomId:{},startTime:{},endTime:{}", roomId, startTime, endTime);
 		List<RoomMoneyVo> roomMoneyVos = new ArrayList<RoomMoneyVo>();
-		RoomMoneyVo roomMoneyVo = null;
 		List<HotelRoomMoneyEntity> moneyEntities = hotelRoomMoneyService.list(new QueryWrapper<HotelRoomMoneyEntity>().eq("room_id", roomId).eq("status", 1));
-		for (HotelRoomMoneyEntity hotelRoomMoneyEntity : moneyEntities) {
-			roomMoneyVo = new RoomMoneyVo();
+		roomMoneyVos = moneyEntities.stream().map((HotelRoomMoneyEntity item) -> {
+			RoomMoneyVo roomMoneyVo = new RoomMoneyVo();
 			// 先set会员价格
-			roomMoneyVo.setAmount(hotelRoomMoneyEntity.getPrice());
-			roomMoneyVo.setId(hotelRoomMoneyEntity.getId());
-			roomMoneyVo.setName(hotelRoomMoneyEntity.getName());
-			roomMoneyVo.setVipPrice(hotelRoomMoneyEntity.getIsVip());
+			roomMoneyVo.setAmount(item.getPrice());
+			roomMoneyVo.setId(item.getId());
+			roomMoneyVo.setName(item.getName());
+			roomMoneyVo.setVipPrice(item.getIsVip());
 			// 查询是否有设置特殊价格
-			log.info("查询特殊房价--start，moneyId:{},roomId:{},date:{}", hotelRoomMoneyEntity.getId(), roomId, startTime.getSeconds());
-			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", hotelRoomMoneyEntity.getId()).eq("room_id", roomId).eq("roomdate", startTime.getSeconds()));
-			log.info("查询特殊房价--end,result:{}", JSON.toJSONString(hotelRoomPriceEntity));
+			log.debug("查询特殊房价--start，moneyId:{},roomId:{},date:{}", item.getId(), roomId, startTime.getSeconds());
+			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", item.getId()).eq("room_id", roomId).eq("roomdate", startTime.getSeconds()));
+			log.debug("查询特殊房价--end,result:{}", JSON.toJSONString(hotelRoomPriceEntity));
 			if (null != hotelRoomPriceEntity) {
 				// 先set会员价格
 				roomMoneyVo.setAmount(hotelRoomPriceEntity.getMprice());
 			}
-			roomMoneyVos.add(roomMoneyVo);
-		}
+			return roomMoneyVo;
+		}).collect(Collectors.toList());
 		log.info("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomMoneyVos));
 		return roomMoneyVos;
 	}

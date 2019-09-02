@@ -24,7 +24,12 @@ import lombok.Data;
 @ApiModel(value = "提交订单表单")
 public class BuildOrderForm {
 
+	@ApiModelProperty(value = "房间ID")
+	@NotNull(message = "房间ID不能为空")
 	private Long roomId;
+
+	@ApiModelProperty(value = "金额ID")
+	@NotNull(message = "金额ID不能为空")
 	private Long moneyId;
 
 	// 房间名称
@@ -41,13 +46,11 @@ public class BuildOrderForm {
 	private String checkOutDate;
 
 	// 房间数量
-	@ApiModelProperty(value = "房间数量")
-	@NotNull(message = "房间数量不能为空")
+	@ApiModelProperty(value = "入住天数")
 	private Long checkInDay;
 
 	// 房间数量
 	@ApiModelProperty(value = "房间数量")
-	@NotNull(message = "房间数量不能为空")
 	private Integer roomNum;
 
 	@ApiModelProperty(value = "联系人ID")
@@ -62,6 +65,7 @@ public class BuildOrderForm {
 	private String discountsAcmount;
 
 	// 优惠券ID
+	@ApiModelProperty(value = "优惠券ID")
 	private Long couponId;
 
 	// 经纬度

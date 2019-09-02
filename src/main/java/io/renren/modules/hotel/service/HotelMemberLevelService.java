@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.form.BecomeVipForm;
 import io.renren.modules.hotel.form.BindVipCardForm;
-import io.renren.modules.hotel.vo.VipCardInfoVo;
 import io.renren.modules.hotel.vo.VipCardItemVo;
 
 /**
@@ -37,7 +37,7 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @param userId
 	 * @param becomeVipForm
 	 */
-	void becomeVip(Long userId, BecomeVipForm becomeVipForm);
+	WxPayMpOrderResult becomeVip(Long userId, BecomeVipForm becomeVipForm);
 
 	/**
 	 * 检查会员状态

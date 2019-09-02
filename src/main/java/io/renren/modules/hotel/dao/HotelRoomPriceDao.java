@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -15,5 +17,13 @@ import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
  */
 @Mapper
 public interface HotelRoomPriceDao extends BaseMapper<HotelRoomPriceEntity> {
+
+	/**
+	 * 分页
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	List<String> getDays(String startDate, String endDate);
 
 }

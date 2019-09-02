@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.github.binarywang.wxpay.bean.coupon.WxPayCouponInfoQueryRequest;
 import com.github.binarywang.wxpay.bean.coupon.WxPayCouponInfoQueryResult;
 import com.github.binarywang.wxpay.bean.coupon.WxPayCouponSendRequest;
@@ -124,7 +125,7 @@ public class WxPayController {
 	 * 调用统一下单接口，并组装生成支付所需参数对象.
 	 *
 	 * @param request 统一下单请求参数
-	 * @param         <T> 请使用{@link com.github.binarywang.wxpay.bean.order}包下的类
+	 * @param <T>     请使用{@link com.github.binarywang.wxpay.bean.order}包下的类
 	 * @return 返回 {@link com.github.binarywang.wxpay.bean.order}包下的类对象
 	 */
 	@ApiOperation(value = "统一下单，并组装所需支付参数")
@@ -181,6 +182,7 @@ public class WxPayController {
 	public String parseOrderNotifyResult(@RequestBody String xmlData) throws WxPayException {
 		log.info("微信支付成功回调--start,params:{}", xmlData);
 		final WxPayOrderNotifyResult notifyResult = this.wxService.parseOrderNotifyResult(xmlData);
+		log.info("微信支付成功回调--start,parse date :{}", JSON.toJSONString(notifyResult));
 		// 开启线程更新订单状态，立马回应微信， 防止重复回调
 		ThreadUtil.execute(new Runnable() {
 			@Override

@@ -199,5 +199,9 @@ public class HotelSellerEntity implements Serializable {
 	 * 到店支付
 	 */
 	private Integer ddOpen;
+	
+	private String lnt;
+	
+	private String lat;
 
 }

@@ -92,10 +92,14 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Override
 	public Page<HotelItemVo> hotelPage(Long userId, HotelSearchCondition params, Page<HotelItemVo> page) {
+		double latitude = Double.valueOf(params.getLonLat().split(",")[1]);
+		double longitude = Double.valueOf(params.getLonLat().split(",")[0]);
+		params.setLatitude(latitude);
+		params.setLongitude(longitude);
 		Page<HotelItemVo> pageResult = baseMapper.hotelPage(page, params);
 		List<HotelItemVo> hotelItemVos = pageResult.getRecords();
 		for (HotelItemVo hotelItemVo : hotelItemVos) {
-			hotelItemVo.setKm(GaodeAPI.getDistance(hotelItemVo.getLonLat(), params.getLonLat()));
+			hotelItemVo.setKm(NumberUtil.round(hotelItemVo.getDistance(), 2));
 			double score = hotelAssessDao.avgScore(hotelItemVo.getId());
 			hotelItemVo.setScore(NumberUtil.round(score, 2));
 		}
@@ -112,36 +116,42 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	@Override
 	@Transactional
 	public void test() {
-		HotelRoomEntity hotelRoomEntity = hotelRoomService.list().get(0);
-		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.list().get(0);
-		String result = HttpUtil.get("https://ihotel.meituan.com/hbsearch/HotelSearch?utm_medium=touch&version_name=999.9&platformid=1&cateId=20&newcate=1&limit=20&offset=120&cityId=30&ci=30&startendday=20190903~20190903&startDay=20190903&endDay=20190903&q=%E5%8D%97%E5%B1%B1%E5%8C%BA&ste=_b400202&mypos=22.531142%2C113.943757&attr_28=129&sort=defaults&userid=331990339&uuid=12E6ABEB1C73C7E218E45A65DB06E21E752EB811B3FC9AD97E63AF23CB2D332B&accommodationType=1&lat=22.531142&lng=113.943757&keyword=%E5%8D%97%E5%B1%B1%E5%8C%BA");
-		JSONObject js = JSON.parseObject(result).getJSONObject("data");
-		JSONArray sellerList = js.getJSONArray("searchresult");
-		for (int i = 0; i < sellerList.size(); i++) {
-			JSONObject obj = sellerList.getJSONObject(i);
-			HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
-			hotelSellerEntity.setAddress(obj.getString("addr"));
-			hotelSellerEntity.setUserId(0L);
-			hotelSellerEntity.setCoordinates(obj.getString("lng") + "," + obj.getString("lat"));
-			hotelSellerEntity.setStar("5");
-			hotelSellerEntity.setState(2);
-			hotelSellerEntity.setName(obj.getString("name"));
-			hotelSellerEntity.setOwner(1);
-			String img = obj.getString("frontImg");
-			hotelSellerEntity.setEwmLogo(img.replace("w.h", "500.500"));
-			hotelSellerEntity.setLinkName("improt_" + i);
-			hotelSellerEntity.setLinkTel("12345678");
-			this.save(hotelSellerEntity);
-			HotelRoomEntity roomEntity = new HotelRoomEntity();
-			BeanUtil.copyProperties(hotelRoomEntity, roomEntity, "id","sellerId");
-			roomEntity.setSellerId(hotelSellerEntity.getId());
-			hotelRoomService.save(roomEntity);
-			HotelRoomMoneyEntity roomMoneyEntity = new HotelRoomMoneyEntity();
-			BeanUtil.copyProperties(hotelRoomMoneyEntity, roomMoneyEntity, "id","sellerId");
-			roomMoneyEntity.setRoomId(hotelRoomEntity.getId());
-			roomMoneyEntity.setSellerId(hotelSellerEntity.getId());
-			hotelRoomMoneyService.save(roomMoneyEntity);
+		List<HotelSellerEntity> hotelSellerEntities = this.list();
+		for (HotelSellerEntity hotelSellerEntity : hotelSellerEntities) {
+			hotelSellerEntity.setLat(hotelSellerEntity.getCoordinates().split(",")[1]);
+			hotelSellerEntity.setLnt(hotelSellerEntity.getCoordinates().split(",")[0]);
+			baseMapper.updateById(hotelSellerEntity);
 		}
+//		HotelRoomEntity hotelRoomEntity = hotelRoomService.list().get(0);
+//		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.list().get(0);
+//		String result = HttpUtil.get("https://ihotel.meituan.com/hbsearch/HotelSearch?utm_medium=touch&version_name=999.9&platformid=1&cateId=20&newcate=1&limit=20&offset=120&cityId=30&ci=30&startendday=20190903~20190903&startDay=20190903&endDay=20190903&q=%E5%8D%97%E5%B1%B1%E5%8C%BA&ste=_b400202&mypos=22.531142%2C113.943757&attr_28=129&sort=defaults&userid=331990339&uuid=12E6ABEB1C73C7E218E45A65DB06E21E752EB811B3FC9AD97E63AF23CB2D332B&accommodationType=1&lat=22.531142&lng=113.943757&keyword=%E5%8D%97%E5%B1%B1%E5%8C%BA");
+//		JSONObject js = JSON.parseObject(result).getJSONObject("data");
+//		JSONArray sellerList = js.getJSONArray("searchresult");
+//		for (int i = 0; i < sellerList.size(); i++) {
+//			JSONObject obj = sellerList.getJSONObject(i);
+//			HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
+//			hotelSellerEntity.setAddress(obj.getString("addr"));
+//			hotelSellerEntity.setUserId(0L);
+//			hotelSellerEntity.setCoordinates(obj.getString("lng") + "," + obj.getString("lat"));
+//			hotelSellerEntity.setStar("5");
+//			hotelSellerEntity.setState(2);
+//			hotelSellerEntity.setName(obj.getString("name"));
+//			hotelSellerEntity.setOwner(1);
+//			String img = obj.getString("frontImg");
+//			hotelSellerEntity.setEwmLogo(img.replace("w.h", "500.500"));
+//			hotelSellerEntity.setLinkName("improt_" + i);
+//			hotelSellerEntity.setLinkTel("12345678");
+//			this.save(hotelSellerEntity);
+//			HotelRoomEntity roomEntity = new HotelRoomEntity();
+//			BeanUtil.copyProperties(hotelRoomEntity, roomEntity, "id","sellerId");
+//			roomEntity.setSellerId(hotelSellerEntity.getId());
+//			hotelRoomService.save(roomEntity);
+//			HotelRoomMoneyEntity roomMoneyEntity = new HotelRoomMoneyEntity();
+//			BeanUtil.copyProperties(hotelRoomMoneyEntity, roomMoneyEntity, "id","sellerId");
+//			roomMoneyEntity.setRoomId(hotelRoomEntity.getId());
+//			roomMoneyEntity.setSellerId(hotelSellerEntity.getId());
+//			hotelRoomMoneyService.save(roomMoneyEntity);
+//		}
 
 	}
 

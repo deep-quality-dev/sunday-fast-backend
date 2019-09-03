@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
@@ -81,6 +82,10 @@ public class HotelSellerController extends AbstractController {
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelseller:save")
 	public R save(@RequestBody HotelSellerEntity hotelSeller) {
+		if (StrUtil.isNotEmpty(hotelSeller.getCoordinates())) {
+			hotelSeller.setLat(hotelSeller.getCoordinates().split(",")[1]);
+			hotelSeller.setLnt(hotelSeller.getCoordinates().split(",")[0]);
+		}
 		hotelSeller.setUserId(getUserId());
 		hotelSellerService.save(hotelSeller);
 
@@ -93,6 +98,10 @@ public class HotelSellerController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelseller:update")
 	public R update(@RequestBody HotelSellerEntity hotelSeller) {
+		if (StrUtil.isNotEmpty(hotelSeller.getCoordinates())) {
+			hotelSeller.setLat(hotelSeller.getCoordinates().split(",")[1]);
+			hotelSeller.setLnt(hotelSeller.getCoordinates().split(",")[0]);
+		}
 		hotelSellerService.updateById(hotelSeller);
 
 		return R.ok();
@@ -105,7 +114,6 @@ public class HotelSellerController extends AbstractController {
 	@RequiresPermissions("hotel:hotelseller:delete")
 	public R delete(@RequestBody Integer[] ids) {
 		hotelSellerService.removeByIds(Arrays.asList(ids));
-
 		return R.ok();
 	}
 

@@ -19,4 +19,10 @@ public class HotelSearchCondition {
 
 	@ApiModelProperty(value = "用户定位信息")
 	private String lonLat;
+	
+	@ApiModelProperty(value = "范围，公里数")
+	private double dis;
+
+	private double latitude;
+	private double longitude;
 }

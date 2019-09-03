@@ -50,25 +50,16 @@
 		<result property="yeOpen" column="ye_open" />
 		<result property="wxOpen" column="wx_open" />
 		<result property="ddOpen" column="dd_open" />
+		<result property="lnt" column="lnt" />
+		<result property="lat" column="lat" />
 	</resultMap>
 
-	<select id="hotelPage"
-		resultType="io.renren.modules.hotel.vo.HotelItemVo">
-		SELECT
-		t.id,
-		t.name,
-		t.ewm_logo as logo,
-		t1.price,
-		t.coordinates as lonLat,
-		(SELECT count(*) From t_hotel_assess a where
-		a.seller_id=t.id) as comment_count
-		From
-		t_hotel_seller t INNER JOIN
-		(SELECT
-		t.seller_id,MIN(t.price) as price
-		from t_hotel_room t GROUP BY
-		t.seller_id ) t1
-		on t.id = t1.seller_id
+	<select id="hotelPage" resultType="io.renren.modules.hotel.vo.HotelItemVo">
+			select temp.* From (
+		SELECT t.id,t.NAME,t.ewm_logo AS logo,t1.price,t.coordinates AS lonLat,(
+		SELECT count(*) FROM t_hotel_assess a WHERE a.seller_id=t.id) AS comment_count,(6371*acos(cos(radians(#{params.latitude}))*cos(radians(t.lat))*cos(radians(t.lnt)-radians(#{params.longitude}))+sin(radians(#{params.latitude}))*sin(radians(lat)))) AS distance FROM t_hotel_seller t INNER JOIN (
+		SELECT t.seller_id,MIN(t.price) AS price FROM t_hotel_room t GROUP BY t.seller_id) t1 ON t.id=t1.seller_id HAVING distance  > 0 ORDER BY distance 
+		) temp
 	</select>
 
 	<select id="search"

@@ -41,9 +41,6 @@ public class GaodeAPI {
 	}
 
 	public static void main(String[] args) {
-		// 22.544269,114.051819 114.05926,22.5429819
-		String startLonLat = "113.849945,22.787577";
-		String endLonLat = "114.216614,22.572170";
-		System.out.println(GaodeAPI.getDistance(startLonLat, endLonLat) + " 公里");// 1.1公里
+		System.out.println(GaodeAPI.meter2Km(1927L));
 	}
 }

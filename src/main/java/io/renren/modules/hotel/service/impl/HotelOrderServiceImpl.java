@@ -36,6 +36,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.constants.HotelOrderStatus;
 import io.renren.modules.constants.HotelWxMsgTemplate;
+import io.renren.modules.constants.OrderTypeConstants;
 import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelOrderDao;
@@ -65,6 +66,7 @@ import io.renren.modules.hotel.service.HotelWxTemplateService;
 import io.renren.modules.hotel.service.TransactionService;
 import io.renren.modules.hotel.vo.HotelOrderVo;
 import io.renren.modules.hotel.vo.OrderDetail;
+import io.renren.modules.wx.OrderType;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -206,6 +208,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
 		wxPayUnifiedOrderRequest.setTotalFee(1);
+		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
 		wxPayUnifiedOrderRequest.setSpbillCreateIp(buildOrderForm.getIp());
 		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
 		log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
@@ -436,14 +439,19 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		this.updateById(hotelOrderEntity);
 		log.info("删除订单--success");
 	}
-
+	public static void main(String[] args) {
+		System.out.println(DateUtil.offset(DateUtil.date(), DateField.MINUTE, 30));
+		
+		//2019-09-03 13:19:11 半小时后
+		//2019-09-03 13:10:11 //下单时间
+	}
 	@Override
 	@Transactional
 	public void updateOrder2Cancel() {
 		log.info("自动取消订单--start");
 		Map<String, Object> params = new HashMap<String, Object>();
 		// 20分钟自动取消
-		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>().eq("status", HotelOrderStatus.UN_PAY).le("create_time", DateUtil.offset(DateUtil.date(), DateField.MINUTE, 30)));
+		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>().eq("status", HotelOrderStatus.UN_PAY).le("create_time", DateUtil.offset(DateUtil.date(), DateField.MINUTE, -30)));
 		List<HotelOrderEntity> hotelOrderEntities = page.getRecords();
 		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
 			hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
@@ -456,7 +464,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			@Override
 			public void run() {
 				// 获取酒店取消订单微信消息模板
-
 				List<WxMpTemplateData> data = null;
 				HotelMemberEntity hotelMemberEntity = null;
 				WxMpTemplateMessage templateMessage = null;

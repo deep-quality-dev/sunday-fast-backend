@@ -45,7 +45,10 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 
 import cn.hutool.core.thread.ThreadUtil;
+import io.renren.modules.constants.OrderTypeConstants;
 import io.renren.modules.hotel.service.HotelOrderService;
+import io.renren.modules.hotel.service.HotelRechargeService;
+import io.renren.modules.wx.OrderType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +65,9 @@ public class WxPayController {
 
 	@Autowired
 	private HotelOrderService hotelOrderService;
+
+	@Autowired
+	private HotelRechargeService hotelRechargeService;
 
 //	@Autowired
 //	public WxPayController(WxPayService wxService) {
@@ -187,7 +193,15 @@ public class WxPayController {
 		ThreadUtil.execute(new Runnable() {
 			@Override
 			public void run() {
-				hotelOrderService.updateOrderStatus2Payed(notifyResult.getOutTradeNo());
+				OrderType orderType = JSON.parseObject(notifyResult.getAttach(), OrderType.class);
+				if (OrderTypeConstants.order_room == orderType.getType()) {
+					log.info("房间预定，支付成功回调");
+					hotelOrderService.updateOrderStatus2Payed(notifyResult.getOutTradeNo());
+				}
+				if (OrderTypeConstants.order_recharge == orderType.getType()) {
+					log.info("进入充值回调");
+					hotelRechargeService.cardRechargeHandler(notifyResult.getOutTradeNo());
+				}
 			}
 		});
 		log.info("微信支付成功回调--success,");

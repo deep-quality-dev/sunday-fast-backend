@@ -131,6 +131,8 @@ public class HotelInfo {
 	/**
 	 * 好评率
 	 */
-	private double commentRate;
+	private String commentRate = "0.00%";
+
+	private BigDecimal score;
 
 }

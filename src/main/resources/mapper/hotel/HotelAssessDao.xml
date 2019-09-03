@@ -50,7 +50,8 @@
 		SELECT
 		t.id,
 		t.content,
-		(SELECT from_unixtime(t.time, '%Y-%m-%d %H:%i:%S')) as date,
+		(SELECT from_unixtime(t.time,
+		'%Y-%m-%d %H:%i:%S')) as date,
 		t.score,
 		t1.`name`,
 		t1.img
@@ -58,9 +59,16 @@
 		t_hotel_assess t inner join t_hotel_member t1
 		on
 		t.user_id = t1.id
-		where t.goods_id = #{goodsId} and t.type = 2
+		where
+		t.goods_id = #{goodsId} and t.type = 2
 		order by
 		t.time desc
+	</select>
+
+	<select id="avgScore" resultType="Double">
+		SELECT ifnull(AVG(t.score),0) as score
+		FROM
+		t_hotel_assess t where t.seller_id = #{sellerId}
 	</select>
 
 

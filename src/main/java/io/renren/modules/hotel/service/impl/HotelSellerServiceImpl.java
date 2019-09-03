@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +16,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.dao.HotelMemberCollectDao;
 import io.renren.modules.hotel.dao.HotelSellerDao;
+import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.map.GaodeAPI;
@@ -34,6 +39,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private HotelMemberCollectDao hotelMemberCollectDao;
+
+	@Autowired
+	private HotelAssessDao hotelAssessDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -54,6 +62,16 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		if (null != hotelMemberCollectEntity) {
 			hotelInfo.setCollect(1);
 		}
+		int commentCount = hotelAssessDao.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().eq(HotelAssessEntity::getSellerId, sellerId));
+		hotelInfo.setCommentCount(commentCount);
+		// 好评
+		int goodsCommentCount = hotelAssessDao.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().eq(HotelAssessEntity::getSellerId, sellerId).ge(HotelAssessEntity::getScore, 3));
+		if (commentCount > 0) {
+			hotelInfo.setCommentRate(NumberUtil.decimalFormat("#.##%", NumberUtil.div(goodsCommentCount, commentCount)));
+		}
+		// 平均评分
+		double score = hotelAssessDao.avgScore(sellerId);
+		hotelInfo.setScore(NumberUtil.round(score, 2));
 		log.info("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
 		return hotelInfo;
 	}
@@ -64,7 +82,8 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		List<HotelItemVo> hotelItemVos = pageResult.getRecords();
 		for (HotelItemVo hotelItemVo : hotelItemVos) {
 			hotelItemVo.setKm(GaodeAPI.getDistance(hotelItemVo.getLonLat(), params.getLonLat()));
-			hotelItemVo.setScore(5.5);
+			double score = hotelAssessDao.avgScore(hotelItemVo.getId());
+			hotelItemVo.setScore(NumberUtil.round(score, 2));
 		}
 		pageResult.setRecords(hotelItemVos);
 		return pageResult;

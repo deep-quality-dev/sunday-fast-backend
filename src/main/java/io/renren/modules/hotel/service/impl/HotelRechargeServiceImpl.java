@@ -20,6 +20,7 @@ import cn.hutool.core.date.DateUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.constants.OrderTypeConstants;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelConsumptionRecordDao;
 import io.renren.modules.hotel.dao.HotelMemberDao;
@@ -40,6 +41,7 @@ import io.renren.modules.hotel.form.CardRechargeForm;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelWxConfigService;
 import io.renren.modules.hotel.vo.CardConsumptionVo;
+import io.renren.modules.wx.OrderType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,6 +112,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
 		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_recharge)));
 		wxPayUnifiedOrderRequest.setTotalFee(1);
 		wxPayUnifiedOrderRequest.setSpbillCreateIp(cardRechargeForm.getIp());
 		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);

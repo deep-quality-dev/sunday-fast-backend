@@ -20,18 +20,28 @@ public interface HotelAssessDao extends BaseMapper<HotelAssessEntity> {
 
 	/**
 	 * 酒店评论列表
+	 * 
 	 * @param page
-	 * @param sellerId 
+	 * @param sellerId
 	 * @return
 	 */
 	Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId);
 
 	/**
 	 * 商品评论列表
+	 * 
 	 * @param page
 	 * @param goodsId
 	 * @return
 	 */
 	Page<CommentItemVo> goodsCommnetList(Page<CommentItemVo> page, Long goodsId);
+
+	/**
+	 * 就定评价平均分
+	 * 
+	 * @param sellerId
+	 * @return
+	 */
+	double avgScore(Long sellerId);
 
 }

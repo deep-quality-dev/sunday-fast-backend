@@ -2,6 +2,7 @@ package io.renren.modules.hotel.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -13,8 +14,6 @@ public class HotelItemVo {
 
 	private String name;
 
-	private double score;
-
 	private List<String> labelds;
 
 	private int commentCount;
@@ -24,4 +23,6 @@ public class HotelItemVo {
 	private float km;
 
 	private String price;
+	
+	private BigDecimal score;
 }

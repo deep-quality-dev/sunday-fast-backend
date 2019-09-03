@@ -5,7 +5,6 @@ import java.util.Map;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
-import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 
 import io.renren.common.utils.PageUtils;
@@ -92,7 +91,7 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @return
 	 * @throws WxPayException
 	 */
-	WxPayUnifiedOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException;
+	WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException;
 
 	/**
 	 * 删除订单

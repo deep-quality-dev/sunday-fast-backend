@@ -151,6 +151,9 @@ public class HotelOrderAPI extends BaseController {
 	 * @param orderId
 	 * @return
 	 */
+	@Login
+	@ApiOperation("订单支付")
+	@PostMapping("/payOrder")
 	public R payOrder(@RequestAttribute("userId") Long userId, Long orderId) {
 		try {
 			hotelOrderService.payOrder(userId, orderId, "127.0.0.1");

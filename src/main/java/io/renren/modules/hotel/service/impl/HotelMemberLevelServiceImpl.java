@@ -106,7 +106,7 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(办卡)");
 		wxPayUnifiedOrderRequest.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS"));
 		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
+		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/"+hotelWxConfigEntity.getAppId()+"/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
 		wxPayUnifiedOrderRequest.setTotalFee(1);
 		wxPayUnifiedOrderRequest.setSpbillCreateIp("127.0.0.1");

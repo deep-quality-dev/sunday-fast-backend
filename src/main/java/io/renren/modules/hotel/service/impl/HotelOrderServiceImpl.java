@@ -205,7 +205,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + createOrderForm.getRoomName() + "(" + createOrderForm.getCheckInDay() + "晚)");
 		wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
 		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/notify/order");
+		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
 		wxPayUnifiedOrderRequest.setTotalFee(1);
 		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
@@ -403,27 +403,27 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public WxPayUnifiedOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException {
+	public WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException {
 		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		// 商户微信信息
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
+		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
+		// 商户微信信息
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-		wxPayUnifiedOrderRequest.setAppid(hotelMemberEntity.getOpenid());
-		wxPayUnifiedOrderRequest.setBody(hotelOrderEntity.getSellerName() + "-" + hotelOrderEntity.getRoomType());
-		wxPayUnifiedOrderRequest.setDetail(JSON.toJSONString(hotelOrderEntity));
-		// wxPayUnifiedOrderRequest.setMchId("");TODO 暂时没做支持多公众号支付，默认读取配置文件商户信息
 		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
+		wxPayUnifiedOrderRequest.setBody(hotelOrderEntity.getSellerName() + "-" + hotelRoomEntity.getName() + "(" + hotelOrderEntity.getDays() + "晚)");
 		wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
-		wxPayUnifiedOrderRequest.setProductId(hotelOrderEntity.getRoomId().toString());
-		wxPayUnifiedOrderRequest.setSceneInfo(hotelOrderEntity.getSellerAddress());
-		// wxPayUnifiedOrderRequest.setNotifyUrl(notifyUrl);
-		BigDecimal totalAmountFen = NumberUtil.mul(hotelOrderEntity.getTotalCost(), new BigDecimal(100));
-		wxPayUnifiedOrderRequest.setTotalFee(totalAmountFen.intValue());
+		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
+		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
+		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+		wxPayUnifiedOrderRequest.setTotalFee(1);
+		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
 		wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
-		WxPayUnifiedOrderResult payUnifiedOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).unifiedOrder(wxPayUnifiedOrderRequest);
-		return payUnifiedOrderResult;
+		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+		return mpOrderResult;
 	}
 
 	@Override
@@ -439,12 +439,14 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		this.updateById(hotelOrderEntity);
 		log.info("删除订单--success");
 	}
+
 	public static void main(String[] args) {
 		System.out.println(DateUtil.offset(DateUtil.date(), DateField.MINUTE, 30));
-		
-		//2019-09-03 13:19:11 半小时后
-		//2019-09-03 13:10:11 //下单时间
+
+		// 2019-09-03 13:19:11 半小时后
+		// 2019-09-03 13:10:11 //下单时间
 	}
+
 	@Override
 	@Transactional
 	public void updateOrder2Cancel() {

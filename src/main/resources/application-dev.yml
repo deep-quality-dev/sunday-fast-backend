@@ -3,9 +3,9 @@ spring:
         type: com.alibaba.druid.pool.DruidDataSource
         druid:
             driver-class-name: com.mysql.jdbc.Driver
-            url: jdbc:mysql://47.107.231.97:3306/hotel_sass?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+            url: jdbc:mysql://119.23.11.214:3306/hotel_sass?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
             username: root
-            password: q&-d-i;Jb2k<
+            password: 123456
             initial-size: 10
             max-active: 100
             min-idle: 10

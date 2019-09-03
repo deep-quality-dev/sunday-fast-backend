@@ -50,4 +50,6 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	 * @return
 	 */
 	Page<HotelSearchVo> search(String kw, Page<HotelSearchVo> page);
+
+	void test();
 }

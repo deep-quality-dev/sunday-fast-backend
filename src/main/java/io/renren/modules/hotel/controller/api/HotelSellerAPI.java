@@ -57,8 +57,8 @@ public class HotelSellerAPI extends BaseController {
 	@ApiOperation("酒店列表")
 	@GetMapping("/page")
 	@Login
-	public R page(@RequestAttribute("userId") Long userId, @ModelAttribute HotelSearchCondition params, Page<HotelItemVo> page) {
-		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(userId, params, page);
+	public R page(@RequestAttribute("userId") Long userId, @ModelAttribute HotelSearchCondition params, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(userId, params, new Page<HotelItemVo>(page, limit));
 		return R.ok(pageResult);
 	}
 

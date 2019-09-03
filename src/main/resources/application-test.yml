@@ -3,9 +3,9 @@ spring:
         type: com.alibaba.druid.pool.DruidDataSource
         druid:
             driver-class-name: com.mysql.jdbc.Driver
-            url: jdbc:mysql://127.0.0.1:3306/hotel_sass?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+            url: jdbc:mysql://127.0.0.1:3306/hotel_sass?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
             username: root
-            password: root
+            password: q&-d-i;Jb2k<
             initial-size: 10
             max-active: 100
             min-idle: 10
@@ -47,10 +47,6 @@ fdfs:
 wx:
   mp:
     configs:
-      - appId: wxeddf8532f51bcbf9 
-        secret: c26c629af156e18283a4f4be0ae11bf8
-        token: 111
-        aesKey: 111
       - appId: wx6065ce85bbd4e19e 
         secret: 9cc8fb5d9f7d73db102a1ed4819355f6
         token: 111
@@ -59,14 +55,21 @@ wx:
         secret: 989851d2be1f8e9bf0cd0b69f2211c85
         token: 111
         aesKey: 111
+  miniapp:
+    configs:
+      - appid: wx2fc4acedc3bc2391 #微信小程序的appid
+        secret: eedf4f808f1eaa7ce42851ba3508a39f #微信小程序的Secret
+        token: #微信小程序消息服务器配置的token
+        aesKey: #微信小程序消息服务器配置的EncodingAESKey
+        msgDataFormat: JSON
   pay:
-    appId: wxeddf8532f51bcbf9
-    mchId: 1529134941
-    mchKey: 930464364F4B4C399C87ABAE48858154
+    appId: wx2fc4acedc3bc2391
+    mchId: 1554061791
+    mchKey: 2284A878E2224B7B8786DD58F9D14819
     subAppId: #服务商模式下的子商户公众账号ID
     subMchId: #服务商模式下的子商户号
     keyPath: # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
-    notifyUrl: http://hotel.xqtinfo.cn/pay/notify/order
+    notifyUrl: http://192.168.2.143:9002/sell/notify
 ##多数据源的配置
 #dynamic:
 #  datasource:

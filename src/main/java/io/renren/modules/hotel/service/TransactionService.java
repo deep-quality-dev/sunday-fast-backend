@@ -13,5 +13,5 @@ public interface TransactionService {
 	 * 退款
 	 * @param refundParams
 	 */
-	void refund(Map<String,String> refundParams);
+	void refund(Map<String,Object> refundParams);
 }

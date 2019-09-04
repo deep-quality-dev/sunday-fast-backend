@@ -13,6 +13,7 @@
         <result property="sellerId" column="seller_id"/>
         <result property="enabled" column="enabled"/>
         <result property="createTime" column="create_time"/>
+        <result property="keyPath" column="key_path"/>
     </resultMap>
 
 

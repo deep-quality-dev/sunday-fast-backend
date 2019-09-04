@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller.api;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,6 +21,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 
+import io.renren.common.exception.RRException;
+import io.renren.common.utils.IPUtils;
 import io.renren.common.utils.NetworkUtil;
 import io.renren.common.utils.R;
 import io.renren.common.validator.ValidatorUtils;
@@ -154,12 +157,17 @@ public class HotelOrderAPI extends BaseController {
 	@Login
 	@ApiOperation("订单支付")
 	@PostMapping("/payOrder")
-	public R payOrder(@RequestAttribute("userId") Long userId, @RequestParam Long orderId) {
+	public R payOrder(@RequestAttribute("userId") Long userId, @RequestBody Map<String, Object> params,HttpServletRequest request) {
 		try {
-			hotelOrderService.payOrder(userId, orderId, "127.0.0.1");
+			Object orderId = params.get("orderId");
+			if (null == orderId) {
+				throw new RRException("参数错误");
+			}
+			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request));
+			return R.ok(mpOrderResult);
 		} catch (WxPayException e) {
 			e.printStackTrace();
 		}
-		return R.ok();
+		return R.error();
 	}
 }

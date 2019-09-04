@@ -60,5 +60,10 @@ public class HotelWxConfigEntity implements Serializable {
 	 * 
 	 */
 	private String token;
+	
+	/**
+	 * 退款证书地址
+	 */
+	private String keyPath;
 
 }

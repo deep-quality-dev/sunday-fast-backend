@@ -358,7 +358,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.PAYED) {
 			log.info("取消订单--订单已支付，执行退款");
 			// 已经在线付款，需要判断是否满足取消规则 TODO
-			Map<String, String> refundParams = new HashMap<String, String>();
+			Map<String, Object> refundParams = new HashMap<String, Object>();
+			HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
+			refundParams.put("appId", hotelWxConfigEntity.getAppId());
+			refundParams.put("outTradeNo", hotelOrderEntity.getOutTradeNo());
+			refundParams.put("totalFee", 1);
+			refundParams.put("refundFee", 1);
 			transactionService.refund(refundParams);
 		}
 		if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.UN_PAY) {
@@ -394,7 +399,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			this.updateById(hotelOrderEntity);
 			// 发送模板支付成功通知 TODO 目前采用异步线程，后期要改为消息队列
 			// 增加积分
-			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(),hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost().intValue(), 10, "订单支付成功");
+			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost().intValue(), 10, "订单支付成功");
 		} catch (WxPayException e) {
 			log.error("search wx order error,outTradeNo:{}", outTradeNo);
 			throw new RRException("查询微信支付订单异常");

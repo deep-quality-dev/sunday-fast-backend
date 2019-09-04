@@ -154,7 +154,7 @@ public class HotelOrderAPI extends BaseController {
 	@Login
 	@ApiOperation("订单支付")
 	@PostMapping("/payOrder")
-	public R payOrder(@RequestAttribute("userId") Long userId, Long orderId) {
+	public R payOrder(@RequestAttribute("userId") Long userId, @RequestParam Long orderId) {
 		try {
 			hotelOrderService.payOrder(userId, orderId, "127.0.0.1");
 		} catch (WxPayException e) {

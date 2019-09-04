@@ -394,7 +394,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			this.updateById(hotelOrderEntity);
 			// 发送模板支付成功通知 TODO 目前采用异步线程，后期要改为消息队列
 			// 增加积分
-			hotelScoreService.transactionScore(hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost().intValue(), 10, "订单支付成功");
+			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(),hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost().intValue(), 10, "订单支付成功");
 		} catch (WxPayException e) {
 			log.error("search wx order error,outTradeNo:{}", outTradeNo);
 			throw new RRException("查询微信支付订单异常");

@@ -31,12 +31,13 @@ public interface HotelScoreService extends IService<HotelScoreEntity> {
 	/**
 	 * 积分交易
 	 * 
-	 * @param userId
+	 * @param sellerId
+	 * @param userId 
 	 * @param score
 	 * @param type 
 	 * @param note
 	 */
-	void transactionScore(Long userId, int type, int score, String note);
+	void transactionScore(Long sellerId, Long userId, int type, int score, String note);
 
 	/**
 	 * 积分列表

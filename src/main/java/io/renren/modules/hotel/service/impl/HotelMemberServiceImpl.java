@@ -41,14 +41,15 @@ import me.chanjar.weixin.mp.bean.result.WxMpUser;
 public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMemberEntity> implements HotelMemberService {
 
 	@Autowired
-	private RedisTemplate redisTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
 	private Map<String, SmsMessageHandler> messageHandlerMap;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelMemberEntity> page = this.page(new Query<HotelMemberEntity>().getPage(params), new QueryWrapper<HotelMemberEntity>());
+		Object name = params.get("name");
+		IPage<HotelMemberEntity> page = this.page(new Query<HotelMemberEntity>().getPage(params), new QueryWrapper<HotelMemberEntity>().like(name != null, "name", name));
 		return new PageUtils(page);
 	}
 

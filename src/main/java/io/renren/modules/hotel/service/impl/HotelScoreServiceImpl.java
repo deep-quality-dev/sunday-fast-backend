@@ -20,8 +20,10 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
 import io.renren.modules.hotel.dao.HotelScoreDao;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
+import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelScoreEntity;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelScoreService;
@@ -34,6 +36,9 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 
 	@Autowired
 	private HotelMemberService hotelMemberService;
+
+	@Autowired
+	private HotelMemberLevelDetailDao hotelMemberLevelDetailDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -76,15 +81,16 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 
 	@Override
 	@Transactional
-	public void transactionScore(Long userId, int score, int type, String note) {
+	public void transactionScore(Long sellerId, Long userId, int type, int score, String note) {
 		log.info("添加积分流水--start,userId:{},score:{},type:{},note:{}", userId, score, type, note);
-		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
 		HotelScoreEntity hotelScoreEntity = new HotelScoreEntity();
 		hotelScoreEntity.setScore(score);
 		hotelScoreEntity.setCreateTime(DateUtil.date());
 		hotelScoreEntity.setUserId(userId);
-		hotelScoreEntity.setSellerId(hotelMemberEntity.getSellerId());
+		hotelScoreEntity.setSellerId(sellerId);
 		hotelScoreEntity.setType(type);
+		hotelScoreEntity.setCardId(hotelMemberLevelDetailEntity.getLevelId());
 		hotelScoreEntity.setNote(note);
 		this.save(hotelScoreEntity);
 		// 更新用户积分

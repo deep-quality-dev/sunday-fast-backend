@@ -1,7 +1,10 @@
 package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
@@ -29,6 +33,7 @@ import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
 import io.renren.modules.hotel.dao.HotelRechargeConfigDao;
 import io.renren.modules.hotel.dao.HotelRechargeDao;
 import io.renren.modules.hotel.dao.HotelSellerDao;
+import io.renren.modules.hotel.dto.HotelRechargeDto;
 import io.renren.modules.hotel.entity.HotelConsumptionRecordEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
@@ -72,8 +77,24 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		Object sellerId = params.get("seller_id");
-		IPage<HotelRechargeEntity> page = this.page(new Query<HotelRechargeEntity>().getPage(params), new QueryWrapper<HotelRechargeEntity>().eq(sellerId != null, "seller_id", sellerId));
-		return new PageUtils(page);
+		Object outTradeNo = params.get("Object");
+		IPage<HotelRechargeEntity> page = this.page(new Query<HotelRechargeEntity>().getPage(params), new QueryWrapper<HotelRechargeEntity>().eq(sellerId != null, "seller_id", sellerId).eq(outTradeNo != null, "out_trade_no", outTradeNo));
+		List<HotelRechargeEntity> rechargeEntities = page.getRecords();
+		List<HotelRechargeDto> hotelRechargeDtos = rechargeEntities.stream().map((HotelRechargeEntity item) -> {
+			HotelRechargeDto hotelRechargeDto = new HotelRechargeDto();
+			BeanUtil.copyProperties(item, hotelRechargeDto);
+			HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(item.getCardId());
+			hotelRechargeDto.setSellerName(hotelSellerDao.selectById(memberLevelEntity.getSellerId()).getName());
+			hotelRechargeDto.setMemberName(hotelMemberDao.selectById(item.getUserId()).getName());
+			return hotelRechargeDto;
+		}).collect(Collectors.toList());
+		IPage<HotelRechargeDto> resultPage = new Page<HotelRechargeDto>();
+		resultPage.setCurrent(page.getCurrent());
+		resultPage.setPages(page.getPages());
+		resultPage.setRecords(hotelRechargeDtos);
+		resultPage.setSize(page.getSize());
+		resultPage.setTotal(page.getTotal());
+		return new PageUtils(resultPage);
 	}
 
 	@Override
@@ -110,7 +131,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(在线充值)");
 		wxPayUnifiedOrderRequest.setOutTradeNo(hotelRechargeEntity.getOutTradeNo());
 		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/"+hotelWxConfigEntity.getAppId()+"/notify/order");
+		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
 		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_recharge)));
 		wxPayUnifiedOrderRequest.setTotalFee(1);

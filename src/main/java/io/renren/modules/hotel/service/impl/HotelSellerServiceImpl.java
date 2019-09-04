@@ -1,7 +1,5 @@
 package io.renren.modules.hotel.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -10,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -20,7 +16,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.http.HttpUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelAssessDao;
@@ -28,10 +23,7 @@ import io.renren.modules.hotel.dao.HotelMemberCollectDao;
 import io.renren.modules.hotel.dao.HotelSellerDao;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
-import io.renren.modules.hotel.entity.HotelRoomEntity;
-import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
-import io.renren.modules.hotel.map.GaodeAPI;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.service.HotelSellerService;
@@ -60,7 +52,10 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		Object state = params.get("state");
-		IPage<HotelSellerEntity> page = this.page(new Query<HotelSellerEntity>().getPage(params), new QueryWrapper<HotelSellerEntity>().eq("state", state));
+		Object name = params.get("name");
+		Object linkName = params.get("linkName");
+		Object linkTel = params.get("linkTel");
+		IPage<HotelSellerEntity> page = this.page(new Query<HotelSellerEntity>().getPage(params), new QueryWrapper<HotelSellerEntity>().eq("state", state).like(name != null, "name", name).like(linkName != null, "link_name", linkName).like(linkTel != null, "link_tel", linkTel));
 
 		return new PageUtils(page);
 	}

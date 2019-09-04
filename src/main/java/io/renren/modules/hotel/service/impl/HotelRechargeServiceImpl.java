@@ -60,6 +60,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	@Autowired
 	private HotelMemberLevelDao hotelMemberLevelDao;
 
+	@Autowired
 	private HotelConsumptionRecordDao hotelConsumptionRecordDao;
 
 	@Autowired

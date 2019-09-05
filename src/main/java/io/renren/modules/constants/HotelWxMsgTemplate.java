@@ -16,4 +16,9 @@ public interface HotelWxMsgTemplate {
 	 * 入住
 	 */
 	public static final int ORDER_ROOM_CHECK_IN = 3;
+
+	/**
+	 * 充值成功
+	 */
+	public static final int CARD_RECHARGE_SUCCESS = 4;
 }

@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -57,8 +59,8 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	}
 
 	@Override
-	public Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId) {
-		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId);
+	public Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId, String type) {
+		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId,type);
 		return pageResult;
 	}
 
@@ -66,6 +68,15 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	public Page<CommentItemVo> goodsCommnetList(Page<CommentItemVo> page, Long goodsId) {
 		Page<CommentItemVo> pageResult = baseMapper.goodsCommnetList(page, goodsId);
 		return pageResult;
+	}
+
+	@Override
+	public Map<String, Integer> hotelCount(Long sellerId) {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		map.put("good", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().gt(HotelAssessEntity::getScore, 3).eq(HotelAssessEntity::getSellerId, sellerId)));
+		map.put("bad", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().lt(HotelAssessEntity::getScore, 3).eq(HotelAssessEntity::getSellerId, sellerId)));
+		map.put("img", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().isNotNull(HotelAssessEntity::getImg).eq(HotelAssessEntity::getSellerId, sellerId)));
+		return map;
 	}
 
 }

@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,8 +43,8 @@ public class HotelCommentAPI {
 	 */
 	@ApiOperation("酒店评论列表")
 	@GetMapping("/hotelList")
-	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long sellerId) {
-		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page,limit), sellerId);
+	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long sellerId,String type) {
+		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page, limit), sellerId,type);
 		return R.ok(pageResult);
 	}
 
@@ -67,7 +69,14 @@ public class HotelCommentAPI {
 	@ApiOperation("商品评论列表")
 	@GetMapping("/goodsList")
 	public R goodsList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limie", required = false, defaultValue = "10") int limie, Long goodsId) {
-		Page<CommentItemVo> pageResult = hotelAssessService.goodsCommnetList(new Page<CommentItemVo>(page,limie), goodsId);
+		Page<CommentItemVo> pageResult = hotelAssessService.goodsCommnetList(new Page<CommentItemVo>(page, limie), goodsId);
 		return R.ok(pageResult);
+	}
+
+	@ApiOperation("酒店评论总数")
+	@GetMapping("/hotelCount")
+	public R hotelCount(@RequestParam Long sellerId) {
+		Map<String, Integer> result = hotelAssessService.hotelCount(sellerId);
+		return R.ok(result);
 	}
 }

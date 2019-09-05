@@ -41,6 +41,15 @@
 		on
 		t.user_id = t1.id
 		where t.seller_id = #{sellerId} and t.type = 1
+		<if test='type =="img"'>
+			and t.img is not null	
+		</if>
+		<if test='type =="good"'>
+			and t.score &gt;= 3
+		</if>
+		<if test='type =="bad"'>
+			and t.score &lt;= 3	
+		</if>
 		order
 		by t.time desc
 	</select>

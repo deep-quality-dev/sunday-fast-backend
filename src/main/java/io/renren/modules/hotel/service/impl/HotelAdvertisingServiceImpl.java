@@ -26,8 +26,8 @@ public class HotelAdvertisingServiceImpl extends ServiceImpl<HotelAdvertisingDao
 	}
 
 	@Override
-	public List<HotelAdvertisingEntity> loadByType(Long sellerId, int type) {
-		return this.list(new QueryWrapper<HotelAdvertisingEntity>().eq("seller_id", sellerId).eq("type", type));
+	public List<HotelAdvertisingEntity> loadByType(int type) {
+		return this.list(new QueryWrapper<HotelAdvertisingEntity>().eq("type", type));
 	}
 
 }

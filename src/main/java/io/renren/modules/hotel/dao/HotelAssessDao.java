@@ -23,9 +23,10 @@ public interface HotelAssessDao extends BaseMapper<HotelAssessEntity> {
 	 * 
 	 * @param page
 	 * @param sellerId
+	 * @param type 
 	 * @return
 	 */
-	Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId);
+	Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId, String type);
 
 	/**
 	 * 商品评论列表

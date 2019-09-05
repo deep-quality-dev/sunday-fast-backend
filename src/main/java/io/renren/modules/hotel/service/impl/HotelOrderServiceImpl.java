@@ -241,7 +241,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setDays(Integer.valueOf(String.valueOf(createOrderForm.getCheckInDay())));
 		hotelOrderEntity.setRoomType(hotelRoomEntity.getName());
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
-		hotelOrderEntity.setOutTradeNo(IdUtil.simpleUUID());
+		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
 		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());
@@ -416,6 +416,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
+		hotelOrderEntity.setOrderNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + userId));
 		// 商户微信信息
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
 		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
@@ -428,6 +429,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
 		wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
 		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+		this.updateById(hotelOrderEntity);
 		return mpOrderResult;
 	}
 
@@ -443,13 +445,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setEnabled(-1);
 		this.updateById(hotelOrderEntity);
 		log.info("删除订单--success");
-	}
-
-	public static void main(String[] args) {
-		System.out.println(DateUtil.offset(DateUtil.date(), DateField.MINUTE, 30));
-
-		// 2019-09-03 13:19:11 半小时后
-		// 2019-09-03 13:10:11 //下单时间
 	}
 
 	@Override
@@ -482,12 +477,13 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 					if (null != hotelWxConfigEntity) {
 						mpService = WxMpConfiguration.getMpServices().get(hotelWxConfigEntity.getAppId());
 						data = new ArrayList<>();
-						data.add(new WxMpTemplateData("first", "您好，您的订单已取消。"));
+						data.add(new WxMpTemplateData("first", "您好，您的订单已取消"));
 						data.add(new WxMpTemplateData("keyword1", hotelOrderEntity.getSellerName()));
-						data.add(new WxMpTemplateData("keyword2", hotelOrderEntity.getName()));
-						data.add(new WxMpTemplateData("keyword3", hotelOrderEntity.getRoomType()));
-						data.add(new WxMpTemplateData("keyword4", String.valueOf(hotelOrderEntity.getNum())));
+						data.add(new WxMpTemplateData("keyword2", hotelOrderEntity.getRoomType()));
+						data.add(new WxMpTemplateData("keyword3", hotelOrderEntity.getName()));
+						data.add(new WxMpTemplateData("keyword4", hotelOrderEntity.getTotalCost().toString()));
 						data.add(new WxMpTemplateData("keyword5", DateUtil.format(hotelOrderEntity.getArrivalTime(), "yyyy-MM-dd")));
+						data.add(new WxMpTemplateData("keyword6", DateUtil.format(hotelOrderEntity.getDepartureTime(), "yyyy-MM-dd")));
 						data.add(new WxMpTemplateData("remark", "您的订单已取消，期待你的下次预定。"));
 						hotelMemberEntity = hotelMemberService.getById(hotelOrderEntity.getUserId());
 						hotelWxTemplateEntity = hotelWxTemplateService.getOne(new QueryWrapper<HotelWxTemplateEntity>().eq("seller_id", hotelOrderEntity.getSellerId()).eq("type", HotelWxMsgTemplate.ORDER_ROOM_CANCEL));

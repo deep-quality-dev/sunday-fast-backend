@@ -26,5 +26,5 @@ public interface HotelAdvertisingService extends IService<HotelAdvertisingEntity
 	 * @param type
 	 * @return
 	 */
-	List<HotelAdvertisingEntity> loadByType(Long sellerId, int type);
+	List<HotelAdvertisingEntity> loadByType(int type);
 }

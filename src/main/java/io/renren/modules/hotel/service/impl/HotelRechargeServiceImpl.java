@@ -20,11 +20,16 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.NumberUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.constants.HotelWxMsgTemplate;
 import io.renren.modules.constants.OrderTypeConstants;
+import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelConsumptionRecordDao;
 import io.renren.modules.hotel.dao.HotelMemberDao;
@@ -38,17 +43,24 @@ import io.renren.modules.hotel.entity.HotelConsumptionRecordEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
+import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelRechargeConfigEntity;
 import io.renren.modules.hotel.entity.HotelRechargeEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelWxConfigEntity;
+import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
 import io.renren.modules.hotel.form.CardRechargeForm;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelWxConfigService;
+import io.renren.modules.hotel.service.HotelWxTemplateService;
 import io.renren.modules.hotel.vo.CardConsumptionVo;
 import io.renren.modules.wx.OrderType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 
 @Slf4j
 @Service("hotelRechargeService")
@@ -65,6 +77,9 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 
 	@Autowired
 	private HotelMemberLevelDetailDao hotelMemberLevelDetailDao;
+
+	@Autowired
+	private HotelWxTemplateService hotelWxTemplateService;
 
 	@Autowired
 	private HotelSellerDao hotelSellerDao;
@@ -157,13 +172,49 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 			baseMapper.updateById(hotelRechargeEntity);
 			// 给用户卡片加钱
 			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, hotelRechargeEntity.getUserId()).eq(HotelMemberLevelDetailEntity::getLevelId, hotelRechargeEntity.getCardId()));
-			memberLevelDetailEntity.setBalance(hotelRechargeEntity.getCzMoney());
+			memberLevelDetailEntity.setBalance(NumberUtil.add(memberLevelDetailEntity.getBalance(), hotelRechargeEntity.getCzMoney()));
 			this.addConsumptionRecord(hotelRechargeEntity.getCzMoney(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "在线充值");
 			if (null != hotelRechargeEntity.getZsMoney()) {
-				memberLevelDetailEntity.setBalance(hotelRechargeEntity.getZsMoney());
+				memberLevelDetailEntity.setBalance(NumberUtil.add(memberLevelDetailEntity.getBalance(), hotelRechargeEntity.getZsMoney()));
 				this.addConsumptionRecord(hotelRechargeEntity.getZsMoney(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "充值赠送");
 			}
 			hotelMemberLevelDetailDao.updateById(memberLevelDetailEntity);
+			// 发送充值成功通知
+			ThreadUtil.execute(new Runnable() {
+				@Override
+				public void run() {
+					// 获取酒店取消订单微信消息模板
+					List<WxMpTemplateData> data = null;
+					HotelMemberEntity hotelMemberEntity = null;
+					WxMpTemplateMessage templateMessage = null;
+					WxMpService mpService = null;
+					HotelWxTemplateEntity hotelWxTemplateEntity = null;
+					HotelWxConfigEntity hotelWxConfigEntity = null;
+					HotelSellerEntity hotelOrderEntity = hotelSellerDao.selectById(memberLevelDetailEntity.getSellerId());
+					hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", memberLevelDetailEntity.getSellerId()));
+					if (null != hotelWxConfigEntity) {
+						mpService = WxMpConfiguration.getMpServices().get(hotelWxConfigEntity.getAppId());
+						data = new ArrayList<>();
+						data.add(new WxMpTemplateData("first", "充值成功通知"));
+						data.add(new WxMpTemplateData("keyword1", hotelOrderEntity.getName()));
+						data.add(new WxMpTemplateData("keyword2", "会员卡充值"));
+						data.add(new WxMpTemplateData("keyword3", memberLevelDetailEntity.getCardNo()));
+						data.add(new WxMpTemplateData("keyword4", hotelRechargeEntity.getCzMoney().toString()));
+						data.add(new WxMpTemplateData("keyword5", hotelRechargeEntity.getZsMoney() != null ? hotelRechargeEntity.getZsMoney().toString() : "0.00"));
+						data.add(new WxMpTemplateData("keyword5", DateUtil.format(DateUtil.date(hotelRechargeEntity.getTime()), "yyyy-MM-dd")));
+						hotelMemberEntity = hotelMemberDao.selectById(memberLevelDetailEntity.getMemberId());
+						hotelWxTemplateEntity = hotelWxTemplateService.getOne(new QueryWrapper<HotelWxTemplateEntity>().eq("seller_id", memberLevelDetailEntity.getSellerId()).eq("type", HotelWxMsgTemplate.CARD_RECHARGE_SUCCESS));
+						templateMessage = new WxMpTemplateMessage(hotelMemberEntity.getOpenid(), hotelWxTemplateEntity.getTemplateId(), null, null, data);
+						try {
+							String result = mpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
+							log.info("发送充值成功微信模板消息：result：{}", result);
+						} catch (WxErrorException e) {
+							e.printStackTrace();
+						}
+					}
+
+				}
+			});
 		}
 
 	}

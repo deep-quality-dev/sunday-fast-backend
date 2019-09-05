@@ -17,7 +17,7 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(value = "酒店广告接口", tags = { "酒店广告接口" })
 @RestController
-@RequestMapping("/{appId}/hotel/adv")
+@RequestMapping("/hotel/adv")
 public class HotelAdvertisingAPI extends BaseController {
 
 	@Autowired
@@ -32,8 +32,8 @@ public class HotelAdvertisingAPI extends BaseController {
 	 */
 	@ApiOperation("获取广告")
 	@GetMapping("/loadByType")
-	public R loadByType(@PathVariable String appId, @RequestParam int type) {
-		List<HotelAdvertisingEntity> advertisingEntities = hotelAdvertisingService.loadByType(sellerId(appId), type);
+	public R loadByType(@RequestParam int type) {
+		List<HotelAdvertisingEntity> advertisingEntities = hotelAdvertisingService.loadByType(type);
 		return R.ok().put("data", advertisingEntities);
 	}
 }

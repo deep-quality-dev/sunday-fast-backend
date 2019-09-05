@@ -133,7 +133,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		hotelRechargeEntity.setCzMoney(amount);
 		hotelRechargeEntity.setUserId(userId);
 		hotelRechargeEntity.setCardId(cardRechargeForm.getCardId());
-		hotelRechargeEntity.setTime(DateUtil.currentSeconds());
+		hotelRechargeEntity.setTime(System.currentTimeMillis()/1000);
 		hotelRechargeEntity.setState(0);
 		hotelRechargeEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS"));
 		baseMapper.insert(hotelRechargeEntity);

@@ -39,6 +39,7 @@ public class WxPayProperties {
 			config.setAppId(hotelWxConfigEntity.getAppId());
 			config.setMchId(hotelWxConfigEntity.getMchId());
 			config.setMchKey(hotelWxConfigEntity.getMchKey());
+			config.setKeyPath(hotelWxConfigEntity.getKeyPath());
 			configs.add(config);
 		}
 		this.setConfigs(configs);

@@ -69,4 +69,12 @@ public class HotelContactsServiceImpl extends ServiceImpl<HotelContactsDao, Hote
 		return addContactsForms;
 	}
 
+	@Override
+	public AddContactsForm latelyContact(Long userId) {
+		AddContactsForm addContactsForm = new AddContactsForm();
+		HotelContactsEntity contactsEntity = baseMapper.latelyContact(userId);
+		BeanUtil.copyProperties(contactsEntity, addContactsForm);
+		return addContactsForm;
+	}
+
 }

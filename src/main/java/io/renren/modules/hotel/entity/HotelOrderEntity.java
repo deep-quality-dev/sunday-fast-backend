@@ -177,5 +177,10 @@ public class HotelOrderEntity implements Serializable {
 	 * 订单快照
 	 */
 	private String orderInfo;
+	
+	/**
+	 * 联系人ID
+	 */
+	private Long contactsId;
 
 }

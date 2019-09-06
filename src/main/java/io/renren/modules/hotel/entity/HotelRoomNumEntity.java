@@ -37,4 +37,9 @@ public class HotelRoomNumEntity implements Serializable {
 	 */
 	private Integer dateday;
 
+	/**
+	 * 房价ID
+	 */
+	private Long moneyId;
+
 }

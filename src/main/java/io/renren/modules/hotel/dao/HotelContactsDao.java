@@ -1,6 +1,8 @@
 package io.renren.modules.hotel.dao;
 
 import io.renren.modules.hotel.entity.HotelContactsEntity;
+import io.renren.modules.hotel.form.AddContactsForm;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,5 +15,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface HotelContactsDao extends BaseMapper<HotelContactsEntity> {
-	
+
+	/**
+	 * 最精使用联系人
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	HotelContactsEntity latelyContact(Long userId);
+
 }

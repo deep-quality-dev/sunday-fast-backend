@@ -44,6 +44,7 @@
         <result property="voice" column="voice"/>
         <result property="qrFromid" column="qr_fromid"/>
         <result property="orderInfo" column="order_info"/>
+        <result property="contactsId" column="contacts_id"/>
     </resultMap>
 
 

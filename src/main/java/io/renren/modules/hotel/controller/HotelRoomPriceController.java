@@ -1,7 +1,6 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.hutool.db.Page;
-import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
 import io.renren.modules.hotel.service.HotelRoomPriceService;
@@ -41,7 +39,11 @@ public class HotelRoomPriceController extends AbstractController {
 //		PageUtils page = hotelRoomPriceService.queryPage(params);
 		int page = 1;
 		int limt = 10;
-		RoomPriceVo roomPriceVo = hotelRoomPriceService.roomPrice(getSellerId(), startDate, endDate, new Page(page, limt));
+		Long sellerId = 0L;
+		if(!isAdmin()) {
+			sellerId = getSellerId();
+		}
+		RoomPriceVo roomPriceVo = hotelRoomPriceService.roomPrice(sellerId, startDate, endDate, new Page(page, limt));
 		return R.ok(roomPriceVo);
 	}
 

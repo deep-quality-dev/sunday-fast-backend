@@ -60,9 +60,22 @@ public class HotelContactsAPI {
 
 	@GetMapping
 	@Login
-	@ApiOperation("添加联系人")
+	@ApiOperation("联系人列表")
 	public R list(@RequestAttribute("userId") Long userId) {
 		List<AddContactsForm> list = hotelContactsService.contactsList(userId);
 		return R.ok(list);
+	}
+
+	/**
+	 * 最近联系人
+	 * 
+	 * @return
+	 */
+	@Login
+	@GetMapping("/latelyContact")
+	@ApiOperation("最近联系人")
+	public R latelyContact(@RequestAttribute("userId") Long userId) {
+		AddContactsForm addContactsForm = hotelContactsService.latelyContact(userId);
+		return R.ok();
 	}
 }

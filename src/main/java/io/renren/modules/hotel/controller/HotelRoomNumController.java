@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.hutool.db.Page;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 import io.renren.modules.hotel.service.HotelRoomNumService;
+import io.renren.modules.hotel.vo.RoomNumVo;
+import io.renren.modules.hotel.vo.RoomPriceVo;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 房量
@@ -25,7 +29,7 @@ import io.renren.modules.hotel.service.HotelRoomNumService;
  */
 @RestController
 @RequestMapping("hotel/hotelroomnum")
-public class HotelRoomNumController {
+public class HotelRoomNumController extends AbstractController {
 	@Autowired
 	private HotelRoomNumService hotelRoomNumService;
 
@@ -34,10 +38,16 @@ public class HotelRoomNumController {
 	 */
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelroomnum:list")
-	public R list(@RequestParam Map<String, Object> params) {
-		PageUtils page = hotelRoomNumService.queryPage(params);
-
-		return R.ok().put("page", page);
+	public R list(@RequestParam String startDate, @RequestParam String endDate) {
+//		PageUtils page = hotelRoomNumService.queryPage(params);
+		int page = 1;
+		int limt = 10;
+		Long sellerId = 0L;
+		if (!isAdmin()) {
+			sellerId = getSellerId();
+		}
+		RoomNumVo roomNumVo = hotelRoomNumService.roomNumData(sellerId, startDate, endDate, new Page(page, limt));
+		return R.ok(roomNumVo);
 	}
 
 	/**

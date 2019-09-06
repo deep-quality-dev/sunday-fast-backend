@@ -52,4 +52,11 @@ public interface HotelContactsService extends IService<HotelContactsEntity> {
 	 */
 	List<AddContactsForm> contactsList(Long userId);
 
+	/**
+	 * 最近使用联系人
+	 * @param userId
+	 * @return
+	 */
+	AddContactsForm latelyContact(Long userId);
+
 }

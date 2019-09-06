@@ -4,12 +4,15 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelRoomNumDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelRoomNumEntity" id="hotelRoomNumMap">
-        <result property="id" column="id"/>
-        <result property="rid" column="rid"/>
-        <result property="nums" column="nums"/>
-        <result property="dateday" column="dateday"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelRoomNumEntity"
+		id="hotelRoomNumMap">
+		<result property="id" column="id" />
+		<result property="rid" column="rid" />
+		<result property="nums" column="nums" />
+		<result property="dateday" column="dateday" />
+		<result property="moneyId" column="money_id" />
+	</resultMap>
 
 
 </mapper>

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -20,8 +21,10 @@ import cn.hutool.core.util.NumberUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelRoomDao;
+import io.renren.modules.hotel.dao.HotelRoomNumDao;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomPriceService;
@@ -40,6 +43,9 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	@Autowired
 	private HotelRoomPriceService hotelRoomPriceService;
 
+	@Autowired
+	private HotelRoomNumDao hotelRoomNumDao;
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		Object sellerId = params.get("seller_id");
@@ -51,7 +57,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	public List<RoomVO> roomList(Long sellerId, String startTime, String endTime) {
 		log.info("获取酒店房型列表--start，sellerId:{},startTime:{},endTime:{}", sellerId, startTime, endTime);
 		List<HotelRoomEntity> hotelRoomEntities = this.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", sellerId));
-		List<RoomVO> roomVOs =  hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
+		List<RoomVO> roomVOs = hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
 			RoomVO roomVO = new RoomVO();
 			BeanUtil.copyProperties(item, roomVO);
 			roomVO.setPrice(NumberUtil.decimalFormat("0.00", item.getPrice().doubleValue()));
@@ -76,9 +82,15 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			roomMoneyVo.setId(item.getId());
 			roomMoneyVo.setName(item.getName());
 			roomMoneyVo.setVipPrice(item.getIsVip());
+			roomMoneyVo.setHasRoom(item.getNum());
+			// 查询特殊房量
+			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
+			if (null != hotelRoomNumEntity) {
+				roomMoneyVo.setHasRoom(hotelRoomNumEntity.getNums());
+			}
 			// 查询是否有设置特殊价格
-			log.debug("查询特殊房价--start，moneyId:{},roomId:{},date:{}", item.getId(), roomId, startTime.getSeconds());
-			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", item.getId()).eq("room_id", roomId).eq("roomdate", startTime.getSeconds()));
+			log.debug("查询特殊房价--start，moneyId:{},roomId:{},date:{}", item.getId(), roomId, startTime.getTime());
+			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", item.getId()).eq("room_id", roomId).eq("roomdate", startTime.getTime()));
 			log.debug("查询特殊房价--end,result:{}", JSON.toJSONString(hotelRoomPriceEntity));
 			if (null != hotelRoomPriceEntity) {
 				// 先set会员价格

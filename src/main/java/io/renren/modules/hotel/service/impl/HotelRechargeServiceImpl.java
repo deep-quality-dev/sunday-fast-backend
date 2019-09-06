@@ -20,7 +20,6 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -43,7 +42,6 @@ import io.renren.modules.hotel.entity.HotelConsumptionRecordEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
-import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelRechargeConfigEntity;
 import io.renren.modules.hotel.entity.HotelRechargeEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;

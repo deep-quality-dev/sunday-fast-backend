@@ -38,6 +38,9 @@ public class CreateOrderForm {
 
 	// 入住人
 	private String checkInPerson;
+	
+	//联系人ID
+	private Long contactsId;
 
 	// 联系电话
 	private String mobile;

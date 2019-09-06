@@ -4,8 +4,10 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import cn.hutool.db.Page;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
+import io.renren.modules.hotel.vo.RoomNumVo;
 
 /**
  * 房量
@@ -17,4 +19,15 @@ import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 public interface HotelRoomNumService extends IService<HotelRoomNumEntity> {
 
 	PageUtils queryPage(Map<String, Object> params);
+
+	/**
+	 * 房量数据
+	 * 
+	 * @param sellerId
+	 * @param startDate
+	 * @param endDate
+	 * @param page
+	 * @return
+	 */
+	RoomNumVo roomNumData(Long sellerId, String startDate, String endDate, Page page);
 }

@@ -19,7 +19,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
-import com.github.binarywang.wxpay.bean.result.WxPayUnifiedOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 
 import cn.hutool.core.bean.BeanUtil;
@@ -29,7 +28,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
@@ -174,6 +172,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		BigDecimal totalAmountFen = NumberUtil.mul(totalAmount, new BigDecimal(100));
 		buildOrderForm.setTotalAmountFen(totalAmountFen.intValue());
 		buildOrderForm.getRecord().addAll(orderDetails);
+		buildOrderForm.setContactsId(contactsId);
 		log.info("构建订单信息--end,result:{}", JSON.toJSONString(buildOrderForm));
 		return buildOrderForm;
 	}
@@ -231,7 +230,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setRoomId(createOrderForm.getRoomId());
 		hotelOrderEntity.setUserId(createOrderForm.getUserId());
 		hotelOrderEntity.setCouponsId(createOrderForm.getCouponId());
-		hotelOrderEntity.setOrderNo(IdUtil.simpleUUID());
+		hotelOrderEntity.setOrderNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS") + createOrderForm.getUserId());
 		hotelOrderEntity.setSellerName(hotelSellerEntity.getName());
 		hotelOrderEntity.setSellerAddress(hotelSellerEntity.getAddress());
 		hotelOrderEntity.setCoordinates(createOrderForm.getCoordinates());
@@ -240,6 +239,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setNum(createOrderForm.getRoomNum());
 		hotelOrderEntity.setDays(Integer.valueOf(String.valueOf(createOrderForm.getCheckInDay())));
 		hotelOrderEntity.setRoomType(hotelRoomEntity.getName());
+		hotelOrderEntity.setContactsId(createOrderForm.getContactsId());
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
 		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
 		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
@@ -249,6 +249,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setTotalCost(BigDecimal.valueOf(Long.valueOf(createOrderForm.getTotalAmountFen())).divide(new BigDecimal(100)));
 		this.save(hotelOrderEntity);
 		// 保存订单明细
+		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
 		// 扣减房量 TODO
 		log.info("创建酒店订单--end,result,orderId:{}", hotelOrderEntity.getId());
 		return hotelOrderEntity;

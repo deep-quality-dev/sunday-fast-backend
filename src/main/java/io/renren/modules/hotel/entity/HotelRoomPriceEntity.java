@@ -69,5 +69,5 @@ public class HotelRoomPriceEntity implements Serializable {
 	 * 
 	 */
 	private Integer status;
-
+	
 }

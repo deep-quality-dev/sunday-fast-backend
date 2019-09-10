@@ -32,5 +32,5 @@ public class AssessTagRelEntity implements Serializable {
 	 * tagID
 	 */
 	private Long tagId;
-
+	
 }

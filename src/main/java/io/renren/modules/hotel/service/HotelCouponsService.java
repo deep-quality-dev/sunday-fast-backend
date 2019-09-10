@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -70,8 +71,9 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 * 商家可用优惠券
 	 * @param userId
 	 * @param sellerId
+	 * @param amount 
 	 * @return
 	 */
-	List<UserCoupons> canUseCoupons(Long userId, Long sellerId);
+	List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount);
 	
 }

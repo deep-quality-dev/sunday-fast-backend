@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.service.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.AssessTagRelDao;
 import io.renren.modules.hotel.dao.HotelAssessDao;
+import io.renren.modules.hotel.entity.AssessTagRelEntity;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.form.CommentForm;
 import io.renren.modules.hotel.service.HotelAssessService;
@@ -29,6 +33,9 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 
 	@Autowired
 	private HotelOrderService hotelOrderService;
+
+	@Autowired
+	private AssessTagRelDao assessTagRelDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -56,11 +63,20 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 		hotelAssessEntity.setUserId(userId);
 		hotelAssessEntity.setOrderId(commentForm.getBizId());
 		baseMapper.insert(hotelAssessEntity);
+		if (CollectionUtil.isNotEmpty(commentForm.getTagList())) {
+			List<Long> tags = commentForm.getTagList();
+			tags.forEach((Long id) -> {
+				AssessTagRelEntity assessTagRelEntity = new AssessTagRelEntity();
+				assessTagRelEntity.setTagId(id);
+				assessTagRelEntity.setAssessId(hotelAssessEntity.getId());
+				assessTagRelDao.insert(assessTagRelEntity);
+			});
+		}
 	}
 
 	@Override
 	public Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId, String type) {
-		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId,type);
+		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId, type);
 		return pageResult;
 	}
 

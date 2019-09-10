@@ -6,6 +6,7 @@ import io.renren.modules.hotel.vo.UserCoupons;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -36,6 +37,6 @@ public interface HotelCouponsCashDao extends BaseMapper<HotelCouponsCashEntity> 
 	 * @param sellerId
 	 * @return
 	 */
-	List<UserCoupons> canUseCoupons(Long userId, Long sellerId);
+	List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount);
 
 }

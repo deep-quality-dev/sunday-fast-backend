@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,8 @@ public class HotelCouponAPI extends BaseController {
 	@Login
 	@ApiOperation("商家可用优惠券")
 	@GetMapping("/sellerCanUseCoupons")
-	public R canUseCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId) {
-		List<UserCoupons> coupons = hotelCouponsService.canUseCoupons(userId, sellerId);
+	public R canUseCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId,@RequestParam(name = "amount", required = true)BigDecimal amount) {
+		List<UserCoupons> coupons = hotelCouponsService.canUseCoupons(userId, sellerId,amount);
 		return R.ok(coupons);
 	}
 }

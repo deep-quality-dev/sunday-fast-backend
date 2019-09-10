@@ -18,12 +18,15 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.AssessTagDao;
 import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.dao.HotelMemberCollectDao;
 import io.renren.modules.hotel.dao.HotelSellerDao;
+import io.renren.modules.hotel.entity.AssessTagEntity;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.service.HotelSellerService;
@@ -42,6 +45,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private HotelAssessDao hotelAssessDao;
+
+	@Autowired
+	private AssessTagDao assessTagDao;
 
 	@Autowired
 	private HotelRoomService hotelRoomService;
@@ -81,6 +87,8 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		// 平均评分
 		double score = hotelAssessDao.avgScore(sellerId);
 		hotelInfo.setScore(NumberUtil.round(score, 2));
+		List<AssessTagEntity> tags = assessTagDao.hotelTags(sellerId);
+		hotelInfo.setTags(tags);
 		log.info("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
 		return hotelInfo;
 	}
@@ -147,6 +155,15 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 //			roomMoneyEntity.setSellerId(hotelSellerEntity.getId());
 //			hotelRoomMoneyService.save(roomMoneyEntity);
 //		}
+
+	}
+
+	@Override
+	public void sellerApply(SellerApplyForm sellerApplyForm) {
+		HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
+		hotelSellerEntity.setState(1);
+
+		baseMapper.insert(hotelSellerEntity);
 
 	}
 

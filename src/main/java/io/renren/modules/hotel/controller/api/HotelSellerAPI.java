@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
+import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
@@ -75,5 +76,15 @@ public class HotelSellerAPI extends BaseController {
 	public R search(String kw, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
 		Page<HotelSearchVo> pageResult = hotelSellerService.search(kw, new Page<HotelSearchVo>(page, limit));
 		return R.ok(pageResult);
+	}
+
+	/**
+	 * 商家入驻申请
+	 * 
+	 * @return
+	 */
+	public R sellerApply(SellerApplyForm sellerApplyForm) {
+		hotelSellerService.sellerApply(sellerApplyForm);
+		return R.ok();
 	}
 }

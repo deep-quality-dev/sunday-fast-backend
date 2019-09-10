@@ -76,6 +76,6 @@ public class HotelContactsAPI {
 	@ApiOperation("最近联系人")
 	public R latelyContact(@RequestAttribute("userId") Long userId) {
 		AddContactsForm addContactsForm = hotelContactsService.latelyContact(userId);
-		return R.ok();
+		return R.ok(addContactsForm);
 	}
 }

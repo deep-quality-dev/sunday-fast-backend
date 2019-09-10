@@ -2,6 +2,9 @@ package io.renren.modules.hotel.dao;
 
 import io.renren.modules.hotel.entity.AssessTagEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -13,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AssessTagDao extends BaseMapper<AssessTagEntity> {
+
+	List<AssessTagEntity> hotelTags(Long sellerId);
 	
 }

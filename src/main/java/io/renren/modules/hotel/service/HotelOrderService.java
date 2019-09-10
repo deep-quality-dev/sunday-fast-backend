@@ -105,4 +105,9 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * 自动取消订单
 	 */
 	public void updateOrder2Cancel();
+
+	/**
+	 * 自动完成订单
+	 */
+	void completeOrder();
 }

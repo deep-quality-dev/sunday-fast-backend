@@ -60,6 +60,7 @@
 		t.coupons_id = t1.id
 		where
 		t.coupons_type = 2 and t.user_id = #{userId}
+		and t1.conditions <![CDATA[ <= ]]> #{amount} or t1.conditions is null
 		and t1.seller_id = #{sellerId}
 	</select>
 </mapper>

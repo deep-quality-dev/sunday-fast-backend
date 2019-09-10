@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +78,8 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public List<UserCoupons> canUseCoupons(Long userId, Long sellerId) {
-		return hotelCouponsCashDao.canUseCoupons(userId, sellerId);
+	public List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount) {
+		return hotelCouponsCashDao.canUseCoupons(userId, sellerId,amount);
 	}
 
 }

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -292,7 +293,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelOrderRecordEntity.setCreateTime(DateUtil.date());
 			hotelOrderRecordEntity.setMoneyId(createOrderForm.getMoneyId());
 			hotelOrderRecordEntity.setOrderId(orderId);
-			hotelOrderRecordEntity.setPriceId(hotelRoomPriceEntity.getId());
+			if (null != hotelRoomPriceEntity) {
+				hotelOrderRecordEntity.setPriceId(hotelRoomPriceEntity.getId());
+			}
 			hotelOrderRecordEntity.setSellerId(createOrderForm.getSellerId());
 			hotelOrderRecordEntity.setRoomType(hotelRoomEntity.getName() + "-" + hotelRoomMoneyEntity.getName());
 			orderRecordEntities.add(hotelOrderRecordEntity);
@@ -501,5 +504,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			}
 		});
 		log.info("自动取消订单--end");
+	}
+
+	@Override
+	public void completeOrder() {
 	}
 }

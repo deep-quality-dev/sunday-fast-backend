@@ -2,9 +2,11 @@ package io.renren.modules.hotel.vo;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 
+import io.renren.modules.hotel.entity.AssessTagEntity;
 import lombok.Data;
 
 @Data
@@ -135,4 +137,5 @@ public class HotelInfo {
 
 	private BigDecimal score;
 
+	private List<AssessTagEntity> tags;
 }

@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
+import io.renren.modules.hotel.entity.AssessTagEntity;
 import io.renren.modules.hotel.form.CommentForm;
+import io.renren.modules.hotel.service.AssessTagService;
 import io.renren.modules.hotel.service.HotelAssessService;
 import io.renren.modules.hotel.vo.CommentItemVo;
 import io.swagger.annotations.Api;
@@ -36,6 +39,16 @@ public class HotelCommentAPI {
 	@Autowired
 	private HotelAssessService hotelAssessService;
 
+	@Autowired
+	private AssessTagService assessTagService;
+
+	@ApiOperation("酒店评论Tag列表")
+	@GetMapping("/commentTags")
+	public R commentTags() {
+		List<AssessTagEntity> assessTagEntities = assessTagService.list();
+		return R.ok(assessTagEntities);
+	}
+
 	/**
 	 * 酒店评论列表
 	 * 
@@ -43,8 +56,8 @@ public class HotelCommentAPI {
 	 */
 	@ApiOperation("酒店评论列表")
 	@GetMapping("/hotelList")
-	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long sellerId,String type) {
-		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page, limit), sellerId,type);
+	public R hotelList(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, Long sellerId, String type) {
+		Page<CommentItemVo> pageResult = hotelAssessService.hotelCommnetList(new Page<CommentItemVo>(page, limit), sellerId, type);
 		return R.ok(pageResult);
 	}
 
@@ -78,5 +91,12 @@ public class HotelCommentAPI {
 	public R hotelCount(@RequestParam Long sellerId) {
 		Map<String, Integer> result = hotelAssessService.hotelCount(sellerId);
 		return R.ok(result);
+	}
+
+	@ApiOperation("酒店评论tags")
+	@GetMapping("/hotelTags")
+	public R hotelTags(@RequestParam Long sellerId) {
+		List<AssessTagEntity> assessTagEntities = assessTagService.hotelTags(sellerId);
+		return R.ok(assessTagEntities);
 	}
 }

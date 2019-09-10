@@ -4,11 +4,21 @@
 <mapper namespace="io.renren.modules.hotel.dao.AssessTagDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.AssessTagEntity" id="assessTagMap">
-        <result property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="createTime" column="create_time"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.AssessTagEntity"
+		id="assessTagMap">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
 
-
+	<select id="hotelTags" resultMap="assessTagMap">
+		SELECT t.* From t_assess_tag t
+		inner JOIN
+		(SELECT t1.tag_id,count(*) as count from t_assess_tag_rel t1
+		inner JOIN t_hotel_assess t2 on t1.assess_id = t2.id where
+		t2.seller_id = #{sellerId}
+		order by count desc limit 3) rel on t.id =
+		rel.tag_id
+	</select>
 </mapper>

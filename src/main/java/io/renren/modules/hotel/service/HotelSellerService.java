@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
@@ -52,4 +53,10 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	Page<HotelSearchVo> search(String kw, Page<HotelSearchVo> page);
 
 	void test();
+
+	/**
+	 * 商家入驻申请
+	 * @param sellerApplyForm
+	 */
+	void sellerApply(SellerApplyForm sellerApplyForm);
 }

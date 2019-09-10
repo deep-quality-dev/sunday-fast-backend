@@ -1,5 +1,8 @@
 package io.renren.modules.hotel.form;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 
 import io.swagger.annotations.ApiModel;
@@ -36,8 +39,11 @@ public class CommentForm {
 	@ApiModelProperty(value = "类型 1-酒店，2-上")
 	@NotBlank(message = "评价类型不能为空")
 	private int type;
-	
+
 	@ApiModelProperty(value = "对应酒店订单或者商品订单")
 	@NotBlank(message = "业务ID不能为空")
 	private Long bizId;
+
+	@ApiModelProperty(value = "Tag 列表")
+	private List<Long> tagList = new ArrayList<Long>();
 }

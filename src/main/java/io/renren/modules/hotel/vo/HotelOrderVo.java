@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.vo;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.Data;
@@ -44,6 +45,12 @@ public class HotelOrderVo {
 	 * 离店时间
 	 */
 	private Date departureTime;
+	
+	/**
+	 * 优惠券金额
+	 */
+	private BigDecimal yhqCost;
+	
 	// 房型
 	private String roomType;
 	private Integer status;

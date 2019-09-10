@@ -52,4 +52,9 @@ public class HotelRoomMoneyEntity implements Serializable {
 	 */
 	private Integer isVip;
 
+	/**
+	 * 预付标示
+	 */
+	private int prepay = 0;
+
 }

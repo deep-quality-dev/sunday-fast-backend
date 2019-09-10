@@ -18,6 +18,8 @@
 		<result property="payFlag" column="pay_flag" />
 		<result property="content" column="content" />
 		<result property="bgImage" column="bg_image" />
+		<result property="level" column="level" />
+		<result property="rgb" column="rgb" />
 	</resultMap>
 
 	<select id="userCardList"
@@ -29,6 +31,7 @@
 		t1.discount,
 		t1.icon,
 		t1.bg_image,
+		t1.rgb,
 		t.score,
 		t.balance,
 		t2.id as seller_id,
@@ -51,6 +54,7 @@
 		t1.name,
 		t1.content,
 		t1.discount,
+		t1.rgb,
 		t1.icon,
 		t1.bg_image,
 		t.score,
@@ -77,6 +81,7 @@
 		t.discount,
 		t.icon,
 		t.bg_image,
+		t.rgb,
 		t1.`name`
 		as seller_name,
 		t1.id as seller_id

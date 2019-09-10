@@ -13,6 +13,7 @@
         <result property="num" column="num"/>
         <result property="status" column="status"/>
         <result property="isVip" column="is_vip"/>
+         <result property="prepay" column="prepay"/>
     </resultMap>
 
 

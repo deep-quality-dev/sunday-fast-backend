@@ -41,7 +41,7 @@ public class HotelMemberLevelEntity implements Serializable {
 	/**
 	 * 折扣
 	 */
-	private String discount;
+	private BigDecimal discount;
 	/**
 	 * 排序
 	 */
@@ -66,5 +66,9 @@ public class HotelMemberLevelEntity implements Serializable {
 	 * 卡片背景图
 	 */
 	private String bgImage;
+
+	private String rgb;
+
+	private int level;
 
 }

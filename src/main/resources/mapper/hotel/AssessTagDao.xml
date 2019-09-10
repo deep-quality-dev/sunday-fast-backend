@@ -18,7 +18,9 @@
 		(SELECT t1.tag_id,count(*) as count from t_assess_tag_rel t1
 		inner JOIN t_hotel_assess t2 on t1.assess_id = t2.id where
 		t2.seller_id = #{sellerId}
-		order by count desc limit 3) rel on t.id =
+		group by t1.tag_id
+		order by count desc limit
+		2) rel on t.id =
 		rel.tag_id
 	</select>
 </mapper>

@@ -40,6 +40,7 @@ import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelOrderDao;
 import io.renren.modules.hotel.entity.HotelContactsEntity;
+import io.renren.modules.hotel.entity.HotelCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
@@ -52,6 +53,7 @@ import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
 import io.renren.modules.hotel.form.BuildOrderForm;
 import io.renren.modules.hotel.form.CreateOrderForm;
 import io.renren.modules.hotel.service.HotelContactsService;
+import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
@@ -88,6 +90,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	private HotelRoomPriceService hotelRoomPriceService;
 
 	@Autowired
+	private HotelCouponsService hotelCouponsService;
+
+	@Autowired
 	private HotelMemberService hotelMemberService;
 
 	@Autowired
@@ -120,7 +125,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId, int roomNum, String checkInDate, String checkOutDate) {
+	public BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId, Long couponId, int roomNum, String checkInDate, String checkOutDate) {
 		log.info("构建订单信息--start,userId,{},roomId:{},moneyId:{},checkInDate:{},checkOutDate:{}", userId, roomId, moneyId, checkInDate, checkOutDate);
 		BuildOrderForm buildOrderForm = new BuildOrderForm();
 		// 总金额
@@ -169,6 +174,14 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			log.info("查询每日房价--end，result:{}", JSON.toJSONString(orderDetail));
 			orderDetails.add(orderDetail);
 		}
+		// 优惠券信息
+		if (null != couponId && couponId > 0) {
+			HotelCouponsEntity couponsEntity = hotelCouponsService.getById(couponId);
+			if (NumberUtil.isGreater(new BigDecimal(totalAmount), couponsEntity.getConditions())) {
+				buildOrderForm.setDiscountsAcmount(NumberUtil.decimalFormat("0.00", couponsEntity.getCost().doubleValue()));
+				totalAmount = NumberUtil.sub(totalAmount.doubleValue(), couponsEntity.getCost().doubleValue());
+			}
+		}
 		buildOrderForm.setTotalAmount(NumberUtil.decimalFormat("0.00", totalAmount));
 		BigDecimal totalAmountFen = NumberUtil.mul(totalAmount, new BigDecimal(100));
 		buildOrderForm.setTotalAmountFen(totalAmountFen.intValue());
@@ -182,7 +195,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	@Transactional
 	public WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException {
 		CreateOrderForm createOrderForm = new CreateOrderForm();
-		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
+		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getCouponId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
 		createOrderForm.setMoneyId(buildOrderForm.getMoneyId());
@@ -345,6 +358,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		BeanUtil.copyProperties(hotelOrderEntity, hotelOrderVo);
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		hotelOrderVo.setSellerTel(hotelSellerEntity.getTel());
+		hotelOrderVo.setCoordinates(hotelSellerEntity.getCoordinates());
 		hotelOrderVo.setTotalCost(NumberUtil.decimalFormat("0.00", hotelOrderEntity.getTotalCost().doubleValue()));
 		log.info("查询订单详情--end,result:{}", JSON.toJSONString(hotelOrderVo));
 		return hotelOrderVo;

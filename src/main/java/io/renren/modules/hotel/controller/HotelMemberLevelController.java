@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
+
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
@@ -61,7 +65,14 @@ public class HotelMemberLevelController extends AbstractController {
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelmemberlevel:save")
 	public R save(@RequestBody HotelMemberLevelEntity hotelMemberLevel) {
-		hotelMemberLevel.setSellerId(1L);
+		hotelMemberLevel.setSellerId(0L);
+		if (!isAdmin()) {
+			hotelMemberLevel.setSellerId(getSellerId());
+		}
+		if (StrUtil.isNotEmpty(hotelMemberLevel.getBgImage())) {
+			String result = HttpUtil.get(hotelMemberLevel.getBgImage() + "?x-oss-process=image/average-hue");
+			hotelMemberLevel.setRgb(JSON.parseObject(result).getString("RGB"));
+		}
 		hotelMemberLevelService.save(hotelMemberLevel);
 
 		return R.ok();
@@ -73,8 +84,11 @@ public class HotelMemberLevelController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelmemberlevel:update")
 	public R update(@RequestBody HotelMemberLevelEntity hotelMemberLevel) {
+		if (StrUtil.isNotEmpty(hotelMemberLevel.getBgImage())) {
+			String result = HttpUtil.get(hotelMemberLevel.getBgImage() + "?x-oss-process=image/average-hue");
+			hotelMemberLevel.setRgb(JSON.parseObject(result).getString("RGB"));
+		}
 		hotelMemberLevelService.updateById(hotelMemberLevel);
-
 		return R.ok();
 	}
 

@@ -45,7 +45,7 @@ public class HotelCouponsEntity implements Serializable {
 	/**
 	 * 优惠条件
 	 */
-	private String conditions;
+	private BigDecimal conditions;
 	/**
 	 * 发布数量
 	 */

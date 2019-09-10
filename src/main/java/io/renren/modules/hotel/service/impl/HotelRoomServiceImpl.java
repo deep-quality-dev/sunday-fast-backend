@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +21,12 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.hotel.dao.HotelMemberLevelDao;
+import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
 import io.renren.modules.hotel.dao.HotelRoomDao;
 import io.renren.modules.hotel.dao.HotelRoomNumDao;
+import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
+import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
@@ -31,6 +36,7 @@ import io.renren.modules.hotel.service.HotelRoomPriceService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.vo.RoomMoneyVo;
 import io.renren.modules.hotel.vo.RoomVO;
+import io.renren.modules.hotel.vo.RoomVipMoneyVo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -46,6 +52,12 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	@Autowired
 	private HotelRoomNumDao hotelRoomNumDao;
 
+	@Autowired
+	private HotelMemberLevelDao hotelMemberLevelDao;
+
+	@Autowired
+	private HotelMemberLevelDetailDao hotelMemberLevelDetailDao;
+
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		Object sellerId = params.get("seller_id");
@@ -54,15 +66,20 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	}
 
 	@Override
-	public List<RoomVO> roomList(Long sellerId, String startTime, String endTime) {
+	public List<RoomVO> roomList(Long userId, Long sellerId, String startTime, String endTime) {
 		log.info("获取酒店房型列表--start，sellerId:{},startTime:{},endTime:{}", sellerId, startTime, endTime);
+		// 商家会员列表
+		List<HotelMemberLevelEntity> hotelMemberLevelEntities = hotelMemberLevelDao.selectList(Wrappers.<HotelMemberLevelEntity>lambdaQuery().eq(HotelMemberLevelEntity::getSellerId, sellerId).orderByAsc(HotelMemberLevelEntity::getLevel));
+		// 用户酒店会员
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(hotelMemberLevelDetailEntity.getLevelId());
 		List<HotelRoomEntity> hotelRoomEntities = this.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", sellerId));
 		List<RoomVO> roomVOs = hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
 			RoomVO roomVO = new RoomVO();
 			BeanUtil.copyProperties(item, roomVO);
 			roomVO.setPrice(NumberUtil.decimalFormat("0.00", item.getPrice().doubleValue()));
 			// 获取房价列表
-			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
+			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);
 			return roomVO;
 		}).collect(Collectors.toList());
@@ -71,17 +88,19 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	}
 
 	@Override
-	public List<RoomMoneyVo> roomMoneys(Long roomId, Date startTime, Date endTime) {
+	public List<RoomMoneyVo> roomMoneys(HotelMemberLevelEntity memberLevelEntity, List<HotelMemberLevelEntity> hotelMemberLevelEntities, Long roomId, Date startTime, Date endTime) {
 		log.debug("查询酒店房价列表--start，roomId:{},startTime:{},endTime:{}", roomId, startTime, endTime);
 		List<RoomMoneyVo> roomMoneyVos = new ArrayList<RoomMoneyVo>();
 		List<HotelRoomMoneyEntity> moneyEntities = hotelRoomMoneyService.list(new QueryWrapper<HotelRoomMoneyEntity>().eq("room_id", roomId).eq("status", 1));
 		roomMoneyVos = moneyEntities.stream().map((HotelRoomMoneyEntity item) -> {
 			RoomMoneyVo roomMoneyVo = new RoomMoneyVo();
 			// 先set会员价格
+			BigDecimal amount = item.getPrice();
 			roomMoneyVo.setAmount(item.getPrice());
 			roomMoneyVo.setId(item.getId());
 			roomMoneyVo.setName(item.getName());
 			roomMoneyVo.setVipPrice(item.getIsVip());
+			roomMoneyVo.setPrepay(roomMoneyVo.getPrepay());
 			roomMoneyVo.setHasRoom(item.getNum());
 			// 查询特殊房量
 			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
@@ -95,6 +114,23 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			if (null != hotelRoomPriceEntity) {
 				// 先set会员价格
 				roomMoneyVo.setAmount(hotelRoomPriceEntity.getMprice());
+				amount = hotelRoomPriceEntity.getMprice();
+			}
+			// 生成会员价格列表
+			if (null != memberLevelEntity) {
+				roomMoneyVo.setAmount(NumberUtil.mul(amount, memberLevelEntity.getDiscount()));
+			}
+			if (item.getIsVip() == 1) {
+				List<RoomVipMoneyVo> vipPriceList = new ArrayList<RoomVipMoneyVo>();
+				RoomVipMoneyVo roomVipMoneyVo = null;
+				for (HotelMemberLevelEntity hotelMemberLevelEntity : hotelMemberLevelEntities) {
+					roomVipMoneyVo = new RoomVipMoneyVo();
+					roomVipMoneyVo.setIcon(hotelMemberLevelEntity.getIcon());
+					roomVipMoneyVo.setAmount(NumberUtil.decimalFormat("0.00", NumberUtil.mul(amount, hotelMemberLevelEntity.getDiscount()).doubleValue()));
+					roomVipMoneyVo.setName(hotelMemberLevelEntity.getName());
+					vipPriceList.add(roomVipMoneyVo);
+				}
+				roomMoneyVo.setVipPriceList(vipPriceList);
 			}
 			return roomMoneyVo;
 		}).collect(Collectors.toList());

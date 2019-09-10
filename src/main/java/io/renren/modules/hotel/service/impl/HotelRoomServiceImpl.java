@@ -100,7 +100,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			roomMoneyVo.setId(item.getId());
 			roomMoneyVo.setName(item.getName());
 			roomMoneyVo.setVipPrice(item.getIsVip());
-			roomMoneyVo.setPrepay(roomMoneyVo.getPrepay());
+			roomMoneyVo.setPrepay(item.getPrepay());
 			roomMoneyVo.setHasRoom(item.getNum());
 			// 查询特殊房量
 			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));

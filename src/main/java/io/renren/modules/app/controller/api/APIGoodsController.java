@@ -18,33 +18,38 @@ import io.renren.modules.app.dto.GoodsDto;
 import io.renren.modules.app.service.GoodsService;
 import io.renren.modules.app.vo.GoodsDetailVo;
 import io.renren.modules.app.vo.GoodsVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
+@Api(value = "积分商城接口", tags = { "积分商城接口" })
 @RestController
 @RequestMapping("app/goods")
 public class APIGoodsController {
 
-    @Autowired
-    private GoodsService goodsService;
+	@Autowired
+	private GoodsService goodsService;
 
-    /**
-     * 商品列表
-     *
-     * @return
-     */
-    @GetMapping("/list")
-    public R list(Page<GoodsVo> page, GoodsDto params) {
-        Page<GoodsVo> goodsListPage = goodsService.goodsList(page,params);
-        return R.ok().put("data",goodsListPage);
-    }
+	/**
+	 * 商品列表
+	 *
+	 * @return
+	 */
+	@ApiOperation("商品列表")
+	@GetMapping("/list")
+	public R list(@RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, GoodsDto params) {
+		Page<GoodsVo> goodsListPage = goodsService.goodsList(new Page<GoodsVo>(page, limit), params);
+		return R.ok().put("data", goodsListPage);
+	}
 
-    /**
-     *
-     * @param goodsId
-     * @return
-     */
-    @GetMapping("/detail")
-    public R detail(@RequestParam(name = "id") Integer goodsId){
-        GoodsDetailVo goodsDetail = goodsService.goodsDetail(goodsId,null);
-        return R.ok().put("data",goodsDetail);
-    }
+	/**
+	 *
+	 * @param goodsId
+	 * @return
+	 */
+	@ApiOperation("商品详情")
+	@GetMapping("/detail")
+	public R detail(@RequestParam(name = "id") Integer goodsId) {
+		GoodsDetailVo goodsDetail = goodsService.goodsDetail(goodsId, null);
+		return R.ok().put("data", goodsDetail);
+	}
 }

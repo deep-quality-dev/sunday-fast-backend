@@ -150,10 +150,6 @@ public class HotelOrderEntity implements Serializable {
 	 */
 	private Integer hbId;
 	/**
-	 * 
-	 */
-	private String fromId;
-	/**
 	 * 分类
 	 */
 	private Integer classify;
@@ -182,5 +178,10 @@ public class HotelOrderEntity implements Serializable {
 	 * 联系人ID
 	 */
 	private Long contactsId;
+	
+	/**
+	 * 小程序模板消息使用
+	 */
+	private String formId;
 
 }

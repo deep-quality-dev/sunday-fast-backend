@@ -55,5 +55,12 @@ public class CreateOrderForm {
 
 	// 经纬度
 	private String coordinates;
+	
+	/**
+	 * 订单是否是需要预付
+	 */
+	private int prepay;
+	
+	private String formId;
 
 }

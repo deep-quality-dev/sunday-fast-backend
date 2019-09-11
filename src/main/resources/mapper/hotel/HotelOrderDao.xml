@@ -4,48 +4,50 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelOrderDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelOrderEntity" id="hotelOrderMap">
-        <result property="id" column="id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="roomId" column="room_id"/>
-        <result property="userId" column="user_id"/>
-        <result property="couponsId" column="coupons_id"/>
-        <result property="orderNo" column="order_no"/>
-        <result property="sellerName" column="seller_name"/>
-        <result property="sellerAddress" column="seller_address"/>
-        <result property="coordinates" column="coordinates"/>
-        <result property="arrivalTime" column="arrival_time"/>
-        <result property="departureTime" column="departure_time"/>
-        <result property="ddTime" column="dd_time"/>
-        <result property="price" column="price"/>
-        <result property="num" column="num"/>
-        <result property="days" column="days"/>
-        <result property="roomType" column="room_type"/>
-        <result property="roomLogo" column="room_logo"/>
-        <result property="bedType" column="bed_type"/>
-        <result property="name" column="name"/>
-        <result property="tel" column="tel"/>
-        <result property="status" column="status"/>
-        <result property="outTradeNo" column="out_trade_no"/>
-        <result property="disCost" column="dis_cost"/>
-        <result property="yjCost" column="yj_cost"/>
-        <result property="yhqCost" column="yhq_cost"/>
-        <result property="yyzkCost" column="yyzk_cost"/>
-        <result property="totalCost" column="total_cost"/>
-        <result property="enabled" column="enabled"/>
-        <result property="createTime" column="create_time"/>
-        <result property="retreatCost" column="retreat_cost"/>
-        <result property="hbCost" column="hb_cost"/>
-        <result property="hbId" column="hb_id"/>
-        <result property="fromId" column="from_id"/>
-        <result property="classify" column="classify"/>
-        <result property="code" column="code"/>
-        <result property="jjTime" column="jj_time"/>
-        <result property="voice" column="voice"/>
-        <result property="qrFromid" column="qr_fromid"/>
-        <result property="orderInfo" column="order_info"/>
-        <result property="contactsId" column="contacts_id"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelOrderEntity"
+		id="hotelOrderMap">
+		<result property="id" column="id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="roomId" column="room_id" />
+		<result property="userId" column="user_id" />
+		<result property="couponsId" column="coupons_id" />
+		<result property="orderNo" column="order_no" />
+		<result property="sellerName" column="seller_name" />
+		<result property="sellerAddress" column="seller_address" />
+		<result property="coordinates" column="coordinates" />
+		<result property="arrivalTime" column="arrival_time" />
+		<result property="departureTime" column="departure_time" />
+		<result property="ddTime" column="dd_time" />
+		<result property="price" column="price" />
+		<result property="num" column="num" />
+		<result property="days" column="days" />
+		<result property="roomType" column="room_type" />
+		<result property="roomLogo" column="room_logo" />
+		<result property="bedType" column="bed_type" />
+		<result property="name" column="name" />
+		<result property="tel" column="tel" />
+		<result property="status" column="status" />
+		<result property="outTradeNo" column="out_trade_no" />
+		<result property="disCost" column="dis_cost" />
+		<result property="yjCost" column="yj_cost" />
+		<result property="yhqCost" column="yhq_cost" />
+		<result property="yyzkCost" column="yyzk_cost" />
+		<result property="totalCost" column="total_cost" />
+		<result property="enabled" column="enabled" />
+		<result property="createTime" column="create_time" />
+		<result property="retreatCost" column="retreat_cost" />
+		<result property="hbCost" column="hb_cost" />
+		<result property="hbId" column="hb_id" />
+		<result property="classify" column="classify" />
+		<result property="code" column="code" />
+		<result property="jjTime" column="jj_time" />
+		<result property="voice" column="voice" />
+		<result property="qrFromid" column="qr_fromid" />
+		<result property="orderInfo" column="order_info" />
+		<result property="contactsId" column="contacts_id" />
+		<result property="formId" column="form_id" />
+	</resultMap>
 
 
 </mapper>

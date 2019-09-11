@@ -77,6 +77,7 @@ public class HotelRoomEntity implements Serializable {
 	 * 
 	 */
 	private String uniacid;
+	
 	/**
 	 * 床型尺寸
 	 */

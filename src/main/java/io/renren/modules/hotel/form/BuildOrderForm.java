@@ -76,6 +76,14 @@ public class BuildOrderForm {
 	private String hotelAddress;
 
 	private String sellerName;
+	
+	//小程序消息场景
+	private String formId;
+	
+	/**
+	 * 订单是否是需要预付
+	 */
+	private int prepay;
 
 	// 明细
 	List<OrderDetail> record = new ArrayList<OrderDetail>();

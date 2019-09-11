@@ -140,7 +140,7 @@ public class HotelOrderAPI extends BaseController {
 	 * @return
 	 */
 	@Login
-	@ApiOperation("取消订单")
+	@ApiOperation("删除订单")
 	@DeleteMapping("/deleteOrder/{orderId}")
 	public R deleteOrder(@RequestAttribute("userId") Long userId, @PathVariable Long orderId) {
 		hotelOrderService.deleteOrder(userId, orderId);

@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.form;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.Data;
@@ -38,8 +39,8 @@ public class CreateOrderForm {
 
 	// 入住人
 	private String checkInPerson;
-	
-	//联系人ID
+
+	// 联系人ID
 	private Long contactsId;
 
 	// 联系电话
@@ -55,12 +56,17 @@ public class CreateOrderForm {
 
 	// 经纬度
 	private String coordinates;
-	
+
 	/**
 	 * 订单是否是需要预付
 	 */
 	private int prepay;
-	
+
 	private String formId;
+
+	private String payMethod;
+
+	// 支付积分
+	private BigDecimal payIntegral;
 
 }

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-
 import io.renren.modules.hotel.entity.AssessTagEntity;
 import lombok.Data;
 

@@ -20,7 +20,6 @@ import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.form.BecomeVipForm;
 import io.renren.modules.hotel.form.BindVipCardForm;
 import io.renren.modules.hotel.service.HotelMemberLevelService;
-import io.renren.modules.hotel.vo.VipCardInfoVo;
 import io.renren.modules.hotel.vo.VipCardItemVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

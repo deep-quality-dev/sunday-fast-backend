@@ -4,17 +4,24 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelRoomMoneyDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelRoomMoneyEntity" id="hotelRoomMoneyMap">
-        <result property="id" column="id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="roomId" column="room_id"/>
-        <result property="name" column="name"/>
-        <result property="price" column="price"/>
-        <result property="num" column="num"/>
-        <result property="status" column="status"/>
-        <result property="isVip" column="is_vip"/>
-         <result property="prepay" column="prepay"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelRoomMoneyEntity"
+		id="hotelRoomMoneyMap">
+		<result property="id" column="id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="roomId" column="room_id" />
+		<result property="name" column="name" />
+		<result property="price" column="price" />
+		<result property="num" column="num" />
+		<result property="status" column="status" />
+		<result property="isVip" column="is_vip" />
+		<result property="prepay" column="prepay" />
+		<result property="integral" column="integral" />
+	</resultMap>
 
+	<update id="updateRoomNum">
+		UPDATE t_hotel_room_money t set t.num =
+		t.num+#{roomNum} where t.id = #{params.id} and t.num = #{params.num}
+	</update>
 
 </mapper>

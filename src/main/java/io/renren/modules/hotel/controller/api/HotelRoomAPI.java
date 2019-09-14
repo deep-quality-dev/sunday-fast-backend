@@ -39,8 +39,8 @@ public class HotelRoomAPI extends BaseController {
 	@Login
 	@ApiOperation("查询房型列表")
 	@GetMapping("/roomList")
-	public R roomList(@RequestAttribute("userId") Long userId,Long sellerId, String checkInTime, String checkOutTime) {
-		List<RoomVO> roomVOs = hotelRoomService.roomList(userId,sellerId, checkInTime, checkOutTime);
+	public R roomList(@RequestAttribute("userId") Long userId,Long sellerId, String checkInTime, String checkOutTime,int roomType) {
+		List<RoomVO> roomVOs = hotelRoomService.roomList(userId,sellerId, checkInTime, checkOutTime,roomType);
 		return R.ok().put("data", roomVOs);
 	}
 

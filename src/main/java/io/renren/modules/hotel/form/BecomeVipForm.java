@@ -39,12 +39,18 @@ public class BecomeVipForm {
 	@ApiModelProperty(value = "姓名")
 	@NotBlank(message = "姓名不能为空")
 	private String name;
-	
+
 	/**
 	 * 推销员
 	 */
 	@ApiModelProperty(value = "推销员")
-	private String  salesman; 
+	private String salesman;
+
+	/**
+	 * 小程序场景
+	 */
+	@ApiModelProperty(value = "小程序formId")
+	private String formId;
 //	/**
 //	 * 手机
 //	 */

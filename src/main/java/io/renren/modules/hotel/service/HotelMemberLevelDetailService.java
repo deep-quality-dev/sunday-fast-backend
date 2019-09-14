@@ -1,10 +1,12 @@
 package io.renren.modules.hotel.service;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.service.IService;
+
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
-
-import java.util.Map;
 
 /**
  * 会员卡详情
@@ -16,5 +18,29 @@ import java.util.Map;
 public interface HotelMemberLevelDetailService extends IService<HotelMemberLevelDetailEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 用户是否有会员卡
+     * @param userId
+     * @param sellerId
+     * @return
+     */
+	boolean hasVipCard(Long userId, Long sellerId);
+
+	/**
+	 * 余额支付
+	 * @param sellerId
+	 * @param userId
+	 * @param totalCost
+	 */
+	void balanceTransaction(Long sellerId, Long userId, BigDecimal totalCost);
+
+	/**
+	 * 积分支付
+	 * @param sellerId
+	 * @param userId
+	 * @param totalCost
+	 */
+	void integralTransaction(Long sellerId, Long userId, BigDecimal totalCost);
 }
 

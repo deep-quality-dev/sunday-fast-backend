@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -66,13 +67,17 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	}
 
 	@Override
-	public List<RoomVO> roomList(Long userId, Long sellerId, String startTime, String endTime) {
+	public List<RoomVO> roomList(Long userId, Long sellerId, String startTime, String endTime, int roomType) {
 		log.info("获取酒店房型列表--start，sellerId:{},startTime:{},endTime:{}", sellerId, startTime, endTime);
 		// 商家会员列表
 		List<HotelMemberLevelEntity> hotelMemberLevelEntities = hotelMemberLevelDao.selectList(Wrappers.<HotelMemberLevelEntity>lambdaQuery().eq(HotelMemberLevelEntity::getSellerId, sellerId).orderByAsc(HotelMemberLevelEntity::getLevel));
 		// 用户酒店会员
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
-		HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(hotelMemberLevelDetailEntity.getLevelId());
+		Long levelId = 0L;
+		if (null != hotelMemberLevelDetailEntity) {
+			levelId = hotelMemberLevelDetailEntity.getLevelId();
+		}
+		HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(levelId);
 		List<HotelRoomEntity> hotelRoomEntities = this.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", sellerId));
 		List<RoomVO> roomVOs = hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
 			RoomVO roomVO = new RoomVO();
@@ -136,6 +141,15 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 		}).collect(Collectors.toList());
 		log.info("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomMoneyVos));
 		return roomMoneyVos;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum) {
+		// 更新价格数量
+		hotelRoomMoneyService.updateRoomNum(hotelRoomMoneyEntity, roomNum);
+		// 更新房型总数
+		baseMapper.updateRoomNum(hotelRoomEntity, roomNum);
 	}
 
 }

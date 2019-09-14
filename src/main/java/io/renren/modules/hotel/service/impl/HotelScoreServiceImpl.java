@@ -22,7 +22,6 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
 import io.renren.modules.hotel.dao.HotelScoreDao;
-import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelScoreEntity;
 import io.renren.modules.hotel.service.HotelMemberService;

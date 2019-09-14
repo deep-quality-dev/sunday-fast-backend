@@ -1,11 +1,11 @@
 package io.renren.modules.hotel.entity;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.math.BigDecimal;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
 /**
@@ -44,7 +44,7 @@ public class HotelCouponsCashEntity implements Serializable {
 	/**
 	 * 优惠条件
 	 */
-	private String conditions;
+	private BigDecimal conditions;
 	/**
 	 * 发布数量
 	 */

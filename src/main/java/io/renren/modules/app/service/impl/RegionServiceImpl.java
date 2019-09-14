@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import io.renren.common.utils.Query;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
 import io.renren.modules.app.dao.RegionDao;
 import io.renren.modules.app.entity.RegionEntity;
 import io.renren.modules.app.service.RegionService;

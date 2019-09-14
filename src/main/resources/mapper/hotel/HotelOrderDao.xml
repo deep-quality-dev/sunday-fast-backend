@@ -47,6 +47,9 @@
 		<result property="orderInfo" column="order_info" />
 		<result property="contactsId" column="contacts_id" />
 		<result property="formId" column="form_id" />
+		<result property="payMethod" column="pay_method" />
+		<result property="totalIntegral" column="total_integral" />
+		<result property="commentFlag" column="comment_flag" />
 	</resultMap>
 
 

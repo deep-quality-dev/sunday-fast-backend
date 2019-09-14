@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -37,13 +38,15 @@ import io.renren.common.utils.Query;
 import io.renren.modules.constants.HotelOrderStatus;
 import io.renren.modules.constants.HotelWxMsgTemplate;
 import io.renren.modules.constants.OrderTypeConstants;
+import io.renren.modules.constants.PayMethodConstants;
 import io.renren.modules.hotel.config.WxMaConfiguration;
 import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelOrderDao;
 import io.renren.modules.hotel.entity.HotelContactsEntity;
-import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
+import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
@@ -55,7 +58,8 @@ import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
 import io.renren.modules.hotel.form.BuildOrderForm;
 import io.renren.modules.hotel.form.CreateOrderForm;
 import io.renren.modules.hotel.service.HotelContactsService;
-import io.renren.modules.hotel.service.HotelCouponsService;
+import io.renren.modules.hotel.service.HotelCouponsCashService;
+import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
@@ -90,10 +94,13 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	private HotelRoomMoneyService hotelRoomMoneyService;
 
 	@Autowired
+	private HotelMemberLevelDetailService hotelMemberLevelDetailService;
+
+	@Autowired
 	private HotelRoomPriceService hotelRoomPriceService;
 
 	@Autowired
-	private HotelCouponsService hotelCouponsService;
+	private HotelCouponsCashService hotelCouponsCashService;
 
 	@Autowired
 	private HotelMemberService hotelMemberService;
@@ -148,6 +155,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		buildOrderForm.setContactsId(contactsId);
 		// 查询房价
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(moneyId);
+		// 积分换房
+		if (null != hotelRoomMoneyEntity.getIntegral() || NumberUtil.isGreater(new BigDecimal(0), hotelRoomMoneyEntity.getIntegral())) {
+			buildOrderForm.setPayIntegral(NumberUtil.mul(roomNum, hotelRoomMoneyEntity.getIntegral()));
+		}
 		// 房型价格是否需要预付
 		buildOrderForm.setPrepay(hotelRoomMoneyEntity.getPrepay());
 		HotelRoomPriceEntity hotelRoomPriceEntity = null;
@@ -181,10 +192,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		}
 		// 优惠券信息
 		if (null != couponId && couponId > 0) {
-			HotelCouponsEntity couponsEntity = hotelCouponsService.getById(couponId);
-			if (NumberUtil.isGreater(new BigDecimal(totalAmount), couponsEntity.getConditions())) {
-				buildOrderForm.setDiscountsAcmount(NumberUtil.decimalFormat("0.00", couponsEntity.getCost().doubleValue()));
-				totalAmount = NumberUtil.sub(totalAmount.doubleValue(), couponsEntity.getCost().doubleValue());
+			HotelCouponsCashEntity hotelCouponsCashEntity = hotelCouponsCashService.getById(couponId);
+			if (NumberUtil.isGreater(new BigDecimal(totalAmount), hotelCouponsCashEntity.getConditions())) {
+				buildOrderForm.setDiscountsAcmount(NumberUtil.decimalFormat("0.00", hotelCouponsCashEntity.getCost().doubleValue()));
+				totalAmount = NumberUtil.sub(totalAmount.doubleValue(), hotelCouponsCashEntity.getCost().doubleValue());
 			}
 		}
 		buildOrderForm.setTotalAmount(NumberUtil.decimalFormat("0.00", totalAmount));
@@ -192,6 +203,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		buildOrderForm.setTotalAmountFen(totalAmountFen.intValue());
 		buildOrderForm.getRecord().addAll(orderDetails);
 		buildOrderForm.setContactsId(contactsId);
+		// 用户积分 余额
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelRoomEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		if (null != hotelMemberLevelDetailEntity) {
+			buildOrderForm.setMemberBalance(hotelMemberLevelDetailEntity.getBalance());
+			buildOrderForm.setMemberIntegral(hotelMemberLevelDetailEntity.getScore());
+		}
 		log.info("构建订单信息--end,result:{}", JSON.toJSONString(buildOrderForm));
 		return buildOrderForm;
 	}
@@ -203,49 +220,88 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		CreateOrderForm createOrderForm = new CreateOrderForm();
 		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getCouponId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
+		createOrderForm.setPayMethod(buildOrderForm.getPayMethod());
 		createOrderForm.setFormId(buildOrderForm.getFormId());
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
 		createOrderForm.setMoneyId(buildOrderForm.getMoneyId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(buildOrderForm.getRoomId());
 		createOrderForm.setSellerId(hotelRoomEntity.getSellerId());
 		createOrderForm.setUserId(userId);
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(buildOrderForm.getMoneyId());
 		HotelContactsEntity hotelContactsEntity = hotelContactsService.getById(buildOrderForm.getContactsId());
 		createOrderForm.setCheckInPerson(hotelContactsEntity.getName());
 		createOrderForm.setMobile(hotelContactsEntity.getMobile());
 		HotelOrderEntity hotelOrderEntity = this.createHotelOrder(createOrderForm);
-		log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
 		// 酒店信息
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelRoomEntity.getSellerId());
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		// 商户微信信息
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelRoomEntity.getSellerId()));
-		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
-		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + createOrderForm.getRoomName() + "(" + createOrderForm.getCheckInDay() + "晚)");
-		wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
-		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
-		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
-		wxPayUnifiedOrderRequest.setTotalFee(1);
-		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
-		wxPayUnifiedOrderRequest.setSpbillCreateIp(buildOrderForm.getIp());
-		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
-		log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
-		// 不需要预付，先发送订房成功通知
-		if (createOrderForm.getPrepay() == 0) {
-			List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
-			maTemplateDatas.add(new WxMaTemplateData("first", "酒店预订成功通知"));
-			maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
-			maTemplateDatas.add(new WxMaTemplateData("keyword2", DateUtil.formatDate(hotelOrderEntity.getCreateTime())));
-			maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
-			maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
-			maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getName()));
-			maTemplateDatas.add(new WxMaTemplateData("keyword6", hotelSellerEntity.getTel()));
-			WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-DAfpKktBMZmWJBPVnMzC3_MlP9Sz0ug4JrFqeg", null, buildOrderForm.getFormId(), maTemplateDatas, null);
-			WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
+		String formId = buildOrderForm.getFormId();
+		if (PayMethodConstants.BALANCE.equals(buildOrderForm.getPayMethod())) {
+			// 扣除余额
+			hotelMemberLevelDetailService.balanceTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+			// 扣减房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -buildOrderForm.getRoomNum());
+			// 更新订单
+			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
+			// 发送预定通知
+			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			return null;
+		} else if (PayMethodConstants.INTEGRAL.equals(buildOrderForm.getPayMethod())) {
+			// 扣除积分
+			hotelMemberLevelDetailService.integralTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+			// 扣减房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -buildOrderForm.getRoomNum());
+			// 更新订单
+			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
+			// 发送预定通知
+			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			//添加消费记录
+			
+			return null;
+		} else if (PayMethodConstants.WX.equals(buildOrderForm.getPayMethod())) {
+			log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
+			WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+			wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
+			wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + createOrderForm.getRoomName() + "(" + createOrderForm.getCheckInDay() + "晚)");
+			wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
+			wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
+			wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
+			wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+			wxPayUnifiedOrderRequest.setTotalFee(1);
+			wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room, buildOrderForm.getFormId())));
+			wxPayUnifiedOrderRequest.setSpbillCreateIp(buildOrderForm.getIp());
+			WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+			log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
+			hotelOrderEntity.setFormId(mpOrderResult.getPackageValue().substring("prepay_id=".length(), mpOrderResult.getPackageValue().length()));
+			baseMapper.updateById(hotelOrderEntity);
+			// 不需要预付，先发送订房成功通知
+			if (createOrderForm.getPrepay() == 0) {
+				sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			}
+			return mpOrderResult;
+		} else {
+			throw new RRException("请选择支付方式");
 		}
-		return mpOrderResult;
+	}
+
+	public void sendReserveMessage(CreateOrderForm createOrderForm, HotelOrderEntity hotelOrderEntity, HotelSellerEntity hotelSellerEntity, HotelMemberEntity hotelMemberEntity, HotelWxConfigEntity hotelWxConfigEntity, String formId) throws WxErrorException {
+		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
+		maTemplateDatas.add(new WxMaTemplateData("first", "酒店预订成功通知"));
+		maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
+		maTemplateDatas.add(new WxMaTemplateData("keyword2", DateUtil.formatDate(hotelOrderEntity.getCreateTime())));
+		maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
+		maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
+		maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getName()));
+		maTemplateDatas.add(new WxMaTemplateData("keyword6", hotelSellerEntity.getTel()));
+		WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-DAfpKktBMZmWJBPVnMzC3_MlP9Sz0ug4JrFqeg", null, formId, maTemplateDatas, null);
+		try {
+			WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
+		} catch (Exception e) {
+			throw new RRException("发送微信通知失败");
+		}
 	}
 
 	/**
@@ -281,7 +337,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());
 		hotelOrderEntity.setEnabled(1);
+		hotelOrderEntity.setPayMethod(createOrderForm.getPayMethod());
 		hotelOrderEntity.setTotalCost(BigDecimal.valueOf(Long.valueOf(createOrderForm.getTotalAmountFen())).divide(new BigDecimal(100)));
+		hotelOrderEntity.setTotalIntegral(createOrderForm.getPayIntegral());
+		if (null != createOrderForm.getCouponId() && 0L != createOrderForm.getCouponId()) {
+//			HotelCouponsCashEntity hotelCouponsCashEntity = hotelCouponsCashService.getById(couponId);
+//			if (NumberUtil.isGreater(new BigDecimal(totalAmount), hotelCouponsCashEntity.getConditions())) {
+//				buildOrderForm.setDiscountsAcmount(NumberUtil.decimalFormat("0.00", hotelCouponsCashEntity.getCost().doubleValue()));
+//				totalAmount = NumberUtil.sub(totalAmount.doubleValue(), hotelCouponsCashEntity.getCost().doubleValue());
+//			}
+		}
 		this.save(hotelOrderEntity);
 		// 保存订单明细
 		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
@@ -388,7 +453,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	@SneakyThrows
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void cancelOrder(Long userId, Long orderId) {
+	public void cancelOrder(Long userId, Long orderId, String formId) {
 		log.info("取消订单--start,userId:{},orderId:{}", userId, orderId);
 		HotelOrderEntity hotelOrderEntity = this.getOne(new QueryWrapper<HotelOrderEntity>().eq("id", orderId).eq("user_id", userId));
 		if (null == hotelOrderEntity) {
@@ -422,7 +487,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
 			maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
 			maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getRoomType()));
-			WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "Fd9nEk2KlaHR80YSIYaVNMSZqrR3vG2x1HnhdfcxHVo", null, hotelOrderEntity.getFormId(), maTemplateDatas, null);
+			WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "Fd9nEk2KlaHR80YSIYaVNMSZqrR3vG2x1HnhdfcxHVo", null, formId, maTemplateDatas, null);
 			WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
 		}
 		this.updateById(hotelOrderEntity);
@@ -559,5 +624,13 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Override
 	public void completeOrder() {
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderStatus2Payed(Long orderId) {
+		HotelOrderEntity hotelOrderEntity = baseMapper.selectById(orderId);
+		hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
+		baseMapper.updateById(hotelOrderEntity);
 	}
 }

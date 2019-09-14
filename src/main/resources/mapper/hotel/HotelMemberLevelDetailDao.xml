@@ -27,5 +27,15 @@
 		<result property="balance" column="balance" />
 	</resultMap>
 
+	<update id="updateBanlance">
+		UPDATE t_hotel_member_level_detail t set t.balance =
+		t.balance - #{totalCost} where t.id =#{params.id} and t.balance =
+		#{params.balance}
+	</update>
+
+	<update id="updateintegral">
+		UPDATE t_hotel_member_level_detail t set t.score = t.score - #{totalCost}
+		where t.id =#{params.id} and t.score = #{params.score}
+	</update>
 
 </mapper>

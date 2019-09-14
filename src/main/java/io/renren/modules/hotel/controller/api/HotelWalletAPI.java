@@ -2,6 +2,8 @@ package io.renren.modules.hotel.controller.api;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 
+import io.renren.common.utils.NetworkUtil;
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.entity.HotelRechargeConfigEntity;
@@ -27,6 +30,7 @@ import io.renren.modules.hotel.vo.HotelScore;
 import io.renren.modules.hotel.vo.WalletDataVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 
 @Api(value = "钱包", tags = { "钱包接口" })
 @RestController
@@ -78,10 +82,11 @@ public class HotelWalletAPI {
 	}
 
 	@Login
+	@SneakyThrows 
 	@ApiOperation("卡片充值")
 	@PostMapping("/cardRecharge")
-	public R cardRecharge(@RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {
-		cardRechargeForm.setIp("127.0.0.1");
+	public R cardRecharge(HttpServletRequest request, @RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {
+		cardRechargeForm.setIp(NetworkUtil.getIpAddress(request));
 		WxPayMpOrderResult mpOrderResult = hotelRechargeService.cardRecharge(userId, cardRechargeForm);
 		return R.ok(mpOrderResult);
 	}

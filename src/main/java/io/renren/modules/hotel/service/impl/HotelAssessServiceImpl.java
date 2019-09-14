@@ -23,6 +23,7 @@ import io.renren.modules.hotel.dao.AssessTagRelDao;
 import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.entity.AssessTagRelEntity;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
+import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.form.CommentForm;
 import io.renren.modules.hotel.service.HotelAssessService;
 import io.renren.modules.hotel.service.HotelOrderService;
@@ -50,7 +51,10 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	public void addAssess(Long userId, CommentForm commentForm) {
 		Long sellerId = null;
 		if (1 == commentForm.getType()) {
-			sellerId = hotelOrderService.getById(commentForm.getBizId()).getSellerId();
+			HotelOrderEntity hotelOrderEntity = hotelOrderService.getById(commentForm.getBizId());
+			hotelOrderEntity.setCommentFlag(1);
+			hotelOrderService.updateById(hotelOrderEntity);
+			sellerId = hotelOrderEntity.getSellerId();
 		}
 		if (2 == commentForm.getType()) {
 			sellerId = null;

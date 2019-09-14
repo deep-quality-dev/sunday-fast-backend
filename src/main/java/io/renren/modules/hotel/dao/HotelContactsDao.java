@@ -1,10 +1,10 @@
 package io.renren.modules.hotel.dao;
 
-import io.renren.modules.hotel.entity.HotelContactsEntity;
-import io.renren.modules.hotel.form.AddContactsForm;
+import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Mapper;
+
+import io.renren.modules.hotel.entity.HotelContactsEntity;
 
 /**
  * 联系人

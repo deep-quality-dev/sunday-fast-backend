@@ -72,8 +72,9 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * 
 	 * @param userId   用户ID
 	 * @param orderId  订单ID
+	 * @param formId   小程序模板消息
 	 */
-	void cancelOrder(Long userId, Long orderId);
+	void cancelOrder(Long userId, Long orderId, String formId);
 
 	/**
 	 * 更新订单状态为支付成功
@@ -81,6 +82,12 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param outTradeNo 支付单号
 	 */
 	void updateOrderStatus2Payed(String outTradeNo);
+	
+	/**
+	 * 更新订单为支付  用于积分支付，余额支付
+	 * @param orderId
+	 */
+	void updateOrderStatus2Payed(Long orderId);
 
 	/**
 	 * 根据订单号支付

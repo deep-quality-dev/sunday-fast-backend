@@ -1,11 +1,12 @@
 package io.renren.modules.hotel.entity;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.math.BigDecimal;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
 /**
@@ -129,6 +130,11 @@ public class HotelOrderEntity implements Serializable {
 	 * 总价格
 	 */
 	private BigDecimal totalCost;
+
+	/**
+	 * 总积分
+	 */
+	private BigDecimal totalIntegral;
 	/**
 	 * 是否删除,-1删除
 	 */
@@ -173,15 +179,25 @@ public class HotelOrderEntity implements Serializable {
 	 * 订单快照
 	 */
 	private String orderInfo;
-	
+
 	/**
 	 * 联系人ID
 	 */
 	private Long contactsId;
-	
+
 	/**
 	 * 小程序模板消息使用
 	 */
 	private String formId;
+
+	/**
+	 * 支付方式
+	 */
+	private String payMethod;
+
+	/**
+	 * 评论标识
+	 */
+	private int commentFlag;
 
 }

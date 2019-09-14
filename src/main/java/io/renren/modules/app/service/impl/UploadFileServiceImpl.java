@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import io.renren.common.utils.Query;
-
 import io.renren.modules.app.dao.UploadFileDao;
 import io.renren.modules.app.entity.UploadFileEntity;
 import io.renren.modules.app.service.UploadFileService;

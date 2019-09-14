@@ -201,7 +201,7 @@ public class WxPayController {
 				}
 				if (OrderTypeConstants.order_recharge == orderType.getType()) {
 					log.info("进入充值回调");
-					hotelRechargeService.cardRechargeHandler(notifyResult.getOutTradeNo());
+					hotelRechargeService.cardRechargeHandler(notifyResult.getOutTradeNo(), orderType.getFormId());
 				}
 			}
 		});

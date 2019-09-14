@@ -7,9 +7,9 @@ import java.util.Map;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
-import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
+import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.vo.RoomMoneyVo;
 import io.renren.modules.hotel.vo.RoomVO;
 
@@ -30,9 +30,10 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @param sellerId
 	 * @param startTime
 	 * @param endTime
+	 * @param roomType 
 	 * @return
 	 */
-	List<RoomVO> roomList(Long userId,Long sellerId, String startTime, String endTime);
+	List<RoomVO> roomList(Long userId, Long sellerId, String startTime, String endTime, int roomType);
 
 	/**
 	 * 获取房价
@@ -41,4 +42,12 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @return
 	 */
 	List<RoomMoneyVo> roomMoneys(HotelMemberLevelEntity memberLevelEntity, List<HotelMemberLevelEntity> hotelMemberLevelEntities, Long roomId, Date startTime, Date endTime);
+
+	/**
+	 * 更新房间数量
+	 * @param hotelRoomEntity 
+	 * @param hotelRoomMoneyEntity
+	 * @param roomNum
+	 */
+	void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum);
 }

@@ -1,8 +1,12 @@
 package io.renren.modules.hotel.dao;
 
-import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.math.BigDecimal;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 
 /**
  * 会员卡详情
@@ -13,5 +17,19 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface HotelMemberLevelDetailDao extends BaseMapper<HotelMemberLevelDetailEntity> {
+
+	/**
+	 * 扣减余额
+	 * @param hotelMemberLevelDetailEntity
+	 * @param totalCost
+	 */
+	void updateBanlance(HotelMemberLevelDetailEntity params, BigDecimal totalCost);
+
+	/**
+	 * 扣减积分
+	 * @param hotelMemberLevelDetailEntity
+	 * @param totalCost
+	 */
+	void updateintegral(HotelMemberLevelDetailEntity params, BigDecimal totalCost);
 	
 }

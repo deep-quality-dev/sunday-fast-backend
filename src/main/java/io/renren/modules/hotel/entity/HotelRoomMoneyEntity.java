@@ -56,5 +56,10 @@ public class HotelRoomMoneyEntity implements Serializable {
 	 * 预付标示
 	 */
 	private int prepay = 0;
+	
+	/**
+	 * 积分换房
+	 */
+	private BigDecimal integral;
 
 }

@@ -1,13 +1,11 @@
 package io.renren.modules.hotel.form;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import io.renren.modules.hotel.vo.OrderDetail;
 import io.swagger.annotations.ApiModel;
@@ -76,14 +74,26 @@ public class BuildOrderForm {
 	private String hotelAddress;
 
 	private String sellerName;
-	
-	//小程序消息场景
+
+	// 小程序消息场景
 	private String formId;
-	
+
 	/**
 	 * 订单是否是需要预付
 	 */
 	private int prepay;
+
+	// 支付方式
+	private String payMethod;
+
+	// 用户余额
+	private BigDecimal memberBalance;
+
+	// 用户积分
+	private BigDecimal memberIntegral;
+
+	// 支付积分
+	private BigDecimal payIntegral;
 
 	// 明细
 	List<OrderDetail> record = new ArrayList<OrderDetail>();

@@ -9,4 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderType {
 	private int type;
+	private String formId;
+
+	public OrderType(int type) {
+		this.type = type;
+	}
 }

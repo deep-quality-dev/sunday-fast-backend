@@ -45,8 +45,9 @@ public interface HotelRechargeService extends IService<HotelRechargeEntity> {
 	 * 充值回调
 	 * 
 	 * @param outTradeNo
+	 * @param formId
 	 */
-	void cardRechargeHandler(String outTradeNo);
+	void cardRechargeHandler(String outTradeNo, String formId);
 
 	/**
 	 * 添加消费记录

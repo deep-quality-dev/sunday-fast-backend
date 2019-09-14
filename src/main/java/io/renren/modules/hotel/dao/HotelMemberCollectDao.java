@@ -1,12 +1,12 @@
 package io.renren.modules.hotel.dao;
 
-import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
-import io.renren.modules.hotel.vo.CollectItemVo;
+import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import org.apache.ibatis.annotations.Mapper;
+import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
+import io.renren.modules.hotel.vo.CollectItemVo;
 
 /**
  * 用户收藏表

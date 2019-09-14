@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
 import io.renren.modules.sys.controller.AbstractController;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.R;
 
 /**
  * 代金券

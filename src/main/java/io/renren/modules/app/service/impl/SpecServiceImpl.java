@@ -11,10 +11,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import io.renren.common.utils.Query;
-
 import cn.hutool.core.bean.BeanUtil;
 import io.renren.common.utils.PageUtils;
+import io.renren.common.utils.Query;
 import io.renren.modules.app.dao.SpecDao;
 import io.renren.modules.app.entity.SpecEntity;
 import io.renren.modules.app.entity.SpecItemEntity;

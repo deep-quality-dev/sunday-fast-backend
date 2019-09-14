@@ -1,8 +1,10 @@
 package io.renren.modules.hotel.dao;
 
-import io.renren.modules.hotel.entity.HotelConsumptionRecordEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import io.renren.modules.hotel.entity.HotelConsumptionRecordEntity;
 
 /**
  * 会员卡消费明细

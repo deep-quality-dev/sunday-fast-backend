@@ -56,4 +56,5 @@ public class CommonAPI {
 
 		return R.ok().put("url", url);
 	}
+	
 }

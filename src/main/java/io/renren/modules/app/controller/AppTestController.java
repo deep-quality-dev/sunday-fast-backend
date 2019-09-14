@@ -12,41 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.http.HttpUtil;
 import io.renren.common.utils.R;
-import io.renren.modules.constants.HotelWxMsgTemplate;
 import io.renren.modules.hotel.config.WxMaConfiguration;
-import io.renren.modules.hotel.config.WxMpConfiguration;
-import io.renren.modules.hotel.entity.HotelMemberEntity;
-import io.renren.modules.hotel.entity.HotelOrderEntity;
-import io.renren.modules.hotel.entity.HotelRoomEntity;
-import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
-import io.renren.modules.hotel.entity.HotelSellerEntity;
-import io.renren.modules.hotel.entity.HotelWxConfigEntity;
-import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
-import io.renren.modules.hotel.service.HotelRoomMoneyService;
-import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.service.HotelSellerService;
-import io.renren.modules.hotel.service.HotelWxTemplateService;
 import io.swagger.annotations.Api;
 import me.chanjar.weixin.common.error.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
-import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 
 /**
  * 测试接口

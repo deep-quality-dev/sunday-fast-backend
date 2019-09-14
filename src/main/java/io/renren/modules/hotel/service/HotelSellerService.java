@@ -1,7 +1,10 @@
 package io.renren.modules.hotel.service;
 
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
 import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
@@ -9,8 +12,6 @@ import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
 import io.renren.modules.hotel.vo.HotelSearchVo;
-
-import java.util.Map;
 
 /**
  * 

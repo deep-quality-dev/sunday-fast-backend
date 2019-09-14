@@ -1,7 +1,6 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.hutool.db.Page;
-import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 import io.renren.modules.hotel.service.HotelRoomNumService;
 import io.renren.modules.hotel.vo.RoomNumVo;
-import io.renren.modules.hotel.vo.RoomPriceVo;
 import io.renren.modules.sys.controller.AbstractController;
 
 /**

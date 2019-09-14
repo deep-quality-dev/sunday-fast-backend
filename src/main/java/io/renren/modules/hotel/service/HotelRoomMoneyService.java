@@ -17,4 +17,12 @@ import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 public interface HotelRoomMoneyService extends IService<HotelRoomMoneyEntity> {
 
 	PageUtils queryPage(Map<String, Object> params);
+
+	/**
+	 * 更新房量
+	 * 
+	 * @param hotelRoomMoneyEntity
+	 * @param roomNum
+	 */
+	void updateRoomNum(HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum);
 }

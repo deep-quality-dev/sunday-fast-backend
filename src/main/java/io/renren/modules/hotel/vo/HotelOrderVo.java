@@ -18,7 +18,7 @@ public class HotelOrderVo {
 	 * 商家名字
 	 */
 	private String sellerName;
-	
+
 	private String sellerTel;
 
 	/**
@@ -29,7 +29,7 @@ public class HotelOrderVo {
 	 * 联系电话
 	 */
 	private String tel;
-	
+
 	private Date createTime;
 	/**
 	 * 商家地址
@@ -45,12 +45,14 @@ public class HotelOrderVo {
 	 * 离店时间
 	 */
 	private Date departureTime;
-	
+
+	private int commentFlag;
+
 	/**
 	 * 优惠券金额
 	 */
 	private BigDecimal yhqCost;
-	
+
 	// 房型
 	private String roomType;
 	private Integer status;

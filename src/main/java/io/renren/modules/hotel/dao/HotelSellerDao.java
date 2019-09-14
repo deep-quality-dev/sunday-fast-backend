@@ -1,15 +1,14 @@
 package io.renren.modules.hotel.dao;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.renren.modules.hotel.vo.HotelItemVo;
-import io.renren.modules.hotel.vo.HotelSearchCondition;
-import io.renren.modules.hotel.vo.HotelSearchVo;
-
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.vo.HotelItemVo;
+import io.renren.modules.hotel.vo.HotelSearchCondition;
+import io.renren.modules.hotel.vo.HotelSearchVo;
 
 /**
  * 

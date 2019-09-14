@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.renren.modules.hotel.service.HotelOrderService;
-import io.renren.modules.job.task.ITask;
 import lombok.extern.slf4j.Slf4j;
 
 

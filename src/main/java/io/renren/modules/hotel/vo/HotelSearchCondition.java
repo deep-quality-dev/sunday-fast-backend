@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.vo;
 
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,7 +29,7 @@ public class HotelSearchCondition {
 	private int sort;
 
 	@ApiModelProperty(value = "酒店星级 1-经济型，2-二星级，3-三星级，4-4星级，5-星级")
-	private int hotelStar;
+	private String levelSort;
 
 	@ApiModelProperty(value = "酒店服务 1-健身房，2-会议室，")
 	private int hotelService;

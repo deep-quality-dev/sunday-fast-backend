@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -62,7 +63,7 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 		HotelAssessEntity hotelAssessEntity = new HotelAssessEntity();
 		BeanUtil.copyProperties(commentForm, hotelAssessEntity);
 		hotelAssessEntity.setSellerId(sellerId);
-		hotelAssessEntity.setTime(DateUtil.millsecond(DateUtil.date()));
+		hotelAssessEntity.setTime(DateTime.now().getTime());
 		hotelAssessEntity.setStatus(1);
 		hotelAssessEntity.setUserId(userId);
 		hotelAssessEntity.setOrderId(commentForm.getBizId());

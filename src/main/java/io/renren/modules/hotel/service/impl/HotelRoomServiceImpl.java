@@ -78,7 +78,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			levelId = hotelMemberLevelDetailEntity.getLevelId();
 		}
 		HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(levelId);
-		List<HotelRoomEntity> hotelRoomEntities = this.list(new QueryWrapper<HotelRoomEntity>().eq("seller_id", sellerId));
+		List<HotelRoomEntity> hotelRoomEntities = this.list(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getClassify, roomType));
 		List<RoomVO> roomVOs = hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
 			RoomVO roomVO = new RoomVO();
 			BeanUtil.copyProperties(item, roomVO);

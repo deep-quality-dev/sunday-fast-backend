@@ -63,6 +63,7 @@ import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
+import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomPriceService;
 import io.renren.modules.hotel.service.HotelRoomService;
@@ -87,6 +88,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	/** 金额为分的格式 */
 	public static final String CURRENCY_FEN_REGEX = "\\-?[0-9]+";
 
+	@Autowired
+	private HotelRechargeService hotelRechargeService;
 	@Autowired
 	private HotelRoomService hotelRoomService;
 
@@ -237,7 +240,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		// 商户微信信息
-		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelRoomEntity.getSellerId()));
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		String formId = buildOrderForm.getFormId();
 		if (PayMethodConstants.BALANCE.equals(buildOrderForm.getPayMethod())) {
 			// 扣除余额
@@ -248,6 +251,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
 			// 发送预定通知
 			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			//添加流水
+			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+			hotelRechargeService.addConsumptionRecord(hotelOrderEntity.getTotalCost(), memberLevelDetailEntity.getLevelId(), userId, "在线预定，" + hotelOrderEntity.getRoomType());
 			return null;
 		} else if (PayMethodConstants.INTEGRAL.equals(buildOrderForm.getPayMethod())) {
 			// 扣除积分
@@ -258,8 +264,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
 			// 发送预定通知
 			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
-			//添加消费记录
-			
+			// 添加积分流水
+			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "在线预定，" + hotelOrderEntity.getRoomType());
 			return null;
 		} else if (PayMethodConstants.WX.equals(buildOrderForm.getPayMethod())) {
 			log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
@@ -467,7 +473,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			log.info("取消订单--订单已支付，执行退款");
 			// 已经在线付款，需要判断是否满足取消规则 TODO
 			Map<String, Object> refundParams = new HashMap<String, Object>();
-			HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
+			HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 			refundParams.put("appId", hotelWxConfigEntity.getAppId());
 			refundParams.put("outTradeNo", hotelOrderEntity.getOutTradeNo());
 			refundParams.put("totalFee", 1);
@@ -506,7 +512,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				return;
 			}
 			// 商户微信信息
-			HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
+			HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 			// SUCCESS—支付成功,REFUND—转入退款,NOTPAY—未支付,CLOSED—已关闭,REVOKED—已撤销（刷卡支付）,USERPAYING--用户支付中,PAYERROR--支付失败(其他原因，如银行返回失败)
 			WxPayOrderQueryResult payOrderQueryResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).queryOrder(null, outTradeNo);
 			String wxOrderStatus = payOrderQueryResult.getTradeState();
@@ -519,7 +525,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			this.updateById(hotelOrderEntity);
 			// 发送模板支付成功通知 TODO 目前采用异步线程，后期要改为消息队列
 			// 增加积分
-			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost().intValue(), 10, "订单支付成功");
+			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "订单支付成功");
 		} catch (WxPayException e) {
 			log.error("search wx order error,outTradeNo:{}", outTradeNo);
 			throw new RRException("查询微信支付订单异常");
@@ -531,7 +537,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	public WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException {
 		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		// 商户微信信息
-		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		// 用户信息
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(userId);
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
@@ -593,7 +599,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				HotelWxTemplateEntity hotelWxTemplateEntity = null;
 				HotelWxConfigEntity hotelWxConfigEntity = null;
 				for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
-					hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelOrderEntity.getSellerId()));
+					hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 					if (null != hotelWxConfigEntity) {
 						mpService = WxMpConfiguration.getMpServices().get(hotelWxConfigEntity.getAppId());
 						data = new ArrayList<>();

@@ -50,7 +50,6 @@ import io.renren.modules.hotel.entity.HotelWxConfigEntity;
 import io.renren.modules.hotel.form.CardRechargeForm;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelWxConfigService;
-import io.renren.modules.hotel.service.HotelWxTemplateService;
 import io.renren.modules.hotel.vo.CardConsumptionVo;
 import io.renren.modules.wx.OrderType;
 import lombok.SneakyThrows;
@@ -71,9 +70,6 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 
 	@Autowired
 	private HotelMemberLevelDetailDao hotelMemberLevelDetailDao;
-
-	@Autowired
-	private HotelWxTemplateService hotelWxTemplateService;
 
 	@Autowired
 	private HotelSellerDao hotelSellerDao;
@@ -135,7 +131,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		HotelMemberLevelEntity hotelMemberLevelEntity = hotelMemberLevelDao.selectById(cardRechargeForm.getCardId());
 		HotelMemberEntity hotelMemberEntity = hotelMemberDao.selectById(userId);
 		HotelSellerEntity hotelSellerEntity = hotelSellerDao.selectById(hotelMemberLevelEntity.getSellerId());
-		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", hotelMemberLevelEntity.getSellerId()));
+		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
 		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(在线充值)");
@@ -178,7 +174,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 			// 获取酒店取消订单微信消息模板
 			HotelWxConfigEntity hotelWxConfigEntity = null;
 			HotelSellerEntity hotelSellerEntity = hotelSellerDao.selectById(memberLevelDetailEntity.getSellerId());
-			hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>().eq("seller_id", memberLevelDetailEntity.getSellerId()));
+			hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 			if (null != hotelWxConfigEntity) {
 				// 发送取消订房通知
 				List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();

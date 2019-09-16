@@ -92,8 +92,6 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 		hotelScoreEntity.setCardId(hotelMemberLevelDetailEntity.getLevelId());
 		hotelScoreEntity.setNote(note);
 		this.save(hotelScoreEntity);
-		// 更新用户积分
-		hotelMemberService.updateUserScore(userId, score);
 		log.info("添加积分流水--end");
 	}
 
@@ -120,7 +118,7 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 	public Page<HotelScore> scoreList(Long userId, Long cardId, Page<HotelScore> page) {
 		List<HotelScore> hotelScores = new ArrayList<HotelScore>();
 		IPage<HotelScoreEntity> pageParams = new Page<HotelScoreEntity>(page.getCurrent(), page.getSize());
-		IPage<HotelScoreEntity> pageResult = this.page(pageParams, Wrappers.<HotelScoreEntity>lambdaQuery().eq(HotelScoreEntity::getCardId, cardId).eq(HotelScoreEntity::getUserId, userId));
+		IPage<HotelScoreEntity> pageResult = this.page(pageParams, Wrappers.<HotelScoreEntity>lambdaQuery().eq(HotelScoreEntity::getCardId, cardId).eq(HotelScoreEntity::getUserId, userId).orderByDesc(HotelScoreEntity::getCreateTime));
 		HotelScore hotelScore = null;
 		List<HotelScoreEntity> hotelScoreEntities = pageResult.getRecords();
 		for (HotelScoreEntity hotelScoreEntity : hotelScoreEntities) {

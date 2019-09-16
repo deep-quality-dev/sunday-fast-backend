@@ -43,7 +43,7 @@ public class HotelAssessEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private Integer time;
+	private Long time;
 	/**
 	 * 用户ID
 	 */

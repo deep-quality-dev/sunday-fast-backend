@@ -60,4 +60,10 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	 * @param sellerApplyForm
 	 */
 	void sellerApply(SellerApplyForm sellerApplyForm);
+
+	/**
+	 * 酒店过滤条件
+	 * @return
+	 */
+	Map<String, Object> filterData();
 }

@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +27,14 @@ import io.renren.modules.hotel.entity.AssessTagEntity;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.entity.HotelTopicEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
-import io.renren.modules.hotel.service.HotelRoomMoneyService;
-import io.renren.modules.hotel.service.HotelRoomService;
+import io.renren.modules.hotel.service.HotelBrandService;
+import io.renren.modules.hotel.service.HotelFacilityService;
 import io.renren.modules.hotel.service.HotelSellerService;
+import io.renren.modules.hotel.service.HotelTopicService;
+import io.renren.modules.hotel.vo.FacilityVo;
+import io.renren.modules.hotel.vo.HotelBrandTypeVo;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
@@ -50,10 +55,13 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	private AssessTagDao assessTagDao;
 
 	@Autowired
-	private HotelRoomService hotelRoomService;
+	private HotelTopicService hotelTopicService;
 
 	@Autowired
-	private HotelRoomMoneyService hotelRoomMoneyService;
+	private HotelBrandService hotelBrandService;
+
+	@Autowired
+	private HotelFacilityService hotelFacilityService;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -165,6 +173,18 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 		baseMapper.insert(hotelSellerEntity);
 
+	}
+
+	@Override
+	public Map<String, Object> filterData() {
+		Map<String, Object> data = new HashMap<String, Object>();
+		List<HotelTopicEntity> hotelTopicEntities = hotelTopicService.list();
+		data.put("topic", hotelTopicEntities);
+		List<HotelBrandTypeVo> brands = hotelBrandService.hotelBrandWithType();
+		data.put("brand", brands);
+		List<FacilityVo> facilityVos = hotelFacilityService.hotelFacility(1);
+		data.put("facility", facilityVos);
+		return data;
 	}
 
 }

@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,6 +36,13 @@ public class HotelSellerAPI extends BaseController {
 
 	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	@ApiOperation("酒店过滤条件")
+	@GetMapping("/filter")
+	public R filter() {
+		Map<String, Object> data = hotelSellerService.filterData();
+		return R.ok(data);
+	}
 
 	/**
 	 * 酒店信息

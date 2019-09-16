@@ -57,7 +57,7 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 			hotelScoreEntity = new HotelScoreEntity();
 			hotelScoreEntity.setCreateTime(DateUtil.date());
 			hotelScoreEntity.setNote("每日签到");
-			hotelScoreEntity.setScore(5);
+			hotelScoreEntity.setScore("+5");
 			hotelScoreEntity.setTime(time.getTime());
 			hotelScoreEntity.setSellerId(sellerId);
 			hotelScoreEntity.setUserId(userId);
@@ -84,7 +84,7 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 		log.info("添加积分流水--start,userId:{},score:{},type:{},note:{}", userId, score, type, note);
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
 		HotelScoreEntity hotelScoreEntity = new HotelScoreEntity();
-		hotelScoreEntity.setScore(score);
+		hotelScoreEntity.setScore(score > 0 ? "+" + score : "-" + score);
 		hotelScoreEntity.setCreateTime(DateUtil.date());
 		hotelScoreEntity.setUserId(userId);
 		hotelScoreEntity.setSellerId(sellerId);

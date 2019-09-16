@@ -42,7 +42,7 @@ public class HotelScoreEntity implements Serializable {
 	/**
 	 * 积分
 	 */
-	private Integer score;
+	private String score;
 	/**
 	 * 备注
 	 */

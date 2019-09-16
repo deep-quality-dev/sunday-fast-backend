@@ -54,5 +54,5 @@ public interface HotelRechargeService extends IService<HotelRechargeEntity> {
 	 * 
 	 * @param consumptionRecordEntity
 	 */
-	void addConsumptionRecord(BigDecimal amount, Long cardId, Long userId, String note);
+	void addConsumptionRecord(int amount, Long cardId, Long userId, String note);
 }

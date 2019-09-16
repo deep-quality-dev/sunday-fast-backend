@@ -40,7 +40,7 @@ public interface HotelMemberLevelDetailDao extends BaseMapper<HotelMemberLevelDe
 	 * @param hotelMemberLevelDetailEntity
 	 * @param totalCost
 	 */
-	void addIntegral(HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity, BigDecimal totalCost);
+	void addIntegral(HotelMemberLevelDetailEntity params, BigDecimal totalCost);
 
 	/**
 	 * 添加余额
@@ -48,6 +48,6 @@ public interface HotelMemberLevelDetailDao extends BaseMapper<HotelMemberLevelDe
 	 * @param hotelMemberLevelDetailEntity
 	 * @param totalCost
 	 */
-	void addBalance(HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity, BigDecimal totalCost);
+	void addBalance(HotelMemberLevelDetailEntity params, BigDecimal totalCost);
 
 }

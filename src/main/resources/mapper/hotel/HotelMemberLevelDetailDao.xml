@@ -25,6 +25,7 @@
 		<result property="status" column="status" />
 		<result property="score" column="score" />
 		<result property="balance" column="balance" />
+		<result property="qrCode" column="qr_code" />
 	</resultMap>
 
 	<update id="updateBanlance">

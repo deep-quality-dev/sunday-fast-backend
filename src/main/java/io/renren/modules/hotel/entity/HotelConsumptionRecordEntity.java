@@ -29,7 +29,7 @@ public class HotelConsumptionRecordEntity implements Serializable {
 	/**
 	 * 金额
 	 */
-	private BigDecimal amount;
+	private String amount;
 	/**
 	 * 卡片ID
 	 */

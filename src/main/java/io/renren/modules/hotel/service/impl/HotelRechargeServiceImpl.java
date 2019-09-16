@@ -164,10 +164,10 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 			// 给用户卡片加钱
 			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, hotelRechargeEntity.getUserId()).eq(HotelMemberLevelDetailEntity::getLevelId, hotelRechargeEntity.getCardId()));
 			memberLevelDetailEntity.setBalance(NumberUtil.add(memberLevelDetailEntity.getBalance(), hotelRechargeEntity.getCzMoney()));
-			this.addConsumptionRecord(hotelRechargeEntity.getCzMoney(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "在线充值");
-			if (null != hotelRechargeEntity.getZsMoney()) {
+			this.addConsumptionRecord(hotelRechargeEntity.getCzMoney().intValue(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "在线充值");
+			if (null != hotelRechargeEntity.getZsMoney() && hotelRechargeEntity.getZsMoney().intValue() > 0) {
 				memberLevelDetailEntity.setBalance(NumberUtil.add(memberLevelDetailEntity.getBalance(), hotelRechargeEntity.getZsMoney()));
-				this.addConsumptionRecord(hotelRechargeEntity.getZsMoney(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "充值赠送");
+				this.addConsumptionRecord(hotelRechargeEntity.getZsMoney().intValue(), hotelRechargeEntity.getCardId(), hotelRechargeEntity.getUserId(), "充值赠送");
 			}
 			hotelMemberLevelDetailDao.updateById(memberLevelDetailEntity);
 			HotelMemberEntity hotelMemberEntity = hotelMemberDao.selectById(memberLevelDetailEntity.getMemberId());
@@ -194,9 +194,9 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void addConsumptionRecord(BigDecimal amount, Long cardId, Long userId, String note) {
+	public void addConsumptionRecord(int amount, Long cardId, Long userId, String note) {
 		HotelConsumptionRecordEntity consumptionRecordEntity = new HotelConsumptionRecordEntity();
-		consumptionRecordEntity.setAmount(amount);
+		consumptionRecordEntity.setAmount(amount > 0 ? "+" + amount : "-" + amount);
 		consumptionRecordEntity.setCardId(cardId);
 		consumptionRecordEntity.setUserId(userId);
 		consumptionRecordEntity.setNote(note);

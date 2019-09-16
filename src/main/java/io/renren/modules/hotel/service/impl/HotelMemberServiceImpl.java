@@ -94,14 +94,15 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 
 	@Override
 	@Transactional
-	public void updateUserScore(Long userId, int score) {
-		log.info("更新用户积分--start,userId:{},score:{}", userId, score);
-		HotelMemberEntity memberEntity = this.getById(userId);
-		BigDecimal scoreCost = NumberUtil.add(null == memberEntity.getScore() ? "0.0" : memberEntity.getScore().toString(), String.valueOf(score));
-		memberEntity.setScore(scoreCost.intValue());
-		this.updateById(memberEntity);
-		// TODO 下发积分变动通知
+	public void updateUserScore(Long userId, String score) {
 		log.info("更新用户积分--end");
+		return;
+//		log.info("更新用户积分--start,userId:{},score:{}", userId, score);
+//		HotelMemberEntity memberEntity = this.getById(userId);
+//		BigDecimal scoreCost = NumberUtil.add(null == memberEntity.getScore() ? "0.0" : memberEntity.getScore().toString(), String.valueOf(score));
+//		memberEntity.setScore(scoreCost.intValue());
+//		this.updateById(memberEntity);
+		// TODO 下发积分变动通知
 	}
 
 	@Override

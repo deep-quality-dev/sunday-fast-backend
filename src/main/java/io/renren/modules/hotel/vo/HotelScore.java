@@ -7,7 +7,8 @@ import lombok.Data;
 @Data
 public class HotelScore {
 	private Long id;
-	private Integer score;
+	
+	private String score;
 	/**
 	 * 备注
 	 */

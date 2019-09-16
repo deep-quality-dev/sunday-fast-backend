@@ -35,6 +35,7 @@
 		t1.rgb,
 		t.score,
 		t.balance,
+		t.qr_code,
 		t2.id as seller_id,
 		t2.`name` as
 		seller_name

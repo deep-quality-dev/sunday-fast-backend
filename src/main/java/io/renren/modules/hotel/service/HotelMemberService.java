@@ -45,7 +45,7 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 * @param userId 用户ID
 	 * @param score  积分
 	 */
-	void updateUserScore(Long userId, int score);
+	void updateUserScore(Long userId, String score);
 
 	/**
 	 * 发送验证码

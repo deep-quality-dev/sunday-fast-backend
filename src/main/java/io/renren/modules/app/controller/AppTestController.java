@@ -20,6 +20,7 @@ import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.renren.modules.hotel.service.HotelMgtService;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.swagger.annotations.Api;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -36,6 +37,9 @@ public class AppTestController {
 	@Autowired
 	private HotelSellerService hotelSellerService;
 
+	@Autowired
+	private HotelMgtService hotelMgtService;
+
 	@GetMapping("/testTpl")
 	public void testTpl() throws WxErrorException {
 		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
@@ -50,6 +54,12 @@ public class AppTestController {
 		WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage("odHq-4ru1nfp6YcKVJcHhEkjAEtk", "qFLAITJmXZ37LFyaQMmk3XF88nQATfUW-RUNdUD8RTU", null, "wx11221358462029f8e5defd641281527300", maTemplateDatas, null);
 		WxMaConfiguration.getMaService("wx2fc4acedc3bc2391").getMsgService().sendTemplateMsg(maTemplateMessage);
 
+	}
+
+	@GetMapping("/mgrCard")
+	public R mgrCard() {
+		hotelMgtService.mgrCard();
+		return R.ok();
 	}
 
 	@GetMapping("/improt")

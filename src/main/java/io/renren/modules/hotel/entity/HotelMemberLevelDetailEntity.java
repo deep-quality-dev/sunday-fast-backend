@@ -99,4 +99,9 @@ public class HotelMemberLevelDetailEntity implements Serializable {
 	 */
 	private BigDecimal balance;
 
+	/**
+	 * 卡片二维码
+	 */
+	private String qrCode;
+
 }

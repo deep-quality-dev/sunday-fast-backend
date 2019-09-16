@@ -96,7 +96,7 @@
 		where t.seller_id =
 		#{sellerId}
 		<if test='levelId !=null'>
-			and t.level>(select t.id from t_hotel_member_level l where t.id  = #{levelId})
+			and t.level>(select l.level from t_hotel_member_level l where l.id  = #{levelId})
 		</if>
 	</select>
 </mapper>

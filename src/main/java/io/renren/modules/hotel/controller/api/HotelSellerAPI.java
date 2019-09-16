@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
+import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.vo.HotelInfo;
@@ -36,6 +37,13 @@ public class HotelSellerAPI extends BaseController {
 
 	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	@ApiOperation("酒店预定提醒")
+	@GetMapping("/reserveRemind")
+	public R reserveRemind(Long sellerId) {
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
+		return R.ok(hotelSellerEntity.getReserveRemind());
+	}
 
 	@ApiOperation("酒店过滤条件")
 	@GetMapping("/filter")

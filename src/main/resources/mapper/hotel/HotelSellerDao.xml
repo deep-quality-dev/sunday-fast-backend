@@ -52,45 +52,56 @@
 		<result property="ddOpen" column="dd_open" />
 		<result property="lnt" column="lnt" />
 		<result property="lat" column="lat" />
+		<result property="reserveRemind" column="reserve_remind" />
 	</resultMap>
 
-	<select id="hotelPage" resultType="io.renren.modules.hotel.vo.HotelItemVo">
-			select temp.* From (
-		SELECT t.id,t.NAME,t.ewm_logo AS logo,t1.price,t.coordinates AS lonLat,(
-		SELECT count(*) FROM t_hotel_assess a WHERE a.seller_id=t.id) AS comment_count,(6371*acos(cos(radians(#{params.latitude}))*cos(radians(t.lat))*cos(radians(t.lnt)-radians(#{params.longitude}))+sin(radians(#{params.latitude}))*sin(radians(lat)))) AS distance FROM t_hotel_seller t INNER JOIN (
-		SELECT t.seller_id,MIN(t.price) AS price FROM t_hotel_room t GROUP BY t.seller_id) t1 ON t.id=t1.seller_id
+	<select id="hotelPage"
+		resultType="io.renren.modules.hotel.vo.HotelItemVo">
+		select temp.* From (
+		SELECT t.id,t.NAME,t.ewm_logo AS
+		logo,t1.price,t.coordinates AS lonLat,(
+		SELECT count(*) FROM
+		t_hotel_assess a WHERE a.seller_id=t.id) AS
+		comment_count,(6371*acos(cos(radians(#{params.latitude}))*cos(radians(t.lat))*cos(radians(t.lnt)-radians(#{params.longitude}))+sin(radians(#{params.latitude}))*sin(radians(lat))))
+		AS distance FROM t_hotel_seller t INNER JOIN (
+		SELECT
+		t.seller_id,MIN(t.price) AS price FROM t_hotel_room t GROUP BY
+		t.seller_id) t1 ON t.id=t1.seller_id
 		<where>
 			<if test='params.levelSort !=null'>
-				and t.star in 
-				 <foreach item="item" collection="params.levelSortlevelSort" separator="," open="(" close=")" index="">  #{item, jdbcType=INTEGER}  </foreach>  		
+				and t.star in
+				<foreach item="item" collection="params.levelSortlevelSort"
+					separator="," open="(" close=")" index=""> #{item, jdbcType=INTEGER}
+				</foreach>
 			</if>
 			<if test='params.hotelService == 1'>
-				and t.gym = 1			
+				and t.gym = 1
 			</if>
 			<if test='params.hotelService == 2'>
-				and t.boardroom = 1			
+				and t.boardroom = 1
 			</if>
 			<if test='params.k !=null'>
-				and (t.`name` like CONCAT('%',#{params.k},'%') or t.address like CONCAT('%',#{params.k},'%'))		
+				and (t.`name` like CONCAT('%',#{params.k},'%') or
+				t.address like CONCAT('%',#{params.k},'%'))
 			</if>
-			
+
 		</where>
-		 HAVING distance  > 0 <!-- and distance  &lt; 100 -->
-		 <if test='params.sort == 0'>
-				ORDER BY distance asc	
+		HAVING distance > 0 <!-- and distance &lt; 100 -->
+		<if test='params.sort == 0'>
+			ORDER BY distance asc
 		</if>
-		 <if test='params.sort > 0'>
+		<if test='params.sort > 0'>
 			<if test='params.sort == 1'>
-				ORDER BY distance asc	
+				ORDER BY distance asc
 			</if>
 			<if test='params.sort == 2'>
-				ORDER BY price asc	
-			</if>	
+				ORDER BY price asc
+			</if>
 			<if test='params.sort == 3'>
-				ORDER BY comment_count asc	
-			</if>			
+				ORDER BY comment_count asc
+			</if>
 		</if>
-		
+
 		) temp
 	</select>
 

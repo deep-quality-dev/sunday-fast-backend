@@ -17,18 +17,20 @@ import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
  */
 public interface HotelMemberLevelDetailService extends IService<HotelMemberLevelDetailEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+	PageUtils queryPage(Map<String, Object> params);
 
-    /**
-     * 用户是否有会员卡
-     * @param userId
-     * @param sellerId
-     * @return
-     */
-	boolean hasVipCard(Long userId, Long sellerId);
+	/**
+	 * 用户是否有会员卡
+	 * 
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	HotelMemberLevelDetailEntity hasVipCard(Long userId, Long sellerId);
 
 	/**
 	 * 余额支付
+	 * 
 	 * @param sellerId
 	 * @param userId
 	 * @param totalCost
@@ -37,10 +39,28 @@ public interface HotelMemberLevelDetailService extends IService<HotelMemberLevel
 
 	/**
 	 * 积分支付
+	 * 
 	 * @param sellerId
 	 * @param userId
 	 * @param totalCost
 	 */
 	void integralTransaction(Long sellerId, Long userId, BigDecimal totalCost);
-}
 
+	/**
+	 * 添加积分
+	 * 
+	 * @param sellerId
+	 * @param userId
+	 * @param totalCost
+	 */
+	void addIntegral(Long sellerId, Long userId, BigDecimal totalCost);
+
+	/**
+	 * 添加余额
+	 * 
+	 * @param sellerId
+	 * @param userId
+	 * @param totalCost
+	 */
+	void addBalance(Long sellerId, Long userId, BigDecimal totalCost);
+}

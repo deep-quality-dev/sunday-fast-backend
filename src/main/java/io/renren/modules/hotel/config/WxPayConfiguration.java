@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 
 /**
  * 支持多公众号支付
+ * 
  * @author taoz
  *
  */
@@ -44,6 +45,7 @@ public class WxPayConfiguration {
 			payConfig.setAppId(StringUtils.trimToNull(a.getAppId()));
 			payConfig.setMchId(StringUtils.trimToNull(a.getMchId()));
 			payConfig.setMchKey(StringUtils.trimToNull(a.getMchKey()));
+			payConfig.setKeyPath(a.getKeyPath());
 			// payConfig.setSubAppId(StringUtils.trimToNull());
 			// payConfig.setSubMchId(StringUtils.trimToNull());
 			// payConfig.setKeyPath(StringUtils.trimToNull());

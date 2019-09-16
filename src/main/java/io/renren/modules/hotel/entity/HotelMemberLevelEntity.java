@@ -58,6 +58,11 @@ public class HotelMemberLevelEntity implements Serializable {
 	private BigDecimal payAmount;
 
 	/**
+	 * 支付积分
+	 */
+	private BigDecimal payIntegral;
+
+	/**
 	 * 是否需要支付
 	 */
 	private int payFlag = 0;

@@ -58,9 +58,9 @@ public class HotelMemberLevelDetailServiceImpl extends ServiceImpl<HotelMemberLe
 	}
 
 	@Override
-	public boolean hasVipCard(Long userId, Long sellerId) {
+	public HotelMemberLevelDetailEntity hasVipCard(Long userId, Long sellerId) {
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = baseMapper.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
-		return hotelMemberLevelDetailEntity != null;
+		return hotelMemberLevelDetailEntity;
 	}
 
 	@Override
@@ -91,6 +91,20 @@ public class HotelMemberLevelDetailServiceImpl extends ServiceImpl<HotelMemberLe
 			return;
 		}
 		throw new RRException("积分不足");
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void addIntegral(Long sellerId, Long userId, BigDecimal totalCost) {
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = baseMapper.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		baseMapper.addIntegral(hotelMemberLevelDetailEntity, totalCost);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void addBalance(Long sellerId, Long userId, BigDecimal totalCost) {
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = baseMapper.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, sellerId).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		baseMapper.addBalance(hotelMemberLevelDetailEntity, totalCost);
 	}
 
 }

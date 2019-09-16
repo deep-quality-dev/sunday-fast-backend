@@ -34,6 +34,11 @@ public class HotelOrderEntity implements Serializable {
 	 * 房ID
 	 */
 	private Long roomId;
+
+	/**
+	 * 金额ID
+	 */
+	private Long moneyId;
 	/**
 	 * 用户ID
 	 */

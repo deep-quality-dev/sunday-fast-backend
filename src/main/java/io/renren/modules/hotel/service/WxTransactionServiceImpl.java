@@ -31,7 +31,7 @@ public class WxTransactionServiceImpl implements TransactionService {
 		request.setTotalFee(totalFee);
 		request.setRefundFee(refundFee);
 		request.setOutRefundNo(IdUtil.simpleUUID());
-		request.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + appId + "/notify/refund");
+		request.setNotifyUrl("https://hotelapi.xqtinfo.cn/pay/" + appId + "/notify/refund");
 		try {
 			WxPayRefundResult payRefundResult = WxPayConfiguration.getPayServices().get(appId).refund(request);
 			log.info("payRefundResult:{}", JSON.toJSONString(payRefundResult));

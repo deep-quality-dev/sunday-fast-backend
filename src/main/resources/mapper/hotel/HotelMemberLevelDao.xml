@@ -20,6 +20,7 @@
 		<result property="bgImage" column="bg_image" />
 		<result property="level" column="level" />
 		<result property="rgb" column="rgb" />
+		<result property="payIntegral" column="pay_integral" />
 	</resultMap>
 
 	<select id="userCardList"
@@ -79,6 +80,9 @@
 		t.`name`,
 		t.content,
 		t.discount,
+		t.pay_integral,
+		t.pay_flag,
+		t.pay_amount,
 		t.icon,
 		t.bg_image,
 		t.rgb,
@@ -91,7 +95,7 @@
 		where t.seller_id =
 		#{sellerId}
 		<if test='levelId !=null'>
-			and t.id !=#{levelId}
+			and t.level>(select t.id from t_hotel_member_level l where t.id  = #{levelId})
 		</if>
 	</select>
 </mapper>

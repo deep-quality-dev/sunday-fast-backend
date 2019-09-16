@@ -39,13 +39,18 @@ public class VipCardItemVo {
 	 */
 	private BigDecimal balance;
 
-//	/**
-//	 * 支付金额
-//	 */
-//	private BigDecimal payAmount;
-//
-//	/**
-//	 * 是否需要支付
-//	 */
-//	private int payFlag;
+	/**
+	 * 支付金额
+	 */
+	private BigDecimal payAmount;
+
+	/**
+	 * 兑换积分
+	 */
+	private BigDecimal payIntegral;
+
+	/**
+	 * 是否需要支付
+	 */
+	private int payFlag;
 }

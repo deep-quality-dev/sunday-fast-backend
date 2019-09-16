@@ -216,6 +216,7 @@ public class WxPayController {
 		final WxPayRefundNotifyResult result = WxPayConfiguration.getPayServices().get(appid).parseRefundNotifyResult(xmlData);
 		// hotelOrderService.updateOrderStatus2Refunded(result.get)
 		log.info("微信退款回调--start,params:{}", JSON.toJSONString(result));
+		hotelOrderService.updateOrderStatus2Refunded(result.getReqInfo().getOutTradeNo());
 		log.info("微信退款回调--success,响应微信");
 		return WxPayNotifyResponse.success("成功");
 	}

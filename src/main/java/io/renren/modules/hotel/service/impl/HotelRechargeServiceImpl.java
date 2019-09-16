@@ -137,7 +137,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "(在线充值)");
 		wxPayUnifiedOrderRequest.setOutTradeNo(hotelRechargeEntity.getOutTradeNo());
 		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("http://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
+		wxPayUnifiedOrderRequest.setNotifyUrl("https://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
 		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
 		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_recharge, cardRechargeForm.getFormId())));
 		wxPayUnifiedOrderRequest.setTotalFee(1);

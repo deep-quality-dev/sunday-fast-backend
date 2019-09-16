@@ -10,6 +10,7 @@
 		<result property="id" column="id" />
 		<result property="sellerId" column="seller_id" />
 		<result property="roomId" column="room_id" />
+		<result property="moneyId" column="money_id" />
 		<result property="userId" column="user_id" />
 		<result property="couponsId" column="coupons_id" />
 		<result property="orderNo" column="order_no" />

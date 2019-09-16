@@ -117,4 +117,10 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * 自动完成订单
 	 */
 	void completeOrder();
+
+	/**
+	 * 更新订单为已退款
+	 * @param outTradeNo
+	 */
+	void updateOrderStatus2Refunded(String outTradeNo);
 }

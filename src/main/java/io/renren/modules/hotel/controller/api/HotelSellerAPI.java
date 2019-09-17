@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,9 @@ public class HotelSellerAPI extends BaseController {
 	@GetMapping("/reserveRemind")
 	public R reserveRemind(Long sellerId) {
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
-		return R.ok(hotelSellerEntity.getReserveRemind());
+		Map<String, String> data  = new HashMap<String,String>();
+		data.put("reserveRemind", hotelSellerEntity.getReserveRemind());
+		return R.ok(data);
 	}
 
 	@ApiOperation("酒店过滤条件")

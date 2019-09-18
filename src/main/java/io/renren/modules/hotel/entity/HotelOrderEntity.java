@@ -47,6 +47,11 @@ public class HotelOrderEntity implements Serializable {
 	 * 优惠券ID
 	 */
 	private Long couponsId;
+
+	/**
+	 * 发票ID
+	 */
+	private Long invoiceId;
 	/**
 	 * 订单号
 	 */

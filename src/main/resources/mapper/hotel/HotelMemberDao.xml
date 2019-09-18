@@ -19,6 +19,7 @@
         <result property="number" column="number"/>
         <result property="commission" column="commission"/>
         <result property="balance" column="balance"/>
+        <result property="gender" column="gender"/>
     </resultMap>
 
 

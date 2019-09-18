@@ -53,6 +53,11 @@ public class HotelOrderVo {
 	 */
 	private BigDecimal yhqCost;
 
+	/**
+	 * 发票标题
+	 */
+	private String invoiceTitle;
+
 	// 房型
 	private String roomType;
 	private Integer status;

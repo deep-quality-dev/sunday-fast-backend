@@ -15,4 +15,10 @@ public class MemberVo {
 
 	private String nickName;
 
+	private String level;
+
+	private String mobile;
+
+	private String gender;
+
 }

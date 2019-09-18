@@ -79,4 +79,9 @@ public class HotelMemberEntity implements Serializable {
 	 */
 	private BigDecimal balance;
 
+	/**
+	 * 性别
+	 */
+	private String gender;
+
 }

@@ -72,7 +72,6 @@ public class HotelMemberAPI extends BaseController {
 		return R.ok().put("data", result);
 	}
 
-
 	/**
 	 * 用户优惠券
 	 * 

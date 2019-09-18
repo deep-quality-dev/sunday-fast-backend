@@ -13,6 +13,7 @@
 		<result property="moneyId" column="money_id" />
 		<result property="userId" column="user_id" />
 		<result property="couponsId" column="coupons_id" />
+		<result property="invoiceId" column="invoice_id" />
 		<result property="orderNo" column="order_no" />
 		<result property="sellerName" column="seller_name" />
 		<result property="sellerAddress" column="seller_address" />

@@ -42,9 +42,11 @@ import io.renren.modules.constants.PayMethodConstants;
 import io.renren.modules.hotel.config.WxMaConfiguration;
 import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.config.WxPayConfiguration;
+import io.renren.modules.hotel.dao.HotelInvoiceDao;
 import io.renren.modules.hotel.dao.HotelOrderDao;
 import io.renren.modules.hotel.entity.HotelContactsEntity;
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
+import io.renren.modules.hotel.entity.HotelInvoiceEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
@@ -129,6 +131,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Autowired
 	private HotelContactsService hotelContactsService;
+
+	@Autowired
+	private HotelInvoiceDao hotelInvoiceDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -453,6 +458,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderVo.setSellerTel(hotelSellerEntity.getTel());
 		hotelOrderVo.setCoordinates(hotelSellerEntity.getCoordinates());
 		hotelOrderVo.setTotalCost(NumberUtil.decimalFormat("0.00", hotelOrderEntity.getTotalCost().doubleValue()));
+		HotelInvoiceEntity hotelInvoiceEntity = hotelInvoiceDao.selectById(hotelOrderEntity.getInvoiceId());
+		if (null != hotelInvoiceEntity) {
+			hotelOrderVo.setInvoiceTitle(hotelInvoiceEntity.getCompany());
+		}
 		log.info("查询订单详情--end,result:{}", JSON.toJSONString(hotelOrderVo));
 		return hotelOrderVo;
 	}

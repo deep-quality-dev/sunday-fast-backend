@@ -34,6 +34,7 @@
 		t1.bg_image,
 		t1.rgb,
 		t.score,
+		t.cardNo,
 		t.balance,
 		t.qr_code,
 		t2.id as seller_id,
@@ -46,7 +47,7 @@
 		t.level_id = t1.id
 		inner join t_hotel_seller
 		t2 on t1.seller_id = t2.id
-		where t.member_id = #{userId}
+		where t.member_id = #{userId} and t.status =  1
 	</select>
 	
 	<select id="userCardDetailById"

@@ -51,12 +51,12 @@ public class BecomeVipForm {
 	 */
 	@ApiModelProperty(value = "小程序formId")
 	private String formId;
-//	/**
-//	 * 手机
-//	 */
-//	@ApiModelProperty(value = "手机")
-//	@NotBlank(message = "手机不能为空")
-//	private String mobile;
+	/**
+	 * 手机
+	 */
+	@ApiModelProperty(value = "手机")
+	@NotBlank(message = "手机不能为空")
+	private String mobile;
 //	/**
 //	 * 性别
 //	 */
@@ -71,4 +71,7 @@ public class BecomeVipForm {
 //	@ApiModelProperty(value = "商家ID")
 //	@NotBlank(message = "商家不能为空")
 //	private Long sellerId;
+	
+	@ApiModelProperty(value = "支付方式")
+	private String payMethod;
 }

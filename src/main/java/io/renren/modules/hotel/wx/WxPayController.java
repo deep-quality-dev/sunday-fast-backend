@@ -47,6 +47,7 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import cn.hutool.core.thread.ThreadUtil;
 import io.renren.modules.constants.OrderTypeConstants;
 import io.renren.modules.hotel.config.WxPayConfiguration;
+import io.renren.modules.hotel.service.HotelMemberLevelService;
 import io.renren.modules.hotel.service.HotelOrderService;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.wx.OrderType;
@@ -69,6 +70,9 @@ public class WxPayController {
 
 	@Autowired
 	private HotelRechargeService hotelRechargeService;
+
+	@Autowired
+	private HotelMemberLevelService hotelMemberLevelService;
 
 //	@Autowired
 //	public WxPayController(WxPayService wxService) {
@@ -189,7 +193,7 @@ public class WxPayController {
 	public String parseOrderNotifyResult(@PathVariable String appid, @RequestBody String xmlData) throws WxPayException {
 		log.info("微信支付成功回调--start,params:{}", xmlData);
 		final WxPayOrderNotifyResult notifyResult = WxPayConfiguration.getPayServices().get(appid).parseOrderNotifyResult(xmlData);
-		log.info("微信支付成功回调--start,parse date :{}", JSON.toJSONString(notifyResult));
+		log.debug("微信支付成功回调--start,parse date :{}", JSON.toJSONString(notifyResult));
 		// 开启线程更新订单状态，立马回应微信， 防止重复回调
 		ThreadUtil.execute(new Runnable() {
 			@Override
@@ -202,6 +206,10 @@ public class WxPayController {
 				if (OrderTypeConstants.order_recharge == orderType.getType()) {
 					log.info("进入充值回调");
 					hotelRechargeService.cardRechargeHandler(notifyResult.getOutTradeNo(), orderType.getFormId());
+				}
+				if (OrderTypeConstants.order_becomvip == orderType.getType()) {
+					log.info("进入办卡成功回调");
+					hotelMemberLevelService.becomeVipCallBack(notifyResult.getOutTradeNo(), orderType.getFormId());
 				}
 			}
 		});

@@ -31,6 +31,8 @@ public class HotelOrderVo {
 	private String tel;
 
 	private Date createTime;
+	
+	private Long sellerId;
 	/**
 	 * 商家地址
 	 */

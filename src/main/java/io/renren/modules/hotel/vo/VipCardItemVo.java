@@ -30,6 +30,8 @@ public class VipCardItemVo {
 	private String rgb;
 
 	private String qrCode;
+	
+	private String cardNo;
 
 	/**
 	 * 积分

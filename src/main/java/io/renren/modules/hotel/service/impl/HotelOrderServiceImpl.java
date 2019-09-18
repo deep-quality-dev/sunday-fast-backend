@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -224,18 +225,18 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	@SneakyThrows
 	@Override
 	@Transactional
-	public WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException {
+	public Long createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException {
 		CreateOrderForm createOrderForm = new CreateOrderForm();
 		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getCouponId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
 		createOrderForm.setPayMethod(buildOrderForm.getPayMethod());
 		createOrderForm.setFormId(buildOrderForm.getFormId());
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
+		createOrderForm.setInvoiceId(buildOrderForm.getInvoiceId());
 		createOrderForm.setMoneyId(buildOrderForm.getMoneyId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(buildOrderForm.getRoomId());
 		createOrderForm.setSellerId(hotelRoomEntity.getSellerId());
 		createOrderForm.setUserId(userId);
-		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(buildOrderForm.getMoneyId());
 		HotelContactsEntity hotelContactsEntity = hotelContactsService.getById(buildOrderForm.getContactsId());
 		createOrderForm.setCheckInPerson(hotelContactsEntity.getName());
 		createOrderForm.setMobile(hotelContactsEntity.getMobile());
@@ -247,58 +248,14 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 商户微信信息
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		String formId = buildOrderForm.getFormId();
-		if (PayMethodConstants.BALANCE.equals(buildOrderForm.getPayMethod())) {
-			// 扣除余额
-			hotelMemberLevelDetailService.balanceTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-			// 扣减房量
-			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -buildOrderForm.getRoomNum());
-			// 更新订单
-			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
-			// 发送预定通知
-			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
-			// 添加流水
-			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
-			hotelRechargeService.addConsumptionRecord(-hotelOrderEntity.getTotalCost().intValue(), memberLevelDetailEntity.getLevelId(), userId, "在线预定，" + hotelOrderEntity.getRoomType());
-			return null;
-		} else if (PayMethodConstants.INTEGRAL.equals(buildOrderForm.getPayMethod())) {
-			// 扣除积分
-			hotelMemberLevelDetailService.integralTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-			// 扣减房量
-			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -buildOrderForm.getRoomNum());
-			// 更新订单
-			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
-			// 发送预定通知
-			sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
-			// 添加积分流水
-			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "在线预定，" + hotelOrderEntity.getRoomType());
-			return null;
-		} else if (PayMethodConstants.WX.equals(buildOrderForm.getPayMethod())) {
-			log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(buildOrderForm));
-			WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-			wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
-			wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + createOrderForm.getRoomName() + "(" + createOrderForm.getCheckInDay() + "晚)");
-			wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
-			wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-			wxPayUnifiedOrderRequest.setNotifyUrl("https://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
-			wxPayUnifiedOrderRequest.setTradeType("JSAPI");
-			wxPayUnifiedOrderRequest.setTotalFee(1);
-			wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room, buildOrderForm.getFormId())));
-			wxPayUnifiedOrderRequest.setSpbillCreateIp(buildOrderForm.getIp());
-			WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
-			log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
-			hotelOrderEntity.setFormId(mpOrderResult.getPackageValue().substring("prepay_id=".length(), mpOrderResult.getPackageValue().length()));
-			baseMapper.updateById(hotelOrderEntity);
-			// 不需要预付，先发送订房成功通知
-			if (createOrderForm.getPrepay() == 0) {
-				sendReserveMessage(createOrderForm, hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
-			}
-			return mpOrderResult;
-		} else {
-			throw new RRException("请选择支付方式");
+		// 不需要预付，先发送订房成功通知
+		if (createOrderForm.getPrepay() == 0) {
+			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
 		}
+		return hotelOrderEntity.getId();
 	}
 
-	public void sendReserveMessage(CreateOrderForm createOrderForm, HotelOrderEntity hotelOrderEntity, HotelSellerEntity hotelSellerEntity, HotelMemberEntity hotelMemberEntity, HotelWxConfigEntity hotelWxConfigEntity, String formId) throws WxErrorException {
+	public void sendReserveMessage(HotelOrderEntity hotelOrderEntity, HotelSellerEntity hotelSellerEntity, HotelMemberEntity hotelMemberEntity, HotelWxConfigEntity hotelWxConfigEntity, String formId) throws WxErrorException {
 		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
 		maTemplateDatas.add(new WxMaTemplateData("first", "酒店预订成功通知"));
 		maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
@@ -322,7 +279,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	 * @return
 	 */
 	@Transactional
-	private HotelOrderEntity createHotelOrder(CreateOrderForm createOrderForm) {
+	public HotelOrderEntity createHotelOrder(CreateOrderForm createOrderForm) {
 		log.info("创建酒店订单--start,params:{}", JSON.toJSONString(createOrderForm));
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(createOrderForm.getSellerId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(createOrderForm.getRoomId());
@@ -346,6 +303,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
 		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
 		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+		hotelOrderEntity.setInvoiceId(createOrderForm.getInvoiceId());
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());
 		hotelOrderEntity.setEnabled(1);
@@ -362,7 +320,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		this.save(hotelOrderEntity);
 		// 保存订单明细
 		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
-		// 扣减房量 TODO
 		log.info("创建酒店订单--end,result,orderId:{}", hotelOrderEntity.getId());
 		return hotelOrderEntity;
 	}
@@ -569,7 +526,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
-	public WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException {
+	@SneakyThrows
+	@Transactional(rollbackFor = Exception.class)
+	public WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip, String payMethod, String formId) throws WxPayException {
 		HotelOrderEntity hotelOrderEntity = this.getById(orderId);
 		// 商户微信信息
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
@@ -578,20 +537,53 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
 		hotelOrderEntity.setOrderNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + userId));
-		// 商户微信信息
-		WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
-		wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
-		wxPayUnifiedOrderRequest.setBody(hotelOrderEntity.getSellerName() + "-" + hotelRoomEntity.getName() + "(" + hotelOrderEntity.getDays() + "晚)");
-		wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
-		wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
-		wxPayUnifiedOrderRequest.setNotifyUrl("https://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
-		wxPayUnifiedOrderRequest.setTradeType("JSAPI");
-		wxPayUnifiedOrderRequest.setTotalFee(1);
-		wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room)));
-		wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
-		WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
-		this.updateById(hotelOrderEntity);
-		return mpOrderResult;
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		////
+		if (PayMethodConstants.BALANCE.equals(payMethod)) {
+			// 扣除余额
+			hotelMemberLevelDetailService.balanceTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+			// 扣减房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelRoomMoneyEntity.getNum());
+			// 更新订单
+			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
+			// 发送预定通知
+			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			// 添加流水
+			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+			hotelRechargeService.addConsumptionRecord(-hotelOrderEntity.getTotalCost().intValue(), memberLevelDetailEntity.getLevelId(), userId, "在线预定，" + hotelOrderEntity.getRoomType());
+			return null;
+		} else if (PayMethodConstants.INTEGRAL.equals(payMethod)) {
+			// 扣除积分
+			hotelMemberLevelDetailService.integralTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+			// 扣减房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelRoomMoneyEntity.getNum());
+			// 更新订单
+			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
+			// 发送预定通知
+			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			// 添加积分流水
+			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "在线预定，" + hotelOrderEntity.getRoomType());
+			return null;
+		} else if (PayMethodConstants.WX.equals(payMethod)) {
+			log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(hotelOrderEntity));
+			WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+			wxPayUnifiedOrderRequest.setOpenid(hotelMemberEntity.getOpenid());
+			wxPayUnifiedOrderRequest.setBody(hotelSellerEntity.getName() + "-" + hotelRoomEntity.getName() + "(" + hotelOrderEntity.getDays() + "晚)");
+			wxPayUnifiedOrderRequest.setOutTradeNo(hotelOrderEntity.getOutTradeNo());
+			wxPayUnifiedOrderRequest.setSceneInfo(hotelSellerEntity.getAddress());
+			wxPayUnifiedOrderRequest.setNotifyUrl("https://hotelapi.xqtinfo.cn/pay/" + hotelWxConfigEntity.getAppId() + "/notify/order");
+			wxPayUnifiedOrderRequest.setTradeType("JSAPI");
+			wxPayUnifiedOrderRequest.setTotalFee(1);
+			wxPayUnifiedOrderRequest.setAttach(JSON.toJSONString(new OrderType(OrderTypeConstants.order_room, formId)));
+			wxPayUnifiedOrderRequest.setSpbillCreateIp(ip);
+			WxPayMpOrderResult mpOrderResult = WxPayConfiguration.getPayServices().get(hotelWxConfigEntity.getAppId()).createOrder(wxPayUnifiedOrderRequest);
+			log.info("调用微信统一下单--start,result:{}", JSON.toJSONString(mpOrderResult));
+			hotelOrderEntity.setFormId(mpOrderResult.getPackageValue().substring("prepay_id=".length(), mpOrderResult.getPackageValue().length()));
+			baseMapper.updateById(hotelOrderEntity);
+			return mpOrderResult;
+		} else {
+			throw new RRException("请选择支付方式");
+		}
 	}
 
 	@Override

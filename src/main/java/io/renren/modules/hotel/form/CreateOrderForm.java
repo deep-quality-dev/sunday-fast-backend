@@ -68,5 +68,8 @@ public class CreateOrderForm {
 
 	// 支付积分
 	private BigDecimal payIntegral;
+	
+	//发票ID
+	private Long invoiceId;
 
 }

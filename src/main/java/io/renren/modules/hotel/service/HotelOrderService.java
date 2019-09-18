@@ -44,9 +44,8 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param buildOrderForm 房间订单信息
 	 * @param userId         用户ID
 	 * @return
-	 * @throws WxPayException
 	 */
-	WxPayMpOrderResult createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException;
+	Long createOrder(BuildOrderForm buildOrderForm, Long userId) throws WxPayException;
 
 	/**
 	 * 用户订单列表
@@ -95,10 +94,12 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param userId   用户ID
 	 * @param orderId  订单ID
 	 * @param ip       下单IP
+	 * @param formId 
+	 * @param payMethod 
 	 * @return
 	 * @throws WxPayException
 	 */
-	WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip) throws WxPayException;
+	WxPayMpOrderResult payOrder(Long userId, Long orderId, String ip, String payMethod, String formId) throws WxPayException;
 
 	/**
 	 * 删除订单

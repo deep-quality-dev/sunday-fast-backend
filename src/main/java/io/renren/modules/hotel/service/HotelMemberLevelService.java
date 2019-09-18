@@ -68,6 +68,7 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 
 	/**
 	 * 用户会员卡列表
+	 * 
 	 * @param userId
 	 * @return
 	 */
@@ -75,9 +76,18 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 
 	/**
 	 * 已办理会员卡信息
+	 * 
 	 * @param userId
 	 * @param sellerId
 	 * @return
 	 */
 	BecomeVipForm getSellerCardInfo(Long userId, Long sellerId);
+
+	/**
+	 * 办卡成功回调
+	 * 
+	 * @param outTradeNo
+	 * @param formId
+	 */
+	void becomeVipCallBack(String outTradeNo, String formId);
 }

@@ -72,7 +72,7 @@ public class HotelOrderAPI extends BaseController {
 	public R createOrder(HttpServletRequest request, @RequestBody BuildOrderForm buildOrderForm, @RequestAttribute("userId") Long userId) {
 		// 表单校验
 		ValidatorUtils.validateEntity(buildOrderForm);
-		WxPayMpOrderResult mpOrderResult = null;
+		Long orderId = null;
 		try {
 			buildOrderForm.setIp(NetworkUtil.getIpAddress(request));
 		} catch (IOException e1) {
@@ -80,12 +80,12 @@ public class HotelOrderAPI extends BaseController {
 			return R.error("创建订单失败，请稍后再试");
 		}
 		try {
-			mpOrderResult = hotelOrderService.createOrder(buildOrderForm, userId);
+			orderId = hotelOrderService.createOrder(buildOrderForm, userId);
 		} catch (WxPayException e) {
 			log.error("创建订单异常，msg:{}", e.getMessage());
 			return R.error("创建订单失败，请稍后再试");
 		}
-		return R.ok().put("data", mpOrderResult);
+		return R.ok().put("data", orderId);
 	}
 
 	/**
@@ -163,7 +163,9 @@ public class HotelOrderAPI extends BaseController {
 			if (null == orderId) {
 				throw new RRException("参数错误");
 			}
-			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request));
+			String payMethod = params.get("orderId").toString();
+			String formId =  params.get("formId").toString();
+			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request),payMethod,formId);
 			return R.ok(mpOrderResult);
 		} catch (WxPayException e) {
 			e.printStackTrace();

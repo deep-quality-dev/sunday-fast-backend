@@ -20,11 +20,13 @@ import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.R;
 import io.renren.modules.app.utils.JwtUtils;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.renren.modules.hotel.config.WxMpConfiguration;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
 /**
  * 微信小程序用户接口

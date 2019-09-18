@@ -94,6 +94,9 @@ public class BuildOrderForm {
 
 	// 支付积分
 	private BigDecimal payIntegral;
+	
+	//发票
+	private Long invoiceId;
 
 	// 明细
 	List<OrderDetail> record = new ArrayList<OrderDetail>();

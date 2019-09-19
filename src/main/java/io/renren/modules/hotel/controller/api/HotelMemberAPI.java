@@ -47,8 +47,8 @@ public class HotelMemberAPI extends BaseController {
 
 	@Login
 	@ApiOperation("实名认证")
-	@GetMapping("/autonym")
-	public R autonym(@RequestAttribute("userId") Long userId, Map<String, String> params) {
+	@PostMapping("/autonym")
+	public R autonym(@RequestAttribute("userId") Long userId,@RequestBody Map<String, String> params) {
 		String relaName = params.get("name");
 		String identityNo = params.get("identityNo");
 		hotelMemberService.autonym(userId, relaName, identityNo);

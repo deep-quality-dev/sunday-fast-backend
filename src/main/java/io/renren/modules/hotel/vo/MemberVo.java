@@ -20,5 +20,15 @@ public class MemberVo {
 	private String mobile;
 
 	private String gender;
+	
+	private String birthday;
+
+	// 1认证，未认证
+	private int authFlag = 0;
+	
+	private String identityNo;
+	
+	private String zsName;
+	 
 
 }

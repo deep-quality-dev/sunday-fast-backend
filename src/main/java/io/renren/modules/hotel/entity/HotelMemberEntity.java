@@ -84,4 +84,14 @@ public class HotelMemberEntity implements Serializable {
 	 */
 	private String gender;
 
+	/**
+	 * 身份证号
+	 */
+	private String identityNo;
+	
+	/**
+	 * 生日
+	 */
+	private String birthday;
+
 }

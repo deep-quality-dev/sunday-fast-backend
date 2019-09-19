@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +131,12 @@ public class HotelScoreServiceImpl extends ServiceImpl<HotelScoreDao, HotelScore
 		scorePageResult.setRecords(hotelScores);
 		scorePageResult.setTotal(pageResult.getTotal());
 		return scorePageResult;
+	}
+
+	@Override
+	public BigDecimal scoreCount(Long userId, Long cardId) {
+		HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailDao.selectOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getLevelId, cardId));
+		return memberLevelDetailEntity.getScore();
 	}
 
 }

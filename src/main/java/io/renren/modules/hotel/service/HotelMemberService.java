@@ -75,9 +75,27 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 
 	/**
 	 * 绑定微信手机
-	 * @param openId 
+	 * 
+	 * @param openId
 	 * @param phoneNoInfo
 	 */
 	void bindWxPhone(String openId, WxMaPhoneNumberInfo phoneNoInfo);
+
+	/**
+	 * 实名认证
+	 * 
+	 * @param userId
+	 * @param relaName
+	 * @param identityNo
+	 */
+	void autonym(Long userId, String relaName, String identityNo);
+
+	/**
+	 * 更新用户信息
+	 * 
+	 * @param userId
+	 * @param userInfo
+	 */
+	void updateUserInfo(Long userId, MemberVo userInfo);
 
 }

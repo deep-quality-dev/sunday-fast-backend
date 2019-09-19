@@ -76,4 +76,6 @@ public class HotelMemberLevelEntity implements Serializable {
 
 	private int level;
 
+	private String rule;
+
 }

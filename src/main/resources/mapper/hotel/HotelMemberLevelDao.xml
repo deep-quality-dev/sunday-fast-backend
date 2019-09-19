@@ -20,6 +20,7 @@
 		<result property="bgImage" column="bg_image" />
 		<result property="level" column="level" />
 		<result property="rgb" column="rgb" />
+		<result property="rule" column="rule" />
 		<result property="payIntegral" column="pay_integral" />
 	</resultMap>
 
@@ -34,7 +35,7 @@
 		t1.bg_image,
 		t1.rgb,
 		t.score,
-		t.cardNo,
+		t.card_no,
 		t.balance,
 		t.qr_code,
 		t2.id as seller_id,

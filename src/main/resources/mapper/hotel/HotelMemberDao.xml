@@ -4,23 +4,27 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelMemberDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelMemberEntity" id="hotelMemberMap">
-        <result property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="joinTime" column="join_time"/>
-        <result property="img" column="img"/>
-        <result property="openid" column="openid"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="tel" column="tel"/>
-        <result property="type" column="type"/>
-        <result property="levelId" column="level_id"/>
-        <result property="score" column="score"/>
-        <result property="zsName" column="zs_name"/>
-        <result property="number" column="number"/>
-        <result property="commission" column="commission"/>
-        <result property="balance" column="balance"/>
-        <result property="gender" column="gender"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelMemberEntity"
+		id="hotelMemberMap">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="joinTime" column="join_time" />
+		<result property="img" column="img" />
+		<result property="openid" column="openid" />
+		<result property="sellerId" column="seller_id" />
+		<result property="tel" column="tel" />
+		<result property="type" column="type" />
+		<result property="levelId" column="level_id" />
+		<result property="score" column="score" />
+		<result property="zsName" column="zs_name" />
+		<result property="number" column="number" />
+		<result property="commission" column="commission" />
+		<result property="balance" column="balance" />
+		<result property="gender" column="gender" />
+		<result property="identityNo" column="identity_no" />
+		<result property="birthday" column="birthday" />
+	</resultMap>
 
 
 </mapper>

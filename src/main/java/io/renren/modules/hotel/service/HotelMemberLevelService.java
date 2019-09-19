@@ -90,4 +90,11 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @param formId
 	 */
 	void becomeVipCallBack(String outTradeNo, String formId);
+
+	/**
+	 * 卡片积分规则
+	 * @param cardId
+	 * @return
+	 */
+	String cardRule(Long cardId);
 }

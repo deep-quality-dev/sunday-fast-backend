@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.controller.api;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,21 @@ public class HotelWalletAPI {
 		return R.ok(pageResult);
 	}
 
+	/**
+	 * 卡片总积分
+	 * 
+	 * @param userId
+	 * @param cardId
+	 * @return
+	 */
+	@Login
+	@ApiOperation("用户卡片总积分")
+	@GetMapping("/scoreCount")
+	public R scoreCount(@RequestAttribute("userId") Long userId, Long cardId) {
+		BigDecimal scoreCount = hotelScoreService.scoreCount(userId, cardId);
+		return R.ok().put("data", scoreCount);
+	}
+
 	@Login
 	@ApiOperation("用户卡片消费记录")
 	@GetMapping("/consumptionRecord")
@@ -82,7 +98,7 @@ public class HotelWalletAPI {
 	}
 
 	@Login
-	@SneakyThrows 
+	@SneakyThrows
 	@ApiOperation("卡片充值")
 	@PostMapping("/cardRecharge")
 	public R cardRecharge(HttpServletRequest request, @RequestAttribute("userId") Long userId, @RequestBody CardRechargeForm cardRechargeForm) {

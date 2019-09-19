@@ -60,6 +60,11 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		HotelMemberEntity hotelMemberEntity = this.getById(userId);
 		memberVo.setHeadImgUrl(hotelMemberEntity.getImg());
 		memberVo.setNickName(hotelMemberEntity.getName());
+		memberVo.setGender(hotelMemberEntity.getGender());
+		memberVo.setAuthFlag(StrUtil.isEmpty(hotelMemberEntity.getIdentityNo()) ? 0 : 1);
+		if (StrUtil.isNotEmpty(hotelMemberEntity.getIdentityNo())) {
+			memberVo.setIdentityNo(hotelMemberEntity.getIdentityNo().replaceAll("(\\d{4})\\d{10}(\\d{4})", "$1****$2"));
+		}
 		log.info("获取用户信息--end，result:{}", JSON.toJSONString(memberVo));
 		return memberVo;
 	}
@@ -177,6 +182,32 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		}
 		hotelMemberEntity.setTel(phoneNoInfo.getPhoneNumber());
 		baseMapper.updateById(hotelMemberEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void autonym(Long userId, String relaName, String identityNo) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		hotelMemberEntity.setZsName(relaName);
+		hotelMemberEntity.setIdentityNo(identityNo);
+		baseMapper.updateById(hotelMemberEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateUserInfo(Long userId, MemberVo userInfo) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		if (StrUtil.isNotEmpty(userInfo.getBirthday())) {
+			hotelMemberEntity.setBirthday(userInfo.getBirthday());
+		}
+		if (StrUtil.isNotEmpty(userInfo.getNickName())) {
+			hotelMemberEntity.setName(userInfo.getNickName());
+		}
+		if (StrUtil.isNotEmpty(userInfo.getMobile())) {
+			hotelMemberEntity.setTel(userInfo.getMobile());
+		}
+		baseMapper.updateById(hotelMemberEntity);
+
 	}
 
 }

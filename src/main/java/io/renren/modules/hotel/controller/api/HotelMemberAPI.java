@@ -45,6 +45,24 @@ public class HotelMemberAPI extends BaseController {
 	@Autowired
 	private HotelScoreService hotelScoreService;
 
+	@Login
+	@ApiOperation("实名认证")
+	@GetMapping("/autonym")
+	public R autonym(@RequestAttribute("userId") Long userId, Map<String, String> params) {
+		String relaName = params.get("name");
+		String identityNo = params.get("identityNo");
+		hotelMemberService.autonym(userId, relaName, identityNo);
+		return R.ok();
+	}
+
+	@Login
+	@ApiOperation("更新用户信息")
+	@PostMapping("/updateUserInfo")
+	public R updateUserInfo(@RequestAttribute("userId") Long userId, @RequestBody MemberVo userInfo) {
+		hotelMemberService.updateUserInfo(userId, userInfo);
+		return R.ok();
+	}
+
 	/**
 	 * 用户信息
 	 * 

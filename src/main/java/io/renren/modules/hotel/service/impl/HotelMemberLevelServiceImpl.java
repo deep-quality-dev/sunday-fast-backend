@@ -284,4 +284,10 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		sendBecomeVipMsg(formId, hotelMemberEntity, hotelMemberLevelEntity, hotelMemberLevelDetailEntity, hotelSellerEntity, flag);
 	}
 
+	@Override
+	public String cardRule(Long cardId) {
+		HotelMemberLevelEntity hotelMemberLevelEntity = baseMapper.selectById(cardId);
+		return hotelMemberLevelEntity.getRule();
+	}
+
 }

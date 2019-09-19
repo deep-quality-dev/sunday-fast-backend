@@ -132,4 +132,12 @@ public class HotelMemberLevelAPI extends BaseController {
 		List<VipCardItemVo> cardItemVos = hotelMemberLevelService.userCardlist(userId);
 		return R.ok(cardItemVos);
 	}
+
+	@Login
+	@ApiOperation("卡片积分规则")
+	@GetMapping("/cardRule")
+	public R cardRule(Long cardId) {
+		String rule = hotelMemberLevelService.cardRule(cardId);
+		return R.ok().put("data", rule);
+	}
 }

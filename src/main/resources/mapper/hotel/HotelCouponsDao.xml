@@ -79,7 +79,8 @@
 		FROM
 		t_hotel_member_level_detail t where t.member_id =
 		#{userId}) as
-		vip_card_num
+		vip_card_num,
+		(SELECT count(*) FROM t_hotel_member_level_detail t where t.member_id = #{userId} and  t.status =1) as vip_card_num
 		from
 		DUAL
 	</select>

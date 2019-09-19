@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,15 +33,16 @@ public interface HotelScoreService extends IService<HotelScoreEntity> {
 	 * 积分交易
 	 * 
 	 * @param sellerId
-	 * @param userId 
+	 * @param userId
 	 * @param score
-	 * @param type 
+	 * @param type
 	 * @param note
 	 */
 	void transactionScore(Long sellerId, Long userId, int type, int score, String note);
 
 	/**
 	 * 积分列表
+	 * 
 	 * @param sellerId
 	 * @param userId
 	 * @param params
@@ -52,4 +54,13 @@ public interface HotelScoreService extends IService<HotelScoreEntity> {
 	 * 卡片积分列表
 	 */
 	Page<HotelScore> scoreList(Long userId, Long cardId, Page<HotelScore> page);
+
+	/**
+	 * 卡片总积分
+	 * 
+	 * @param userId
+	 * @param cardId
+	 * @return
+	 */
+	BigDecimal scoreCount(Long userId, Long cardId);
 }

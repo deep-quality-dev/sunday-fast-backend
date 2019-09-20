@@ -196,7 +196,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	@Transactional(rollbackFor = Exception.class)
 	public void addConsumptionRecord(int amount, Long cardId, Long userId, String note) {
 		HotelConsumptionRecordEntity consumptionRecordEntity = new HotelConsumptionRecordEntity();
-		consumptionRecordEntity.setAmount(amount > 0 ? "+" + amount : "-" + amount);
+		consumptionRecordEntity.setAmount(amount > 0 ? "+" + amount : "" + amount);
 		consumptionRecordEntity.setCardId(cardId);
 		consumptionRecordEntity.setUserId(userId);
 		consumptionRecordEntity.setNote(note);

@@ -76,10 +76,10 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	/**
 	 * 绑定微信手机
 	 * 
-	 * @param openId
+	 * @param userId
 	 * @param phoneNoInfo
 	 */
-	void bindWxPhone(String openId, WxMaPhoneNumberInfo phoneNoInfo);
+	void bindWxPhone(Long userId, WxMaPhoneNumberInfo phoneNoInfo);
 
 	/**
 	 * 实名认证

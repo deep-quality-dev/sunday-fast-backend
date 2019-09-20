@@ -62,6 +62,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		memberVo.setZsName(hotelMemberEntity.getZsName());
 		memberVo.setNickName(hotelMemberEntity.getName());
 		memberVo.setBirthday(hotelMemberEntity.getBirthday());
+		memberVo.setMobile(hotelMemberEntity.getTel());
 		memberVo.setGender(hotelMemberEntity.getGender());
 		memberVo.setAuthFlag(StrUtil.isEmpty(hotelMemberEntity.getIdentityNo()) ? 0 : 1);
 		if (StrUtil.isNotEmpty(hotelMemberEntity.getIdentityNo())) {
@@ -177,8 +178,8 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void bindWxPhone(String openId, WxMaPhoneNumberInfo phoneNoInfo) {
-		HotelMemberEntity hotelMemberEntity = baseMapper.selectOne(Wrappers.<HotelMemberEntity>lambdaQuery().eq(HotelMemberEntity::getOpenid, openId));
+	public void bindWxPhone(Long userId, WxMaPhoneNumberInfo phoneNoInfo) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
 		if (null == hotelMemberEntity) {
 			throw new RRException("用户信息未找到");
 		}

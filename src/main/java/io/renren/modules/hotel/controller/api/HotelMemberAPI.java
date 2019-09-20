@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
+import io.renren.modules.hotel.config.WxMaConfiguration;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelScoreService;
@@ -48,7 +51,7 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("实名认证")
 	@PostMapping("/autonym")
-	public R autonym(@RequestAttribute("userId") Long userId,@RequestBody Map<String, String> params) {
+	public R autonym(@RequestAttribute("userId") Long userId, @RequestBody Map<String, String> params) {
 		String relaName = params.get("name");
 		String identityNo = params.get("identityNo");
 		hotelMemberService.autonym(userId, relaName, identityNo);
@@ -145,5 +148,26 @@ public class HotelMemberAPI extends BaseController {
 		Assert.notBlank(vcode, "验证码不能为空");
 		hotelMemberService.bindSms(sellerId(appId), userId, mobile, vcode);
 		return R.ok();
+	}
+
+	/**
+	 * <pre>
+	 * 获取用户绑定手机号信息
+	 * </pre>
+	 */
+	@ApiOperation("获取用户绑定手机号信息")
+	@GetMapping("/{appid}/phone")
+	@Login
+	public R phone(@RequestAttribute("userId") Long userId, @PathVariable String appid, String sessionKey, String signature, String rawData, String encryptedData, String iv) {
+		final WxMaService wxService = WxMaConfiguration.getMaService(appid);
+
+		// 用户信息校验
+		if (!wxService.getUserService().checkUserInfo(sessionKey, rawData, signature)) {
+			return R.ok("user check failed");
+		}
+		// 解密
+		WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
+		hotelMemberService.bindWxPhone(userId, phoneNoInfo);
+		return R.ok(phoneNoInfo);
 	}
 }

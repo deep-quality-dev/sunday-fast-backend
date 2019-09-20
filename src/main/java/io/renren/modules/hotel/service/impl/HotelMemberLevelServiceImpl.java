@@ -235,8 +235,10 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 		if (null == hotelMemberLevelDetailEntity) {
 			return null;
 		}
+		becomeVipForm.setMemberIntegral(hotelMemberLevelDetailEntity.getScore());
 		becomeVipForm.setCertificate(hotelMemberLevelDetailEntity.getCertificate());
 		becomeVipForm.setCertificateNo(hotelMemberLevelDetailEntity.getCertificateNo());
+		becomeVipForm.setMobile(hotelMemberLevelDetailEntity.getMobile());
 		becomeVipForm.setName(hotelMemberLevelDetailEntity.getName());
 		becomeVipForm.setLevelId(hotelMemberLevelDetailEntity.getLevelId());
 		return becomeVipForm;

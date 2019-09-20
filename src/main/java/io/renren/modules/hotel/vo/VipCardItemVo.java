@@ -57,4 +57,6 @@ public class VipCardItemVo {
 	 * 是否需要支付
 	 */
 	private int payFlag;
+	
+	private BigDecimal memberIntegral;
 }

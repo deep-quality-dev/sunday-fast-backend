@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.form;
 
+import java.math.BigDecimal;
+
 import javax.validation.constraints.NotBlank;
 
 import io.swagger.annotations.ApiModel;
@@ -74,4 +76,6 @@ public class BecomeVipForm {
 	
 	@ApiModelProperty(value = "支付方式")
 	private String payMethod;
+	
+	private BigDecimal memberIntegral;
 }

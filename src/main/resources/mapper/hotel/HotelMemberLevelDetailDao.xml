@@ -48,7 +48,7 @@
 	</update>
 	<update id="addBalance">
 		UPDATE t_hotel_member_level_detail t set t.score = t.balance + #{totalCost}
-		where t.id =#{params.id} and t.score = #{params.balance}
+		where t.id =#{params.id} and t.balance = #{params.balance}
 	</update>
 
 </mapper>

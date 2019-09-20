@@ -32,4 +32,10 @@ public class CardRechargeForm {
 
 	@ApiModelProperty(value = "小程序场景")
 	private String formId;
+
+	/**
+	 * 推销员
+	 */
+	@ApiModelProperty(value = "推销员")
+	private String salesman;
 }

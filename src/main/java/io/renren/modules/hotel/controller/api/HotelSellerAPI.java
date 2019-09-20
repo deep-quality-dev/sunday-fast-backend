@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +45,7 @@ public class HotelSellerAPI extends BaseController {
 	@GetMapping("/reserveRemind")
 	public R reserveRemind(Long sellerId) {
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
-		Map<String, String> data  = new HashMap<String,String>();
+		Map<String, String> data = new HashMap<String, String>();
 		data.put("reserveRemind", hotelSellerEntity.getReserveRemind());
 		return R.ok(data);
 	}
@@ -76,10 +78,10 @@ public class HotelSellerAPI extends BaseController {
 	 * @return
 	 */
 	@ApiOperation("酒店列表")
-	@GetMapping("/page")
+	@PostMapping("/page")
 	@Login
-	public R page(@RequestAttribute("userId") Long userId, @ModelAttribute HotelSearchCondition params, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
-		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(userId, params, new Page<HotelItemVo>(page, limit));
+	public R page(@RequestAttribute("userId") Long userId, @RequestBody HotelSearchCondition params, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
+		Page<HotelItemVo> pageResult = hotelSellerService.hotelPage(userId, params, new Page<HotelItemVo>(params.getPage(), params.getLimit()));
 		return R.ok(pageResult);
 	}
 

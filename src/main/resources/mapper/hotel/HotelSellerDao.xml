@@ -70,9 +70,12 @@
 		<where>
 			<if test='params.levelSort !=null'>
 				and t.star in
-				<foreach item="item" collection="params.levelSortlevelSort"
+				<foreach item="item" collection="params.levelSort"
 					separator="," open="(" close=")" index=""> #{item, jdbcType=INTEGER}
 				</foreach>
+			</if>
+			<if test='params.priceSort !=null'>
+				and t1.price BETWEEN #{params.priceSort[0]} and #{params.priceSort[1]}
 			</if>
 			<if test='params.hotelService == 1'>
 				and t.gym = 1

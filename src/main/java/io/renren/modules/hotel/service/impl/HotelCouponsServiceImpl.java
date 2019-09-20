@@ -58,8 +58,8 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public Page<UserCoupons> userCoupons(Long userId, Page<UserCoupons> page) {
-		return baseMapper.userCoupons(page, userId);
+	public Page<UserCoupons> userCoupons(Long userId, int status, Page<UserCoupons> page) {
+		return baseMapper.userCoupons(page,status, userId);
 	}
 
 	@Override
@@ -68,18 +68,18 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	}
 
 	@Override
-	public Page<UserCoupons> userCashCoupons(Long userId, Page<UserCoupons> page) {
-		return hotelCouponsCashDao.userCashCouponsPage(page, userId);
+	public Page<UserCoupons> userCashCoupons(Long userId, int status, Page<UserCoupons> page) {
+		return hotelCouponsCashDao.userCashCouponsPage(page, status,userId);
 	}
 
 	@Override
-	public Page<UserCoupons> userBreakfastCoupons(Long userId, Page<UserCoupons> page) {
-		return hotelCouponsBreakfastDao.userBreakfastCoupons(page, userId);
+	public Page<UserCoupons> userBreakfastCoupons(Long userId, int status, Page<UserCoupons> page) {
+		return hotelCouponsBreakfastDao.userBreakfastCoupons(page, status, userId);
 	}
 
 	@Override
 	public List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount) {
-		return hotelCouponsCashDao.canUseCoupons(userId, sellerId,amount);
+		return hotelCouponsCashDao.canUseCoupons(userId, sellerId, amount);
 	}
 
 }

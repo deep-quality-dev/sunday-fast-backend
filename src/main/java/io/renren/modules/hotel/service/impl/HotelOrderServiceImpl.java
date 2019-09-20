@@ -48,6 +48,7 @@ import io.renren.modules.hotel.dao.HotelOrderDao;
 import io.renren.modules.hotel.entity.HotelContactsEntity;
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
 import io.renren.modules.hotel.entity.HotelInvoiceEntity;
+import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
@@ -62,6 +63,7 @@ import io.renren.modules.hotel.form.BuildOrderForm;
 import io.renren.modules.hotel.form.CreateOrderForm;
 import io.renren.modules.hotel.service.HotelContactsService;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
+import io.renren.modules.hotel.service.HotelMemberCouponsService;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
@@ -107,6 +109,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Autowired
 	private HotelCouponsCashService hotelCouponsCashService;
+
+	@Autowired
+	private HotelMemberCouponsService hotelMemberCouponsService;
 
 	@Autowired
 	private HotelMemberService hotelMemberService;
@@ -212,12 +217,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		buildOrderForm.setTotalAmountFen(totalAmountFen.intValue());
 		buildOrderForm.getRecord().addAll(orderDetails);
 		buildOrderForm.setContactsId(contactsId);
-		// 用户积分 余额
-		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelRoomEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
-		if (null != hotelMemberLevelDetailEntity) {
-			buildOrderForm.setMemberBalance(hotelMemberLevelDetailEntity.getBalance());
-			buildOrderForm.setMemberIntegral(hotelMemberLevelDetailEntity.getScore());
-		}
 		log.info("构建订单信息--end,result:{}", JSON.toJSONString(buildOrderForm));
 		return buildOrderForm;
 	}
@@ -240,6 +239,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelContactsEntity hotelContactsEntity = hotelContactsService.getById(buildOrderForm.getContactsId());
 		createOrderForm.setCheckInPerson(hotelContactsEntity.getName());
 		createOrderForm.setMobile(hotelContactsEntity.getMobile());
+		createOrderForm.setCouponId(buildOrderForm.getCouponId());
 		HotelOrderEntity hotelOrderEntity = this.createHotelOrder(createOrderForm);
 		// 酒店信息
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelRoomEntity.getSellerId());
@@ -249,9 +249,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		String formId = buildOrderForm.getFormId();
 		// 不需要预付，先发送订房成功通知
-		if (createOrderForm.getPrepay() == 0) {
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(createOrderForm.getMoneyId());
+		if (hotelRoomMoneyEntity.getPrepay() == 0) {
 			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
 		}
+		// 扣减房量
+		hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelOrderEntity.getNum());
 		return hotelOrderEntity.getId();
 	}
 
@@ -310,12 +313,19 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setPayMethod(createOrderForm.getPayMethod());
 		hotelOrderEntity.setTotalCost(BigDecimal.valueOf(Long.valueOf(createOrderForm.getTotalAmountFen())).divide(new BigDecimal(100)));
 		hotelOrderEntity.setTotalIntegral(createOrderForm.getPayIntegral());
+		// 优惠券信息
 		if (null != createOrderForm.getCouponId() && 0L != createOrderForm.getCouponId()) {
-//			HotelCouponsCashEntity hotelCouponsCashEntity = hotelCouponsCashService.getById(couponId);
-//			if (NumberUtil.isGreater(new BigDecimal(totalAmount), hotelCouponsCashEntity.getConditions())) {
-//				buildOrderForm.setDiscountsAcmount(NumberUtil.decimalFormat("0.00", hotelCouponsCashEntity.getCost().doubleValue()));
-//				totalAmount = NumberUtil.sub(totalAmount.doubleValue(), hotelCouponsCashEntity.getCost().doubleValue());
-//			}
+			HotelCouponsCashEntity hotelCouponsCashEntity = hotelCouponsCashService.getById(createOrderForm.getCouponId());
+			if (NumberUtil.isGreater(hotelOrderEntity.getTotalCost(), hotelCouponsCashEntity.getConditions())) {
+				hotelOrderEntity.setTotalCost(NumberUtil.sub(hotelOrderEntity.getTotalCost(), hotelCouponsCashEntity.getConditions()));
+				hotelOrderEntity.setYhqCost(hotelCouponsCashEntity.getConditions());
+				HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getCouponId()));
+				if (null == hotelMemberCouponsEntity) {
+					throw new RRException("用户优惠券不存在");
+				}
+				hotelMemberCouponsEntity.setState(-1);
+				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+			}
 		}
 		this.save(hotelOrderEntity);
 		// 保存订单明细
@@ -416,9 +426,21 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderVo.setCoordinates(hotelSellerEntity.getCoordinates());
 		hotelOrderVo.setTotalCost(NumberUtil.decimalFormat("0.00", hotelOrderEntity.getTotalCost().doubleValue()));
 		HotelInvoiceEntity hotelInvoiceEntity = hotelInvoiceDao.selectById(hotelOrderEntity.getInvoiceId());
+		// 房间类型
+		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		hotelOrderVo.setClassify(hotelRoomEntity.getClassify());
 		if (null != hotelInvoiceEntity) {
 			hotelOrderVo.setInvoiceTitle(hotelInvoiceEntity.getCompany());
 		}
+		hotelOrderVo.setPrepay(hotelRoomMoneyEntity.getPrepay());
+		// 用户积分 余额
+		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelRoomEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
+		if (null != hotelMemberLevelDetailEntity) {
+			hotelOrderVo.setMemberBalance(hotelMemberLevelDetailEntity.getBalance());
+			hotelOrderVo.setMemberIntegral(hotelMemberLevelDetailEntity.getScore());
+		}
+		hotelOrderVo.setPayIntegral(hotelRoomMoneyEntity.getIntegral());
 		log.info("查询订单详情--end,result:{}", JSON.toJSONString(hotelOrderVo));
 		return hotelOrderVo;
 	}
@@ -435,49 +457,58 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		}
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(hotelOrderEntity.getUserId());
-		// 判断订单状态
-		if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.PAYED) {
-			if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.WX)) {
-				log.info("取消订单--订单已支付，执行退款");
-				// 已经在线付款，需要判断是否满足取消规则 TODO
-				Map<String, Object> refundParams = new HashMap<String, Object>();
-				HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
-				refundParams.put("appId", hotelWxConfigEntity.getAppId());
-				refundParams.put("outTradeNo", hotelOrderEntity.getOutTradeNo());
-				refundParams.put("totalFee", 1);
-				refundParams.put("refundFee", 1);
-				transactionService.refund(refundParams);
-				hotelOrderEntity.setStatus(HotelOrderStatus.APPLY_REFUND);
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
+		// 恢复房量
+		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
+		hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderEntity.getNum());
+		if (hotelRoomMoneyEntity.getPrepay() == 1) {
+			// 判断订单状态
+			if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.PAYED) {
+				if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.WX)) {
+					log.info("取消订单--订单已支付，执行退款");
+					Map<String, Object> refundParams = new HashMap<String, Object>();
+					HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
+					refundParams.put("appId", hotelWxConfigEntity.getAppId());
+					refundParams.put("outTradeNo", hotelOrderEntity.getOutTradeNo());
+					refundParams.put("totalFee", 1);
+					refundParams.put("refundFee", 1);
+					transactionService.refund(refundParams);
+					hotelOrderEntity.setStatus(HotelOrderStatus.APPLY_REFUND);
+				}
+				if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.BALANCE)) {
+					hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
+					// 恢复余额
+					hotelMemberLevelDetailService.addBalance(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+					// 添加流水
+					HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, hotelOrderEntity.getUserId()).eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()));
+					hotelRechargeService.addConsumptionRecord(hotelOrderEntity.getTotalCost().intValue(), memberLevelDetailEntity.getLevelId(), userId, "取消订房，" + hotelOrderEntity.getRoomType());
+				}
+				if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.INTEGRAL)) {
+					hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
+					// 恢复积分
+					hotelMemberLevelDetailService.addIntegral(hotelOrderEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
+					// 添加积分流水
+					hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "取消订房，" + hotelOrderEntity.getRoomType());
+				}
 			}
-			if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.BALANCE)) {
+			if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.UN_PAY) {
+				log.info("取消订单--订单未支付，直接取消");
 				hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
-				// 恢复房量
-				HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
-				HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
-				hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderEntity.getNum());
-				// 恢复余额
-				hotelMemberLevelDetailService.addBalance(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-				// 添加流水
-				HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getMemberId, hotelOrderEntity.getUserId()).eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()));
-				hotelRechargeService.addConsumptionRecord(hotelOrderEntity.getTotalCost().intValue(), memberLevelDetailEntity.getLevelId(), userId, "取消订房，" + hotelOrderEntity.getRoomType());
-			}
-			if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.INTEGRAL)) {
-				hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
-				// 恢复房量
-				HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
-				HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
-				hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderEntity.getNum());
-				// 恢复积分
-				hotelMemberLevelDetailService.addIntegral(hotelOrderEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-				// 添加积分流水
-				hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "取消订房，" + hotelOrderEntity.getRoomType());
 			}
 		}
-		if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.UN_PAY) {
-			log.info("取消订单--订单未支付，直接取消");
-			hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
-		}
+		// 更新订单
 		this.updateById(hotelOrderEntity);
+
+		// 恢复用户优惠券
+		if (null != hotelOrderEntity.getCouponsId() && 0L != hotelOrderEntity.getCouponsId()) {
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getCouponsId()));
+			if (null == hotelMemberCouponsEntity) {
+				throw new RRException("用户优惠券不存在");
+			}
+			hotelMemberCouponsEntity.setState(1);
+			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+		}
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		// 发送取消订房通知
 		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
@@ -537,13 +568,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
 		hotelOrderEntity.setOrderNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + userId));
-		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
 		////
 		if (PayMethodConstants.BALANCE.equals(payMethod)) {
 			// 扣除余额
 			hotelMemberLevelDetailService.balanceTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-			// 扣减房量
-			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelRoomMoneyEntity.getNum());
 			// 更新订单
 			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
 			// 发送预定通知
@@ -555,8 +583,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		} else if (PayMethodConstants.INTEGRAL.equals(payMethod)) {
 			// 扣除积分
 			hotelMemberLevelDetailService.integralTransaction(hotelRoomEntity.getSellerId(), userId, hotelOrderEntity.getTotalCost());
-			// 扣减房量
-			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelRoomMoneyEntity.getNum());
 			// 更新订单
 			this.updateOrderStatus2Payed(hotelOrderEntity.getId());
 			// 发送预定通知

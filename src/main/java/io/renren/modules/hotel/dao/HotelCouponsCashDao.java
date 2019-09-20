@@ -28,7 +28,7 @@ public interface HotelCouponsCashDao extends BaseMapper<HotelCouponsCashEntity> 
 	 * @param userId
 	 * @return
 	 */
-	Page<UserCoupons> userCashCouponsPage(Page<UserCoupons> page, Long userId);
+	Page<UserCoupons> userCashCouponsPage(Page<UserCoupons> page,int status, Long userId);
 
 	/**
 	 * 商家可用优惠券

@@ -36,14 +36,15 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	/**
 	 * 用户优惠券
 	 * 
-	 * @param userId   用户ID·
+	 * @param userId 用户ID·
 	 * @param params
 	 * @return
 	 */
-	Page<UserCoupons> userCoupons(Long userId, Page<UserCoupons> page);
+	Page<UserCoupons> userCoupons(Long userId, int status, Page<UserCoupons> page);
 
 	/**
-	 * 	钱包主页数据
+	 * 钱包主页数据
+	 * 
 	 * @param userId
 	 * @return
 	 */
@@ -51,29 +52,32 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 
 	/**
 	 * 用户代金券
+	 * 
 	 * @param userId
 	 * @param page
 	 * @param limit
 	 * @return
 	 */
-	Page<UserCoupons> userCashCoupons(Long userId, Page<UserCoupons> page);
+	Page<UserCoupons> userCashCoupons(Long userId, int status, Page<UserCoupons> page);
 
 	/**
 	 * 用户早餐券
+	 * 
 	 * @param userId
 	 * @param page
 	 * @param limit
 	 * @return
 	 */
-	Page<UserCoupons> userBreakfastCoupons(Long userId, Page<UserCoupons> page);
+	Page<UserCoupons> userBreakfastCoupons(Long userId, int status, Page<UserCoupons> page);
 
 	/**
 	 * 商家可用优惠券
+	 * 
 	 * @param userId
 	 * @param sellerId
-	 * @param amount 
+	 * @param amount
 	 * @return
 	 */
 	List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount);
-	
+
 }

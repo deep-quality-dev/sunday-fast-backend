@@ -35,11 +35,22 @@
 		t1.seller_id,
 		t1.conditions
 		from
-		t_hotel_member_coupons t inner join
+		t_hotel_member_coupons t
+		inner join
 		t_hotel_coupons_breakfast t1 on
 		t.coupons_id = t1.id
-		where
-		t.coupons_type = 3 and t.user_id = #{userId}
+		<where>
+			t.coupons_type = 3 and t.user_id = #{userId}
+			<if test="status == 1 ">
+				and t.state = 1
+			</if>
+			<if test="status == -1 ">
+				and t.state = -1
+			</if>
+			<if test="status == 0">
+				t1.end_time >= now()
+			</if>
+		</where>
 	</select>
 
 </mapper>

@@ -34,6 +34,6 @@ public interface HotelCouponsDao extends BaseMapper<HotelCouponsEntity> {
 	 * @param userId
 	 * @return
 	 */
-	Page<UserCoupons> userCoupons(Page<UserCoupons> page, Long userId);
+	Page<UserCoupons> userCoupons(Page<UserCoupons> page, int status, Long userId);
 
 }

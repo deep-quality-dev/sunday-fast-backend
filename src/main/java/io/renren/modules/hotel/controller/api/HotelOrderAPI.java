@@ -163,7 +163,7 @@ public class HotelOrderAPI extends BaseController {
 			if (null == orderId) {
 				throw new RRException("参数错误");
 			}
-			String payMethod = params.get("orderId").toString();
+			String payMethod = params.get("payMethod").toString();
 			String formId =  params.get("formId").toString();
 			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request),payMethod,formId);
 			return R.ok(mpOrderResult);

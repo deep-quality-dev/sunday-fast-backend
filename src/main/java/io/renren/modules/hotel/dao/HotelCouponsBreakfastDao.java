@@ -25,6 +25,6 @@ public interface HotelCouponsBreakfastDao extends BaseMapper<HotelCouponsBreakfa
 	 * @param userId
 	 * @return
 	 */
-	Page<UserCoupons> userBreakfastCoupons(Page<UserCoupons> page, Long userId);
+	Page<UserCoupons> userBreakfastCoupons(Page<UserCoupons> page,int status, Long userId);
 
 }

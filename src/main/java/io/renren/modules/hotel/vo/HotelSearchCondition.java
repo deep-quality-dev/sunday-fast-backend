@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.vo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.annotations.ApiModel;
@@ -29,16 +30,19 @@ public class HotelSearchCondition {
 	private int sort;
 
 	@ApiModelProperty(value = "酒店星级 1-经济型，2-二星级，3-三星级，4-4星级，5-星级")
-	private String levelSort;
+	private List<String> levelSort;
 
 	@ApiModelProperty(value = "酒店服务 1-健身房，2-会议室，")
-	private int hotelService;
+	private List<String> hotelService;
+	
+	@ApiModelProperty(value = "价格区间")
+	private List<BigDecimal> priceSort;
 
 	@ApiModelProperty(value = "关键字")
 	private String k;
 
 	@ApiModelProperty(value = "主题类型，这里待定，数据可能需要后台配置")
-	private String topic;
+	private List<String> topic;
 
 	@ApiModelProperty(value = "入住时间")
 	private String startDay;
@@ -48,4 +52,8 @@ public class HotelSearchCondition {
 
 	private double latitude;
 	private double longitude;
+	
+	private int page =1;
+	
+	private int limit = 15;
 }

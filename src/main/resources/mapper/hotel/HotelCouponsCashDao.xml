@@ -36,11 +36,22 @@
 		t1.end_time,
 		t1.conditions
 		from
-		t_hotel_member_coupons t inner join
+		t_hotel_member_coupons t
+		inner join
 		t_hotel_coupons_cash t1 on
 		t.coupons_id = t1.id
-		where
-		t.coupons_type = 2 and t.user_id = #{userId}
+		<where>
+			t.coupons_type = 2 and t.user_id = #{userId}
+			<if test="status == 1 ">
+				and t.state = 1
+			</if>
+			<if test="status == -1 ">
+				and t.state = -1
+			</if>
+			<if test="status == 0">
+				t1.end_time >= now()
+			</if>
+		</where>
 	</select>
 
 	<select id="canUseCoupons"
@@ -55,12 +66,14 @@
 		t1.end_time,
 		t1.conditions
 		from
-		t_hotel_member_coupons t inner join
+		t_hotel_member_coupons t
+		inner join
 		t_hotel_coupons_cash t1 on
 		t.coupons_id = t1.id
 		where
 		t.coupons_type = 2 and t.user_id = #{userId}
-		and t1.conditions <![CDATA[ <= ]]> #{amount} or t1.conditions is null
-		and t1.seller_id = #{sellerId}
+		and t1.conditions <![CDATA[ <= ]]>
+		#{amount} or t1.conditions is null
+		and t1.seller_id = #{sellerId} and t.state = 1
 	</select>
 </mapper>

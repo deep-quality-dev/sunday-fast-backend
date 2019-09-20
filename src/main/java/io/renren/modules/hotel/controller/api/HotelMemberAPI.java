@@ -100,8 +100,8 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户优惠券")
 	@GetMapping("/userCoupons")
-	public R userCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
-		Page<UserCoupons> pageResult = hotelCouponsService.userCoupons(userId, new Page<UserCoupons>(page, limit));
+	public R userCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, @RequestParam(required = false, name = "status", defaultValue = "1") int status) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userCoupons(userId, status, new Page<UserCoupons>(page, limit));
 		return R.ok().put("data", pageResult);
 	}
 
@@ -115,8 +115,8 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户代金券")
 	@GetMapping("/userCashCoupons")
-	public R userCashCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
-		Page<UserCoupons> pageResult = hotelCouponsService.userCashCoupons(userId, new Page<UserCoupons>(page, limit));
+	public R userCashCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, @RequestParam(required = false, name = "status", defaultValue = "1") int status) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userCashCoupons(userId, status, new Page<UserCoupons>(page, limit));
 		return R.ok().put("data", pageResult);
 	}
 
@@ -130,8 +130,8 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("用户早餐券")
 	@GetMapping("/userBreakfastCoupons")
-	public R userBreakfastCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit) {
-		Page<UserCoupons> pageResult = hotelCouponsService.userBreakfastCoupons(userId, new Page<UserCoupons>(page, limit));
+	public R userBreakfastCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "page", required = false, defaultValue = "1") int page, @RequestParam(name = "limit", required = false, defaultValue = "10") int limit, @RequestParam(required = false, name = "status", defaultValue = "1") int status) {
+		Page<UserCoupons> pageResult = hotelCouponsService.userBreakfastCoupons(userId, status, new Page<UserCoupons>(page, limit));
 		return R.ok().put("data", pageResult);
 	}
 

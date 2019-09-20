@@ -3,6 +3,10 @@ package io.renren.modules.hotel.vo;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -42,10 +46,15 @@ public class HotelOrderVo {
 	 */
 	private String coordinates;
 
+	
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date arrivalTime;
 	/**
 	 * 离店时间
 	 */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date departureTime;
 
 	private int commentFlag;
@@ -62,8 +71,23 @@ public class HotelOrderVo {
 
 	// 房型
 	private String roomType;
+	private Integer classify;
 	private Integer status;
 	private String totalCost;
 	private Integer days;
 	private Integer num;
+	
+	// 用户余额
+	private BigDecimal memberBalance;
+
+	// 用户积分
+	private BigDecimal memberIntegral;
+
+	// 支付积分
+	private BigDecimal payIntegral;
+	
+	/**
+	 * 订单是否是需要预付
+	 */
+	private int prepay;
 }

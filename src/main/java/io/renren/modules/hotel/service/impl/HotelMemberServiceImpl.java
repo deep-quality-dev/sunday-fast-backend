@@ -59,7 +59,9 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		MemberVo memberVo = new MemberVo();
 		HotelMemberEntity hotelMemberEntity = this.getById(userId);
 		memberVo.setHeadImgUrl(hotelMemberEntity.getImg());
+		memberVo.setZsName(hotelMemberEntity.getZsName());
 		memberVo.setNickName(hotelMemberEntity.getName());
+		memberVo.setBirthday(hotelMemberEntity.getBirthday());
 		memberVo.setGender(hotelMemberEntity.getGender());
 		memberVo.setAuthFlag(StrUtil.isEmpty(hotelMemberEntity.getIdentityNo()) ? 0 : 1);
 		if (StrUtil.isNotEmpty(hotelMemberEntity.getIdentityNo())) {

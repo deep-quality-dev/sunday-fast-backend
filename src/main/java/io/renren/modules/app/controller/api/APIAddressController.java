@@ -23,7 +23,11 @@ import io.renren.modules.app.service.AddressService;
 import io.renren.modules.app.service.RegionService;
 import io.renren.modules.app.vo.AddressVo;
 import io.renren.modules.app.vo.RegionVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
+
+@Api(value = "收货地址接口", tags = { "收货地址接口" })
 @RestController
 @RequestMapping("app/address")
 public class APIAddressController {
@@ -41,6 +45,7 @@ public class APIAddressController {
      */
     @Login
     @PostMapping
+    @ApiOperation("添加地址")
     public R addAddress(@RequestBody AddressEntity addressEntity, @RequestAttribute("userId") Integer userId) {
         addressService.addUserAddress(addressEntity, userId);
         return R.ok();
@@ -53,6 +58,7 @@ public class APIAddressController {
      */
     @Login
     @PutMapping
+    @ApiOperation("修改地址")
     public R updAddress(@RequestBody AddressEntity addressEntity, @RequestAttribute("userId") Integer userId) {
         addressService.updUserAddress(addressEntity, userId);
         return R.ok();
@@ -65,6 +71,7 @@ public class APIAddressController {
      */
     @Login
     @GetMapping("/list")
+    @ApiOperation("用户收获地址列表")
     public R list(@RequestAttribute("userId") Integer userId) {
         List<AddressEntity> addressEntityList = addressService.userAddessList(userId);
         return R.ok().put("data", addressEntityList);
@@ -72,6 +79,7 @@ public class APIAddressController {
 
     @Login
     @GetMapping("/{id}")
+    @ApiOperation("地址详情")
     public R detail(@PathVariable Integer id, @RequestAttribute("userId") Integer userId) {
         AddressEntity addressEntity = addressService.getById(id);
         if (null == addressEntity || addressEntity.getUid().intValue() != userId) {
@@ -117,6 +125,7 @@ public class APIAddressController {
      */
     @Login
     @DeleteMapping("/{id}")
+    @ApiOperation("删除收货地址")
     public R del(@PathVariable Integer id, @RequestAttribute("userId") Integer userId) {
         addressService.delAddress(id, userId);
         return R.ok();

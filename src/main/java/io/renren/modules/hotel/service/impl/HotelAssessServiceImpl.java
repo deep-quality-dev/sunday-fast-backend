@@ -17,7 +17,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.AssessTagRelDao;
@@ -35,6 +34,9 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 
 	@Autowired
 	private HotelOrderService hotelOrderService;
+
+	@Autowired
+	private HotelAssessDao hotelAssessDao;
 
 	@Autowired
 	private AssessTagRelDao assessTagRelDao;
@@ -92,11 +94,13 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	}
 
 	@Override
-	public Map<String, Integer> hotelCount(Long sellerId) {
-		Map<String, Integer> map = new HashMap<String, Integer>();
+	public Map<String, Object> hotelCount(Long sellerId) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("good", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().gt(HotelAssessEntity::getScore, 3).eq(HotelAssessEntity::getSellerId, sellerId)));
 		map.put("bad", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().lt(HotelAssessEntity::getScore, 3).eq(HotelAssessEntity::getSellerId, sellerId)));
 		map.put("img", baseMapper.selectCount(Wrappers.<HotelAssessEntity>lambdaQuery().isNotNull(HotelAssessEntity::getImg).eq(HotelAssessEntity::getSellerId, sellerId)));
+		double score = hotelAssessDao.avgScore(sellerId);
+		map.put("score", score);
 		return map;
 	}
 

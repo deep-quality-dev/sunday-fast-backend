@@ -52,5 +52,5 @@ public interface HotelAssessService extends IService<HotelAssessEntity> {
 	 * @param sellerId
 	 * @return
 	 */
-	Map<String, Integer> hotelCount(Long sellerId);
+	Map<String, Object> hotelCount(Long sellerId);
 }

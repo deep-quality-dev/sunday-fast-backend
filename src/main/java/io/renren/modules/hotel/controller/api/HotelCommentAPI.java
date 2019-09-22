@@ -89,8 +89,8 @@ public class HotelCommentAPI {
 	@ApiOperation("酒店评论总数")
 	@GetMapping("/hotelCount")
 	public R hotelCount(@RequestParam Long sellerId) {
-		Map<String, Integer> result = hotelAssessService.hotelCount(sellerId);
-		return R.ok(result);
+		Map<String, Object> result = hotelAssessService.hotelCount(sellerId);
+		return R.ok().put("data", result);
 	}
 
 	@ApiOperation("酒店评论tags")

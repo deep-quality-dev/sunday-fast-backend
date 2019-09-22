@@ -1,6 +1,5 @@
 package io.renren.modules.hotel.service.impl;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -13,13 +12,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import io.renren.common.exception.RRException;
@@ -62,13 +59,14 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		memberVo.setZsName(hotelMemberEntity.getZsName());
 		memberVo.setNickName(hotelMemberEntity.getName());
 		memberVo.setBirthday(hotelMemberEntity.getBirthday());
+		memberVo.setLevel("1");
 		memberVo.setMobile(hotelMemberEntity.getTel());
 		memberVo.setGender(hotelMemberEntity.getGender());
 		memberVo.setAuthFlag(StrUtil.isEmpty(hotelMemberEntity.getIdentityNo()) ? 0 : 1);
 		if (StrUtil.isNotEmpty(hotelMemberEntity.getIdentityNo())) {
-			memberVo.setIdentityNo(hotelMemberEntity.getIdentityNo().replaceAll("(\\d{4})\\d{10}(\\d{4})", "$1****$2"));
+			memberVo.setIdentityNo(hotelMemberEntity.getIdentityNo());
 		}
-		log.info("获取用户信息--end，result:{}", JSON.toJSONString(memberVo));
+		log.debug("获取用户信息--end，result:{}", JSON.toJSONString(memberVo));
 		return memberVo;
 	}
 
@@ -168,6 +166,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		if (null == hotelMemberEntity) {
 			hotelMemberEntity = new HotelMemberEntity();
 			hotelMemberEntity.setOpenid(userInfo.getOpenId());
+			hotelMemberEntity.setLevelId(1L);
 			hotelMemberEntity.setImg(userInfo.getAvatarUrl());
 			hotelMemberEntity.setJoinTime(DateUtil.date());
 			hotelMemberEntity.setName(userInfo.getNickName());

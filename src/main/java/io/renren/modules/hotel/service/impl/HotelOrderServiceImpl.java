@@ -2,6 +2,7 @@ package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelWxConfigEntity;
@@ -70,6 +72,7 @@ import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
+import io.renren.modules.hotel.service.HotelRoomNumService;
 import io.renren.modules.hotel.service.HotelRoomPriceService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.service.HotelScoreService;
@@ -106,6 +109,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Autowired
 	private HotelRoomPriceService hotelRoomPriceService;
+
+	@Autowired
+	private HotelRoomNumService hotelRoomNumService;
 
 	@Autowired
 	private HotelCouponsCashService hotelCouponsCashService;
@@ -170,9 +176,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 查询房价
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(moneyId);
 		// 积分换房
-		if (null != hotelRoomMoneyEntity.getIntegral() || NumberUtil.isGreater(new BigDecimal(0), hotelRoomMoneyEntity.getIntegral())) {
+		if (null != hotelRoomMoneyEntity.getIntegral() && NumberUtil.isGreater(new BigDecimal(0), hotelRoomMoneyEntity.getIntegral())) {
 			buildOrderForm.setPayIntegral(NumberUtil.mul(roomNum, hotelRoomMoneyEntity.getIntegral()));
 		}
+		HotelRoomNumEntity hotelRoomNumEntity = null;
 		// 房型价格是否需要预付
 		buildOrderForm.setPrepay(hotelRoomMoneyEntity.getPrepay());
 		HotelRoomPriceEntity hotelRoomPriceEntity = null;
@@ -184,11 +191,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		for (int i = 0; i < checkInDay; i++) {
 			orderDetail = new OrderDetail();
 			// 是否有特殊价格
-			long thisdateTimes = curentTime.millsecond();// 当天时间戳
+			long thisdateTimes = curentTime.getTime();// 当天时间
 			log.info("查询每日房价--start，time:{},roomId:{},moneyId:{},sellerId:{}", thisdateTimes, roomId, moneyId, hotelRoomEntity.getSellerId());
 			hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("seller_id", hotelRoomEntity.getSellerId()).eq("money_id", moneyId).eq("room_id", roomId).eq("thisdate", thisdateTimes));
-			// 时间后移
-			curentTime = DateUtil.offsetDay(curentTime, 1);
 			Double amount = 0.0;
 			if (null != hotelRoomPriceEntity) {
 				log.info("日期:{},存在特殊价格:{}", curentTime, hotelRoomPriceEntity.getMprice());
@@ -201,8 +206,21 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			totalAmount = NumberUtil.add(totalAmount, amount);
 			orderDetail.setAmount(NumberUtil.decimalFormat("0.00", amount));
 			orderDetail.setNum(roomNum);
+			orderDetail.setDate(DateUtil.format(curentTime, "yyyy-MM-dd"));
 			log.info("查询每日房价--end，result:{}", JSON.toJSONString(orderDetail));
 			orderDetails.add(orderDetail);
+			hotelRoomNumEntity = hotelRoomNumService.getOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getDateday, curentTime).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()));
+			if (null == hotelRoomNumEntity) {
+				if (hotelRoomMoneyEntity.getNum() < roomNum) {
+					throw new RRException("房量不足");
+				}
+			} else {
+				if (hotelRoomNumEntity.getNums() < roomNum) {
+					throw new RRException("房量不足");
+				}
+			}
+			// 时间后移
+			curentTime = DateUtil.offsetDay(curentTime, 1);
 		}
 		// 优惠券信息
 		if (null != couponId && couponId > 0) {
@@ -251,10 +269,9 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 不需要预付，先发送订房成功通知
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(createOrderForm.getMoneyId());
 		if (hotelRoomMoneyEntity.getPrepay() == 0) {
-			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			// sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity,
+			// hotelWxConfigEntity, formId);
 		}
-		// 扣减房量
-		hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, -hotelOrderEntity.getNum());
 		return hotelOrderEntity.getId();
 	}
 
@@ -347,16 +364,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(createOrderForm.getMoneyId());
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(createOrderForm.getRoomId());
 		HotelRoomPriceEntity hotelRoomPriceEntity = null;
+		HotelRoomNumEntity hotelRoomNumEntity = null;
 		DateTime curentTime = new DateTime(DateUtil.parse(createOrderForm.getCheckInDate()));
 		HotelOrderRecordEntity hotelOrderRecordEntity = null;
 		List<HotelOrderRecordEntity> orderRecordEntities = new ArrayList<HotelOrderRecordEntity>();
+
 		for (int i = 0; i < createOrderForm.getCheckInDay(); i++) {
 			// 是否有特殊价格
 			long thisdateTimes = curentTime.millsecond();// 当天时间戳
 			log.info("创建订单明细--price，time:{},roomId:{},moneyId:{},sellerId:{}", thisdateTimes, createOrderForm.getRoomId(), createOrderForm.getMoneyId(), createOrderForm.getSellerId());
 			hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("seller_id", createOrderForm.getSellerId()).eq("money_id", createOrderForm.getMoneyId()).eq("room_id", createOrderForm.getRoomId()).eq("thisdate", thisdateTimes));
-			// 时间后移
-			curentTime = DateUtil.offsetDay(curentTime, 1);
 			Double amount = 0.0;
 			if (null != hotelRoomPriceEntity) {
 				log.info("创建订单明细--日期:{},存在特殊价格:{}", curentTime, hotelRoomPriceEntity.getMprice());
@@ -366,7 +383,19 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				// 使用原价--暂时取会员价
 				amount = NumberUtil.mul(createOrderForm.getRoomNum(), hotelRoomMoneyEntity.getPrice().doubleValue());
 			}
+			// 查询每天的房量，并且创建记录
+			hotelRoomNumEntity = hotelRoomNumService.getOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getDateday, curentTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()));
+			if (null == hotelRoomNumEntity) {
+				hotelRoomNumEntity = new HotelRoomNumEntity();
+				hotelRoomNumEntity.setDateday(curentTime.getTime());
+				hotelRoomNumEntity.setMoneyId(hotelRoomMoneyEntity.getId());
+				hotelRoomNumEntity.setNums(hotelRoomMoneyEntity.getNum());
+				hotelRoomNumEntity.setRid(hotelRoomMoneyEntity.getRoomId());
+				hotelRoomNumService.save(hotelRoomNumEntity);
+			}
 			hotelOrderRecordEntity = new HotelOrderRecordEntity();
+			hotelOrderRecordEntity.setRoomId(hotelRoomMoneyEntity.getRoomId());
+			hotelOrderRecordEntity.setArrivalTime(DateUtil.date(curentTime));
 			hotelOrderRecordEntity.setAmount(new BigDecimal(amount));
 			hotelOrderRecordEntity.setCreateTime(DateUtil.date());
 			hotelOrderRecordEntity.setMoneyId(createOrderForm.getMoneyId());
@@ -376,10 +405,33 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			}
 			hotelOrderRecordEntity.setSellerId(createOrderForm.getSellerId());
 			hotelOrderRecordEntity.setRoomType(hotelRoomEntity.getName() + "-" + hotelRoomMoneyEntity.getName());
+			// 扣减房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, curentTime.getTime(), -createOrderForm.getRoomNum());
 			orderRecordEntities.add(hotelOrderRecordEntity);
+			// 时间后移
+			curentTime = DateUtil.offsetDay(curentTime, 1);
 		}
 		hotelOrderRecordService.saveBatch(orderRecordEntities);
-		log.info("创建订单明细--end,result:{}", JSON.toJSONString(orderRecordEntities));
+		log.debug("创建订单明细--end,result:{}", JSON.toJSONString(orderRecordEntities));
+	}
+
+	// 获取区间日期每一天
+	public List<String> findDates(String dBegin, String dEnd) {
+		List<String> lDate = new ArrayList<String>();
+		lDate.add(dBegin);
+		Calendar calBegin = Calendar.getInstance();
+		// 使用给定的 Date 设置此 Calendar 的时间
+		calBegin.setTime(DateUtil.parse(dBegin));
+		Calendar calEnd = Calendar.getInstance();
+		// 使用给定的 Date 设置此 Calendar 的时间
+		calEnd.setTime(DateUtil.parse(dEnd));
+		// 测试此日期是否在指定日期之后
+		while (DateUtil.parse(dEnd).after(calBegin.getTime())) {
+			// 根据日历的规则，为给定的日历字段添加或减去指定的时间量
+			calBegin.add(Calendar.DAY_OF_MONTH, 1);
+			lDate.add(DateUtil.formatDate(calBegin.getTime()));
+		}
+		return lDate;
 	}
 
 	@Override
@@ -441,6 +493,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelOrderVo.setMemberIntegral(hotelMemberLevelDetailEntity.getScore());
 		}
 		hotelOrderVo.setPayIntegral(hotelRoomMoneyEntity.getIntegral());
+		// 订单明细
+		List<HotelOrderRecordEntity> hotelOrderRecordEntities = hotelOrderRecordService.list(Wrappers.<HotelOrderRecordEntity>lambdaQuery().eq(HotelOrderRecordEntity::getOrderId, orderId));
+		OrderDetail orderDetail = null;
+		for (HotelOrderRecordEntity hotelOrderRecordEntity : hotelOrderRecordEntities) {
+			orderDetail = new OrderDetail();
+			orderDetail.setAmount(NumberUtil.decimalFormat("0.00", hotelOrderRecordEntity.getAmount().doubleValue()));
+			orderDetail.setDate(DateUtil.format(hotelOrderRecordEntity.getArrivalTime(), "yyyy-MM-dd"));
+			orderDetail.setNum(hotelOrderEntity.getNum());
+			hotelOrderVo.getRecord().add(orderDetail);
+		}
 		log.info("查询订单详情--end,result:{}", JSON.toJSONString(hotelOrderVo));
 		return hotelOrderVo;
 	}
@@ -460,7 +522,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
 		// 恢复房量
 		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
-		hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderEntity.getNum());
+
 		if (hotelRoomMoneyEntity.getPrepay() == 1) {
 			// 判断订单状态
 			if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.PAYED) {
@@ -493,6 +555,11 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				log.info("取消订单--订单未支付，直接取消");
 				hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
 			}
+		}
+		List<HotelOrderRecordEntity> hotelOrderRecordEntities = hotelOrderRecordService.list(Wrappers.<HotelOrderRecordEntity>lambdaQuery().eq(HotelOrderRecordEntity::getOrderId, orderId));
+		for (HotelOrderRecordEntity hotelOrderRecordEntity : hotelOrderRecordEntities) {
+			// 恢复每天的房量
+			hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderRecordEntity.getArrivalTime().getTime(), hotelOrderEntity.getNum());
 		}
 		hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
 		// 更新订单
@@ -701,10 +768,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	public void updateOrderStatus2Refunded(String outTradeNo) {
 		HotelOrderEntity hotelOrderEntity = baseMapper.selectOne(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getOutTradeNo, outTradeNo));
 		hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
-		// 恢复房量
-		HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
-		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
-		hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderEntity.getNum());
 		baseMapper.updateById(hotelOrderEntity);
 	}
 }

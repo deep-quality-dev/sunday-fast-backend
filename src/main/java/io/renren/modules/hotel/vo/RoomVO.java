@@ -47,6 +47,11 @@ public class RoomVO {
 	 * 最低价格
 	 */
 	private String price;
+	
+	/**
+	 * 是否有房
+	 */
+	private boolean hasRoom;
 
 	/**
 	 * 价格列表

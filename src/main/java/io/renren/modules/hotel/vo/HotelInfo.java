@@ -134,6 +134,11 @@ public class HotelInfo {
 	private String commentRate = "0.00%";
 
 	private BigDecimal score;
+	
+	/**
+	 * 等级类型
+	 */
+	private String levelType;
 
 	private List<AssessTagEntity> tags;
 }

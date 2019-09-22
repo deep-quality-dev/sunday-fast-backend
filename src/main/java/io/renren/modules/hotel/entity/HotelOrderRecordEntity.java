@@ -42,6 +42,11 @@ public class HotelOrderRecordEntity implements Serializable {
 	 * 
 	 */
 	private Long priceId;
+	
+	/**
+	 * 入住日期
+	 */
+	private Date arrivalTime; 
 	/**
 	 * 
 	 */

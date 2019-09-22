@@ -1,7 +1,9 @@
 package io.renren.modules.hotel.vo;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -35,7 +37,7 @@ public class HotelOrderVo {
 	private String tel;
 
 	private Date createTime;
-	
+
 	private Long sellerId;
 	/**
 	 * 商家地址
@@ -46,7 +48,6 @@ public class HotelOrderVo {
 	 */
 	private String coordinates;
 
-	
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date arrivalTime;
@@ -76,7 +77,7 @@ public class HotelOrderVo {
 	private String totalCost;
 	private Integer days;
 	private Integer num;
-	
+
 	// 用户余额
 	private BigDecimal memberBalance;
 
@@ -85,9 +86,11 @@ public class HotelOrderVo {
 
 	// 支付积分
 	private BigDecimal payIntegral;
-	
+
 	/**
 	 * 订单是否是需要预付
 	 */
 	private int prepay;
+
+	List<OrderDetail> record = new ArrayList<OrderDetail>();
 }

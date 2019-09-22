@@ -16,4 +16,11 @@ import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 @Mapper
 public interface HotelRoomNumDao extends BaseMapper<HotelRoomNumEntity> {
 
+	/**
+	 * 更新房量
+	 * @param hotelRoomNumEntity
+	 * @param roomNum
+	 */
+	void updateRoomNum(HotelRoomNumEntity params, int roomNum);
+
 }

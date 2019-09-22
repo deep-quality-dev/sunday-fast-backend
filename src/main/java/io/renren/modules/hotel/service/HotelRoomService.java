@@ -49,5 +49,5 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @param hotelRoomMoneyEntity
 	 * @param roomNum
 	 */
-	void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum);
+	void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity,Long dateTime, int roomNum);
 }

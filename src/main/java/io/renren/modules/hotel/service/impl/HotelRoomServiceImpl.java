@@ -86,9 +86,12 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);
+			// 日期区间是否有满房情况
+			int result = hotelRoomNumDao.selectCount(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).between(HotelRoomNumEntity::getDateday, DateUtil.parse(startTime).getTime(), DateUtil.parse(endTime).getTime()).lt(HotelRoomNumEntity::getNums, 1));
+			roomVO.setHasRoom(result == 0);
 			return roomVO;
 		}).collect(Collectors.toList());
-		log.info("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomVOs));
+		log.debug("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomVOs));
 		return roomVOs;
 	}
 
@@ -108,7 +111,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			roomMoneyVo.setPrepay(item.getPrepay());
 			roomMoneyVo.setHasRoom(item.getNum());
 			// 查询特殊房量
-			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
+			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getRoomId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
 			if (null != hotelRoomNumEntity) {
 				roomMoneyVo.setHasRoom(hotelRoomNumEntity.getNums());
 			}
@@ -145,11 +148,9 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum) {
-		// 更新价格数量
-		hotelRoomMoneyService.updateRoomNum(hotelRoomMoneyEntity, roomNum);
-		// 更新房型总数
-		baseMapper.updateRoomNum(hotelRoomEntity, roomNum);
+	public void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, Long dateTime, int roomNum) {
+		HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getDateday, dateTime).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()));
+		hotelRoomNumDao.updateRoomNum(hotelRoomNumEntity, roomNum);
 	}
 
 }

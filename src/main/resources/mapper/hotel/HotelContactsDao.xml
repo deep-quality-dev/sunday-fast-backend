@@ -14,6 +14,6 @@
     </resultMap>
 
 	<select id="latelyContact" resultMap="hotelContactsMap">
-		SELECT t1.* From t_hotel_order t INNER JOIN t_hotel_contacts t1 on t.contacts_id = t1.id order by t.create_time desc LIMIT 1
+		SELECT t1.* From t_hotel_order t INNER JOIN t_hotel_contacts t1 on t.contacts_id = t1.id where t.user_id= #{userId} order by t.create_time desc LIMIT 1
 	</select>
 </mapper>

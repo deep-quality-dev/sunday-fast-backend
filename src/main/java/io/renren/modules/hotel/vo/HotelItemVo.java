@@ -23,8 +23,10 @@ public class HotelItemVo {
 	private BigDecimal km;
 
 	private String price;
-	
+
 	private float distance;
-	
+
 	private BigDecimal score;
+
+	private String levelType;
 }

@@ -34,7 +34,11 @@ public class HotelInvoiceServiceImpl extends ServiceImpl<HotelInvoiceDao, HotelI
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addInvoice(Long userId, AddInvoiceForm addInvoiceForm) {
-		HotelInvoiceEntity hotelInvoiceEntity = new HotelInvoiceEntity();
+		HotelInvoiceEntity hotelInvoiceEntity = baseMapper.selectOne(Wrappers.<HotelInvoiceEntity>lambdaQuery().eq(HotelInvoiceEntity::getMemberId, userId).eq(HotelInvoiceEntity::getCompany, addInvoiceForm.getCompany()));
+		if (null != hotelInvoiceEntity) {
+			throw new RRException("发票信息已存在");
+		}
+		hotelInvoiceEntity = new HotelInvoiceEntity();
 		BeanUtil.copyProperties(addInvoiceForm, hotelInvoiceEntity);
 		hotelInvoiceEntity.setMemberId(userId);
 		baseMapper.insert(hotelInvoiceEntity);

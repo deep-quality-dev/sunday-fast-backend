@@ -25,11 +25,14 @@ import io.renren.modules.hotel.dao.HotelMemberCollectDao;
 import io.renren.modules.hotel.dao.HotelSellerDao;
 import io.renren.modules.hotel.entity.AssessTagEntity;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
+import io.renren.modules.hotel.entity.HotelBrandEntity;
+import io.renren.modules.hotel.entity.HotelBrandTypeEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelTopicEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.service.HotelBrandService;
+import io.renren.modules.hotel.service.HotelBrandTypeService;
 import io.renren.modules.hotel.service.HotelFacilityService;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.service.HotelTopicService;
@@ -62,6 +65,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private HotelFacilityService hotelFacilityService;
+
+	@Autowired
+	private HotelBrandTypeService hotelBrandTypeService;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -97,7 +103,12 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		hotelInfo.setScore(NumberUtil.round(score, 2));
 		List<AssessTagEntity> tags = assessTagDao.hotelTags(sellerId);
 		hotelInfo.setTags(tags);
-		log.info("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
+		HotelBrandEntity hotelBrandEntity = hotelBrandService.getById(hotelSellerEntity.getBrandId());
+		if (null != hotelBrandEntity) {
+			HotelBrandTypeEntity brandTypeEntity = hotelBrandTypeService.getById(hotelBrandEntity.getTypeId());
+			hotelInfo.setLevelType(brandTypeEntity.getName());
+		}
+		log.debug("获取酒店信息--end,result:{}", JSON.toJSONString(hotelInfo));
 		return hotelInfo;
 	}
 

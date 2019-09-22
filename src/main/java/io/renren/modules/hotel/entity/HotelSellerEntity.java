@@ -33,6 +33,11 @@ public class HotelSellerEntity implements Serializable {
 	 * 用户ID
 	 */
 	private Long userId;
+
+	/**
+	 * 品牌ID
+	 */
+	private String brandId;
 	/**
 	 * 1后台添加,2入住
 	 */

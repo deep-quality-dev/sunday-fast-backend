@@ -34,7 +34,11 @@ public class HotelContactsServiceImpl extends ServiceImpl<HotelContactsDao, Hote
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void addContacts(Long userId, AddContactsForm contactsForm) {
-		HotelContactsEntity hotelContactsEntity = new HotelContactsEntity();
+		HotelContactsEntity hotelContactsEntity = baseMapper.selectOne(Wrappers.<HotelContactsEntity>lambdaQuery().eq(HotelContactsEntity::getMemberId, userId).eq(HotelContactsEntity::getMobile, contactsForm.getMobile()).eq(HotelContactsEntity::getName, contactsForm.getName()));
+		if (null != hotelContactsEntity) {
+			throw new RRException("联系人已经存在");
+		}
+		hotelContactsEntity = new HotelContactsEntity();
 		BeanUtil.copyProperties(contactsForm, hotelContactsEntity);
 		hotelContactsEntity.setMemberId(userId);
 		baseMapper.insert(hotelContactsEntity);
@@ -73,7 +77,7 @@ public class HotelContactsServiceImpl extends ServiceImpl<HotelContactsDao, Hote
 	public AddContactsForm latelyContact(Long userId) {
 		AddContactsForm addContactsForm = new AddContactsForm();
 		HotelContactsEntity contactsEntity = baseMapper.latelyContact(userId);
-		if(null == contactsEntity) {
+		if (null == contactsEntity) {
 			return null;
 		}
 		BeanUtil.copyProperties(contactsEntity, addContactsForm);

@@ -23,11 +23,11 @@ public class HotelRoomNumEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 房型ID
 	 */
-	private Integer rid;
+	private Long rid;
 	/**
 	 * 数量
 	 */
@@ -35,7 +35,7 @@ public class HotelRoomNumEntity implements Serializable {
 	/**
 	 * 日期
 	 */
-	private Integer dateday;
+	private Long dateday;
 
 	/**
 	 * 房价ID

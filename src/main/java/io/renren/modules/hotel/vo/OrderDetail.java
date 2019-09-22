@@ -16,4 +16,6 @@ public class OrderDetail {
 	private String amount;
 
 	private String discounts;
+
+	private String date;
 }

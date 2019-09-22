@@ -13,6 +13,10 @@
 		<result property="dateday" column="dateday" />
 		<result property="moneyId" column="money_id" />
 	</resultMap>
-
+	<update id="updateRoomNum">
+		update t_hotel_room_num t set t.nums =
+		t.nums+#{roomNum} where t.id = #{params.id} and t.nums =
+		#{params.nums}
+	</update>
 
 </mapper>

@@ -84,6 +84,8 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 			hotelMemberEntity.setImg(user.getHeadImgUrl());
 			hotelMemberEntity.setJoinTime(DateUtil.date());
 			hotelMemberEntity.setName(user.getNickname());
+			hotelMemberEntity.setGender(null != user.getSex() ? user.getSex().toString() : "0");
+
 			this.save(hotelMemberEntity);
 			// 增加会员积分
 
@@ -207,6 +209,9 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		}
 		if (StrUtil.isNotEmpty(userInfo.getMobile())) {
 			hotelMemberEntity.setTel(userInfo.getMobile());
+		}
+		if (StrUtil.isNotEmpty(userInfo.getGender())) {
+			hotelMemberEntity.setGender(userInfo.getGender());
 		}
 		baseMapper.updateById(hotelMemberEntity);
 

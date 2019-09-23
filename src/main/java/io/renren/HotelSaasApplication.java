@@ -10,5 +10,6 @@ public class HotelSaasApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HotelSaasApplication.class, args);
 	}
+	
 
 }

@@ -63,6 +63,8 @@
 		t1.bg_image,
 		t.score,
 		t.balance,
+		t.card_no,
+		t.qr_code,
 		t2.id as seller_id,
 		t2.`name` as
 		seller_name

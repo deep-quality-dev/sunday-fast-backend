@@ -25,14 +25,14 @@ public class UserCoupons {
 	/**
 	 * 开始时间
 	 */
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date startTime;
 	/**
 	 * 结束时间
 	 */
-	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date endTime;
 	/**
 	 * 优惠条件
@@ -51,4 +51,6 @@ public class UserCoupons {
 	 * 商家ID
 	 */
 	private Long sellerId;
+	
+	private String sellerName;
 }

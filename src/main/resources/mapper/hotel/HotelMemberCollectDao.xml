@@ -20,6 +20,7 @@
 		SELECT t.* ,t1.ewm_logo as image ,t1.`name`,t1.address from
 		t_hotel_member_collect t
 		inner join t_hotel_seller t1 on t.biz_id = t1.id and t.biz_type =1
+		where t.user_id = #{userId} 
 		order by t.create_date desc
 	</select>
 

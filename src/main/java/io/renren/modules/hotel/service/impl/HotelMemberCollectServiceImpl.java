@@ -54,7 +54,7 @@ public class HotelMemberCollectServiceImpl extends ServiceImpl<HotelMemberCollec
 
 	@Override
 	public Page<CollectItemVo> collectList(Page<CollectItemVo> page, Long userId, int type) {
-		Page<CollectItemVo> pageResult = baseMapper.hotelcollectPageList(page);
+		Page<CollectItemVo> pageResult = baseMapper.hotelcollectPageList(page,userId,type);
 		return pageResult;
 	}
 

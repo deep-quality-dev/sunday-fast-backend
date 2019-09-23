@@ -25,6 +25,6 @@ public interface HotelMemberCollectDao extends BaseMapper<HotelMemberCollectEnti
 	 * @param type
 	 * @return
 	 */
-	Page<CollectItemVo> hotelcollectPageList(Page<CollectItemVo> page);
+	Page<CollectItemVo> hotelcollectPageList(Page<CollectItemVo> page, Long userId, int type);
 
 }

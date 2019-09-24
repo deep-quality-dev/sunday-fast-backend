@@ -36,10 +36,11 @@ sms:
   dingtalk:
     webhook: https://oapi.dingtalk.com/robot/send?access_token=639c8b9cbe01b2d664e5bfd69c2514ad145fb68da6efd554691eeae7fcb317d8
   aliyun:
-    accessKey: LTAIz55SzMsiNx7c
-    secretKey: 0O7ZyB5u6jjjrUDKMV4j5LNnLZBWVV
+    accessKey: LTAIud8RJMKBx8ii
+    secretKey: pAq2y2TNzjC7nl2j6YViP8DgcmtQc5
     channels:
       loginCodeChannel: SMS_162220476
+      validateCode: SMS_171858888
 fdfs:
   file-host: http://photo.xqtinfo.cn/
   tracker-list: 

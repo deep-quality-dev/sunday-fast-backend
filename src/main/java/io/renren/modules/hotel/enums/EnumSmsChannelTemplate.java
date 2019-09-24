@@ -8,7 +8,7 @@ public enum EnumSmsChannelTemplate {
 	/**
 	 * 登录验证
 	 */
-	LOGIN_NAME_LOGIN("loginCodeChannel", "金誉兴电子"),;
+	LOGIN_NAME_LOGIN("loginCodeChannel", "金誉兴电子"), VALIDATE_CODE("validateCode", "千兰会"),;
 
 	/**
 	 * 模板名称

@@ -48,6 +48,40 @@ public class HotelMemberAPI extends BaseController {
 	@Autowired
 	private HotelScoreService hotelScoreService;
 
+	/**
+	 * 设置支付密码
+	 * 
+	 * @return
+	 */
+	@Login
+	@ApiOperation("设置支付密码")
+	@PostMapping("/setPayPwd")
+	public R setPayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String pwd, @RequestParam(required = true) String mobile, @RequestParam(required = true) String vcode) {
+		hotelMemberService.setPayPwd(userId, pwd, mobile, vcode);
+		return R.ok();
+	}
+
+	@Login
+	@ApiOperation("修改支付密码")
+	@PostMapping("/updatePayPwd")
+	public R updatePayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String oldPwd, @RequestParam(required = true) String newPwd) {
+		hotelMemberService.updatePayPwd(userId, oldPwd, newPwd);
+		return R.ok();
+	}
+
+	/**
+	 * 设置支付密码
+	 * 
+	 * @return
+	 */
+	@Login
+	@ApiOperation("忘记支付密码")
+	@PostMapping("/setPayPwd")
+	public R forgetPayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String pwd, @RequestParam(required = true) String mobile, @RequestParam(required = true) String vcode) {
+		hotelMemberService.forgetPayPwd(userId, pwd, mobile, vcode);
+		return R.ok();
+	}
+
 	@Login
 	@ApiOperation("实名认证")
 	@PostMapping("/autonym")

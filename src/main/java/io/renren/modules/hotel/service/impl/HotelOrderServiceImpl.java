@@ -3,6 +3,7 @@ package io.renren.modules.hotel.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,6 +247,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		CreateOrderForm createOrderForm = new CreateOrderForm();
 		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getCouponId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
+		createOrderForm.setDdTime(buildOrderForm.getDdTime());
+		createOrderForm.setRemark(buildOrderForm.getRemark());
 		createOrderForm.setPayMethod(buildOrderForm.getPayMethod());
 		createOrderForm.setFormId(buildOrderForm.getFormId());
 		createOrderForm.setRoomId(buildOrderForm.getRoomId());
@@ -269,8 +272,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 不需要预付，先发送订房成功通知
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(createOrderForm.getMoneyId());
 		if (hotelRoomMoneyEntity.getPrepay() == 0) {
-			// sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity,
-			// hotelWxConfigEntity, formId);
+			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
 		}
 		return hotelOrderEntity.getId();
 	}
@@ -313,6 +315,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setSellerName(hotelSellerEntity.getName());
 		hotelOrderEntity.setSellerAddress(hotelSellerEntity.getAddress());
 		hotelOrderEntity.setCoordinates(createOrderForm.getCoordinates());
+		hotelOrderEntity.setDdTime(createOrderForm.getDdTime());
+		hotelOrderEntity.setRemark(createOrderForm.getRemark());
 		hotelOrderEntity.setArrivalTime(DateUtil.parse(createOrderForm.getCheckInDate()));
 		hotelOrderEntity.setDepartureTime(DateUtil.parse(createOrderForm.getCheckOutDate()));
 		hotelOrderEntity.setNum(createOrderForm.getRoomNum());
@@ -473,6 +477,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		}
 		HotelOrderVo hotelOrderVo = new HotelOrderVo();
 		BeanUtil.copyProperties(hotelOrderEntity, hotelOrderVo);
+		hotelOrderVo.setRemark(hotelOrderEntity.getRemark());
+		hotelOrderVo.setDdTime(hotelOrderEntity.getDdTime());
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		hotelOrderVo.setSellerTel(hotelSellerEntity.getTel());
 		hotelOrderVo.setCoordinates(hotelSellerEntity.getCoordinates());
@@ -769,5 +775,37 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelOrderEntity hotelOrderEntity = baseMapper.selectOne(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getOutTradeNo, outTradeNo));
 		hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
 		baseMapper.updateById(hotelOrderEntity);
+	}
+
+	@Override
+	@Transactional
+	public void checkInOrderTask() {
+		int sys = 24; // 系统每天自动入住订单时间
+		// 当日小时数
+		int hour = DateUtil.hour(DateUtil.date(), true);
+		List<HotelOrderEntity> hotelOrderEntities = baseMapper.selectList(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getStatus, HotelOrderStatus.WAIT_CHECK_IN).le(HotelOrderEntity::getArrivalTime, DateUtil.date()));
+		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
+			// 获取商家自动入住时间
+
+			// 未设置就以系统时间为准
+			if (hour == sys) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.CHECK_IN);
+				baseMapper.updateById(hotelOrderEntity);
+			}
+		}
+	}
+
+	@Override
+	@Transactional
+	public void orderAutoCheckOut() {
+		int sys = 12; // 系统离店时间
+		int hour = DateUtil.hour(DateUtil.date(), true);
+		List<HotelOrderEntity> hotelOrderEntities = baseMapper.selectList(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getStatus, HotelOrderStatus.CHECK_IN).le(HotelOrderEntity::getArrivalTime, DateUtil.date()));
+		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
+			if (hour == sys) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_COMMENT); // 更新订单为待评价
+				baseMapper.updateById(hotelOrderEntity);
+			}
+		}
 	}
 }

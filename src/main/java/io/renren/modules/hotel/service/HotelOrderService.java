@@ -30,13 +30,13 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param userId       用户ID
 	 * @param roomId       房型ID
 	 * @param moneyId      房价ID
-	 * @param contactsId 
+	 * @param contactsId
 	 * @param roomNum      房间数量
 	 * @param checkOutDate 离店时间
 	 * @param checkInDate  入住时间
 	 * @return
 	 */
-	BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId,Long couponId, int roomNum, String checkInDate, String checkOutDate);
+	BuildOrderForm buildOrder(Long userId, Long roomId, Long moneyId, Long contactsId, Long couponId, int roomNum, String checkInDate, String checkOutDate);
 
 	/**
 	 * 创建订单
@@ -60,8 +60,8 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	/**
 	 * 订单详情
 	 * 
-	 * @param userId   用户ID
-	 * @param orderId  订单ID
+	 * @param userId  用户ID
+	 * @param orderId 订单ID
 	 * @return
 	 */
 	HotelOrderVo orderDetail(Long userId, Long orderId);
@@ -69,9 +69,9 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	/**
 	 * 取消订单
 	 * 
-	 * @param userId   用户ID
-	 * @param orderId  订单ID
-	 * @param formId   小程序模板消息
+	 * @param userId  用户ID
+	 * @param orderId 订单ID
+	 * @param formId  小程序模板消息
 	 */
 	void cancelOrder(Long userId, Long orderId, String formId);
 
@@ -81,9 +81,10 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param outTradeNo 支付单号
 	 */
 	void updateOrderStatus2Payed(String outTradeNo);
-	
+
 	/**
-	 * 更新订单为支付  用于积分支付，余额支付
+	 * 更新订单为支付 用于积分支付，余额支付
+	 * 
 	 * @param orderId
 	 */
 	void updateOrderStatus2Payed(Long orderId);
@@ -91,11 +92,11 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	/**
 	 * 根据订单号支付
 	 * 
-	 * @param userId   用户ID
-	 * @param orderId  订单ID
-	 * @param ip       下单IP
-	 * @param formId 
-	 * @param payMethod 
+	 * @param userId    用户ID
+	 * @param orderId   订单ID
+	 * @param ip        下单IP
+	 * @param formId
+	 * @param payMethod
 	 * @return
 	 * @throws WxPayException
 	 */
@@ -104,10 +105,10 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	/**
 	 * 删除订单
 	 * 
-	 * @param userId   用户ID
-	 * @param orderId  订单ID
+	 * @param userId  用户ID
+	 * @param orderId 订单ID
 	 */
-	void deleteOrder( Long userId, Long orderId);
+	void deleteOrder(Long userId, Long orderId);
 
 	/**
 	 * 自动取消订单
@@ -121,7 +122,18 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 
 	/**
 	 * 更新订单为已退款
+	 * 
 	 * @param outTradeNo
 	 */
 	void updateOrderStatus2Refunded(String outTradeNo);
+
+	/**
+	 * 订单自动入住
+	 */
+	void checkInOrderTask();
+
+	/**
+	 * 订单自动离店
+	 */
+	void orderAutoCheckOut();
 }

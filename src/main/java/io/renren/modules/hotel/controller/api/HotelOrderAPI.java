@@ -128,7 +128,7 @@ public class HotelOrderAPI extends BaseController {
 	@ApiOperation("取消订单")
 	@PutMapping("/cancelOrder/{orderId}")
 	public R cancelOrder(@RequestAttribute("userId") Long userId, @PathVariable Long orderId, String formId) {
-		hotelOrderService.cancelOrder(userId, orderId,formId);
+		hotelOrderService.cancelOrder(userId, orderId, formId);
 		return R.ok();
 	}
 
@@ -164,8 +164,8 @@ public class HotelOrderAPI extends BaseController {
 				throw new RRException("参数错误");
 			}
 			String payMethod = params.get("payMethod").toString();
-			String formId =  params.get("formId").toString();
-			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request),payMethod,formId);
+			String formId = params.get("formId").toString();
+			WxPayMpOrderResult mpOrderResult = hotelOrderService.payOrder(userId, Long.valueOf(orderId.toString()), IPUtils.getIpAddr(request), payMethod, formId);
 			return R.ok(mpOrderResult);
 		} catch (WxPayException e) {
 			e.printStackTrace();

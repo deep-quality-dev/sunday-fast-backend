@@ -54,6 +54,10 @@ public class BuildOrderForm {
 	@ApiModelProperty(value = "联系人ID")
 	@NotNull(message = "联系人ID")
 	private Long contactsId;
+	
+	private String remark;
+	
+	private String ddTime;
 	// 格式化总金额
 	private String totalAmount;
 

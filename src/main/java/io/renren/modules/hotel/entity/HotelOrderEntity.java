@@ -210,4 +210,9 @@ public class HotelOrderEntity implements Serializable {
 	 */
 	private int commentFlag;
 
+	/**
+	 * 备注
+	 */
+	private String remark;
+
 }

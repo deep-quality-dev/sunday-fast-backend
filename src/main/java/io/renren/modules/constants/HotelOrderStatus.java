@@ -10,4 +10,6 @@ public interface HotelOrderStatus {
 	public static final int APPLY_REFUND = 6;
 	public static final int REFUNDED = 7;
 	public static final int REFUSE_REFUND = 8;
+	public static final int WAIT_CHECK_IN = 9;
+	public static final int WAIT_COMMENT = 10;
 }

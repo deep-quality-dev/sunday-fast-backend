@@ -19,6 +19,8 @@ import cn.binarywang.wx.miniapp.bean.WxMaUserInfo;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.MD5;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -124,10 +126,9 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		String code = RandomUtil.randomNumbers(4);
 		JSONObject contextJson = new JSONObject();
 		contextJson.put("code", code);
-		contextJson.put("product", "Pig4Cloud");
 		log.info("短信发送请求消息中心 -> 手机号:{} -> 验证码：{}", mobile, code);
 		// TODO 组装数据采用MQ发送
-		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(mobile, contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.LOGIN_NAME_LOGIN.getSignName(), EnumSmsChannelTemplate.LOGIN_NAME_LOGIN.getTemplate());
+		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(mobile, contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.VALIDATE_CODE.getSignName(), EnumSmsChannelTemplate.VALIDATE_CODE.getTemplate());
 		redisTemplate.opsForValue().set(CommonConstant.DEFAULT_CODE_KEY + mobile, code, CommonConstant.DEFAULT_IMAGE_EXPIRE, TimeUnit.SECONDS);
 		String channel = mobileMsgTemplate.getChannel();
 		SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
@@ -215,6 +216,43 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		}
 		baseMapper.updateById(hotelMemberEntity);
 
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void setPayPwd(Long userId, String pwd, String mobile, String vcode) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + mobile);
+		if (tempCode == null || vcode.equals(tempCode.toString())) {
+			throw new RRException("验证码错误");
+		}
+		hotelMemberEntity.setPayPwd(SecureUtil.md5(pwd));
+		baseMapper.updateById(hotelMemberEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updatePayPwd(Long userId, String oldPwd, String newPwd) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		if (!hotelMemberEntity.getPayPwd().equals(SecureUtil.md5(oldPwd))) {
+			throw new RRException("旧密码不正确");
+		}
+		if (StrUtil.isEmpty(newPwd)) {
+			throw new RRException("密码不能为空");
+		}
+		hotelMemberEntity.setPayPwd(SecureUtil.md5(newPwd));
+
+	}
+
+	@Override
+	public void forgetPayPwd(Long userId, String pwd, String mobile, String vcode) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + mobile);
+		if (tempCode == null || vcode.equals(tempCode.toString())) {
+			throw new RRException("验证码错误");
+		}
+		hotelMemberEntity.setPayPwd(SecureUtil.md5(pwd));
+		baseMapper.updateById(hotelMemberEntity);
 	}
 
 }

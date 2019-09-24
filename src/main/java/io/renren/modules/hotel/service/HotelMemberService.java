@@ -98,4 +98,32 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 */
 	void updateUserInfo(Long userId, MemberVo userInfo);
 
+	/**
+	 * 设置支付密码
+	 * 
+	 * @param userId
+	 * @param pwd
+	 * @param mobile
+	 * @param vcode
+	 */
+	void setPayPwd(Long userId, String pwd, String mobile, String vcode);
+
+	/**
+	 * 修改支付密码
+	 * 
+	 * @param userId
+	 * @param oldPwd
+	 * @param newPwd
+	 */
+	void updatePayPwd(Long userId, String oldPwd, String newPwd);
+	
+	/**
+	 * 忘记支付密码
+	 * @param userId
+	 * @param pwd
+	 * @param mobile
+	 * @param vcode
+	 */
+	void forgetPayPwd(Long userId, String pwd, String mobile, String vcode);
+
 }

@@ -49,13 +49,15 @@ public class CreateOrderForm {
 	// 总金额分
 	private Integer totalAmountFen;
 	// 到店时间
-	private Date ddTime;
+	private String ddTime;
 
 	// 优惠券ID
 	private Long couponId;
 
 	// 经纬度
 	private String coordinates;
+
+	private String remark;
 
 	/**
 	 * 订单是否是需要预付
@@ -68,8 +70,8 @@ public class CreateOrderForm {
 
 	// 支付积分
 	private BigDecimal payIntegral;
-	
-	//发票ID
+
+	// 发票ID
 	private Long invoiceId;
 
 }

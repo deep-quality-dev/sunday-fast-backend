@@ -93,5 +93,10 @@ public class HotelMemberEntity implements Serializable {
 	 * 生日
 	 */
 	private String birthday;
+	
+	/**
+	 * 支付密码
+	 */
+	private String payPwd;
 
 }

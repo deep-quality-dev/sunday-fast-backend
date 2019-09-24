@@ -48,6 +48,9 @@ public class HotelOrderVo {
 	 */
 	private String coordinates;
 
+	/**
+	 * 到店时间
+	 */
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date arrivalTime;
@@ -57,6 +60,10 @@ public class HotelOrderVo {
 	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date departureTime;
+
+	private String ddTime;
+
+	private String remark;
 
 	private int commentFlag;
 

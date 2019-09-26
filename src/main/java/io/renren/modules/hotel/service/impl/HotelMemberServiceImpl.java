@@ -65,6 +65,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		memberVo.setMobile(hotelMemberEntity.getTel());
 		memberVo.setGender(hotelMemberEntity.getGender());
 		memberVo.setAuthFlag(StrUtil.isEmpty(hotelMemberEntity.getIdentityNo()) ? 0 : 1);
+		memberVo.setPayPwdFlag(StrUtil.isEmpty(hotelMemberEntity.getPayPwd()) ? 0 : 1);
 		if (StrUtil.isNotEmpty(hotelMemberEntity.getIdentityNo())) {
 			memberVo.setIdentityNo(hotelMemberEntity.getIdentityNo());
 		}
@@ -245,6 +246,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void forgetPayPwd(Long userId, String pwd, String mobile, String vcode) {
 		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
 		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + mobile);
@@ -253,6 +255,14 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		}
 		hotelMemberEntity.setPayPwd(SecureUtil.md5(pwd));
 		baseMapper.updateById(hotelMemberEntity);
+	}
+
+	@Override
+	public void checkPayPwd(Long userId, String pwd) {
+		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
+		if (!hotelMemberEntity.getPayPwd().equals(SecureUtil.md5(pwd))) {
+			throw new RRException("密码不正确");
+		}
 	}
 
 }

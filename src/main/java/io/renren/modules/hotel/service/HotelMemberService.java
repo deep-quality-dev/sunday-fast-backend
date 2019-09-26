@@ -126,4 +126,11 @@ public interface HotelMemberService extends IService<HotelMemberEntity> {
 	 */
 	void forgetPayPwd(Long userId, String pwd, String mobile, String vcode);
 
+	/**
+	 * 用户密码校验
+	 * @param userId
+	 * @param pwd
+	 */
+	void checkPayPwd(Long userId, String pwd);
+
 }

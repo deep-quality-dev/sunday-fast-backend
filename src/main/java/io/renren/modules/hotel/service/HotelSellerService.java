@@ -57,13 +57,28 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 
 	/**
 	 * 商家入驻申请
+	 * 
 	 * @param sellerApplyForm
 	 */
 	void sellerApply(SellerApplyForm sellerApplyForm);
 
 	/**
 	 * 酒店过滤条件
+	 * 
 	 * @return
 	 */
 	Map<String, Object> filterData();
+
+	/**
+	 * 审核通过
+	 * 
+	 * @param id
+	 */
+	void auditPass(Long id);
+
+	/**
+	 * 审核拒绝
+	 * @param id
+	 */
+	void auditRefuse(Long id);
 }

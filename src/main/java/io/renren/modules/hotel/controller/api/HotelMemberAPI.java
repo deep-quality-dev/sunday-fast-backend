@@ -18,8 +18,11 @@ import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.hutool.core.lang.Assert;
 import io.renren.common.utils.R;
+import io.renren.common.validator.ValidatorUtils;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.config.WxMaConfiguration;
+import io.renren.modules.hotel.form.SetPayPwdForm;
+import io.renren.modules.hotel.form.UpdatePayPwdForm;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.hotel.service.HotelScoreService;
@@ -48,6 +51,14 @@ public class HotelMemberAPI extends BaseController {
 	@Autowired
 	private HotelScoreService hotelScoreService;
 
+	@Login
+	@ApiOperation("密码校验，支付时")
+	@GetMapping("/checkPayPwd")
+	public R checkPayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String pwd) {
+		hotelMemberService.checkPayPwd(userId, pwd);
+		return R.ok();
+	}
+
 	/**
 	 * 设置支付密码
 	 * 
@@ -56,29 +67,32 @@ public class HotelMemberAPI extends BaseController {
 	@Login
 	@ApiOperation("设置支付密码")
 	@PostMapping("/setPayPwd")
-	public R setPayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String pwd, @RequestParam(required = true) String mobile, @RequestParam(required = true) String vcode) {
-		hotelMemberService.setPayPwd(userId, pwd, mobile, vcode);
+	public R setPayPwd(@RequestAttribute("userId") Long userId, @RequestBody SetPayPwdForm pwdForm) {
+		ValidatorUtils.validateEntity(pwdForm);
+		hotelMemberService.setPayPwd(userId, pwdForm.getPwd(), pwdForm.getMobile(), pwdForm.getVcode());
 		return R.ok();
 	}
 
 	@Login
 	@ApiOperation("修改支付密码")
 	@PostMapping("/updatePayPwd")
-	public R updatePayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String oldPwd, @RequestParam(required = true) String newPwd) {
-		hotelMemberService.updatePayPwd(userId, oldPwd, newPwd);
+	public R updatePayPwd(@RequestAttribute("userId") Long userId, @RequestBody UpdatePayPwdForm pwdForm) {
+		ValidatorUtils.validateEntity(pwdForm);
+		hotelMemberService.updatePayPwd(userId, pwdForm.getOldPwd(), pwdForm.getNewPwd());
 		return R.ok();
 	}
 
 	/**
-	 * 设置支付密码
+	 * 忘记支付密码
 	 * 
 	 * @return
 	 */
 	@Login
 	@ApiOperation("忘记支付密码")
-	@PostMapping("/setPayPwd")
-	public R forgetPayPwd(@RequestAttribute("userId") Long userId, @RequestParam(required = true) String pwd, @RequestParam(required = true) String mobile, @RequestParam(required = true) String vcode) {
-		hotelMemberService.forgetPayPwd(userId, pwd, mobile, vcode);
+	@PostMapping("/forgetPayPwd")
+	public R forgetPayPwd(@RequestAttribute("userId") Long userId, @RequestBody SetPayPwdForm pwdForm) {
+		ValidatorUtils.validateEntity(pwdForm);
+		hotelMemberService.forgetPayPwd(userId, pwdForm.getPwd(), pwdForm.getMobile(), pwdForm.getVcode());
 		return R.ok();
 	}
 

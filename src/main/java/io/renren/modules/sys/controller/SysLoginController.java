@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
 
 package io.renren.modules.sys.controller;
 
@@ -26,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.renren.common.utils.R;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.form.RegisterForm;
 import io.renren.modules.sys.form.SysLoginForm;
 import io.renren.modules.sys.service.SysCaptchaService;
 import io.renren.modules.sys.service.SysUserService;
@@ -59,6 +53,16 @@ public class SysLoginController extends AbstractController {
 		ServletOutputStream out = response.getOutputStream();
 		ImageIO.write(image, "jpg", out);
 		IOUtils.closeQuietly(out);
+	}
+
+	@PostMapping("/sys/register")
+	public R register(@RequestBody RegisterForm registerForm) {
+		boolean captcha = sysCaptchaService.validate(registerForm.getUuid(), registerForm.getCaptcha());
+		if (!captcha) {
+			return R.error("验证码不正确");
+		}
+		SysUserEntity user = sysUserService.register(registerForm.getMobile(), registerForm.getPassword());
+		return R.ok();
 	}
 
 	/**

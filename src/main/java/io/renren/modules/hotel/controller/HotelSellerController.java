@@ -19,6 +19,8 @@ import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.sys.controller.AbstractController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 
@@ -27,11 +29,38 @@ import io.renren.modules.sys.controller.AbstractController;
  * @email 18819175397@163.com
  * @date 2019-03-20 12:49:33
  */
+@Api(value = "后台管理-酒店接口", tags = { "后台管理-酒店接口" })
 @RestController
 @RequestMapping("hotel/hotelseller")
 public class HotelSellerController extends AbstractController {
 	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	/**
+	 * 通过审核
+	 * 
+	 * @return
+	 */
+	@ApiOperation("通过审核")
+	@RequestMapping("/auditPass")
+	@RequiresPermissions("hotel:hotelseller:auditPass")
+	public R auditPass(@RequestParam Long id) {
+		hotelSellerService.auditPass(id);
+		return R.ok();
+	}
+
+	/**
+	 * 拒绝审核
+	 * 
+	 * @return
+	 */
+	@ApiOperation("拒绝审核")
+	@RequestMapping("/auditRefuse")
+	@RequiresPermissions("hotel:hotelseller:auditRefuse")
+	public R auditRefuse(@RequestParam Long id) {
+		hotelSellerService.auditRefuse(id);
+		return R.ok();
+	}
 
 	@RequestMapping("/store")
 	@RequiresPermissions("hotel:hotelseller:store")

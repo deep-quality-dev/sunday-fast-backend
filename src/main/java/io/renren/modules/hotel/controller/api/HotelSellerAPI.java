@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller.api;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import io.renren.common.utils.R;
 import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
+import io.renren.modules.hotel.service.HotelBrandService;
 import io.renren.modules.hotel.service.HotelSellerService;
+import io.renren.modules.hotel.vo.HotelBrandTypeVo;
 import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
@@ -39,6 +42,9 @@ public class HotelSellerAPI extends BaseController {
 
 	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	@Autowired
+	private HotelBrandService hotelBrandService;
 
 	@ApiOperation("酒店预定提醒")
 	@GetMapping("/reserveRemind")
@@ -104,8 +110,17 @@ public class HotelSellerAPI extends BaseController {
 	 * 
 	 * @return
 	 */
+	@ApiOperation("商家入驻申请")
+	@GetMapping("/sellerApply")
 	public R sellerApply(SellerApplyForm sellerApplyForm) {
 		hotelSellerService.sellerApply(sellerApplyForm);
 		return R.ok();
+	}
+
+	@ApiOperation("酒店品牌列表")
+	@GetMapping("/hotelBrands")
+	public R hotelBrands() {
+		List<HotelBrandTypeVo> brands = hotelBrandService.hotelBrandWithType();
+		return R.ok(brands);
 	}
 }

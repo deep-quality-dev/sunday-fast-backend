@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
+import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.AssessTagDao;
@@ -181,7 +182,6 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	public void sellerApply(SellerApplyForm sellerApplyForm) {
 		HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
 		hotelSellerEntity.setState(1);
-
 		baseMapper.insert(hotelSellerEntity);
 
 	}
@@ -196,6 +196,30 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		List<FacilityVo> facilityVos = hotelFacilityService.hotelFacility(1);
 		data.put("facility", facilityVos);
 		return data;
+	}
+
+// 1待审核,2通过，3拒绝
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void auditPass(Long id) {
+		HotelSellerEntity hotelSellerEntity = this.getById(id);
+		if (null == hotelSellerEntity) {
+			throw new RRException("未找到数据");
+		}
+		hotelSellerEntity.setState(2);
+		this.updateById(hotelSellerEntity);
+	}
+
+	// 1待审核,2通过，3拒绝
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void auditRefuse(Long id) {
+		HotelSellerEntity hotelSellerEntity = this.getById(id);
+		if (null == hotelSellerEntity) {
+			throw new RRException("未找到数据");
+		}
+		hotelSellerEntity.setState(3);
+		this.updateById(hotelSellerEntity);
 	}
 
 }

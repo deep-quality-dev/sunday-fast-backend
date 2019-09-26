@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import io.renren.common.exception.RRException;
@@ -136,5 +137,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		if (!roleIdList.containsAll(user.getRoleIdList())) {
 			throw new RRException("新增用户所选角色，不是本人创建");
 		}
+	}
+
+	@Override
+	public SysUserEntity register(String mobile, String password) {
+		SysUserEntity user = this.getOne(Wrappers.<SysUserEntity>lambdaQuery().eq(SysUserEntity::getUsername, mobile).or().eq(SysUserEntity::getMobile, mobile));
+		user.setCreateTime(new Date());
+		user.setUsername(mobile);
+		user.setMobile(mobile);
+		user.setStatus(0);
+		// sha256加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		user.setPassword(new Sha256Hash(user.getPassword(), salt).toHex());
+		user.setSalt(salt);
+		this.save(user);
+		return user;
 	}
 }

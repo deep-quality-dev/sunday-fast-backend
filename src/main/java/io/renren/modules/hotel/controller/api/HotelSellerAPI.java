@@ -111,7 +111,7 @@ public class HotelSellerAPI extends BaseController {
 	 * @return
 	 */
 	@ApiOperation("商家入驻申请")
-	@GetMapping("/sellerApply")
+	@PostMapping("/sellerApply")
 	public R sellerApply(SellerApplyForm sellerApplyForm) {
 		hotelSellerService.sellerApply(sellerApplyForm);
 		return R.ok();

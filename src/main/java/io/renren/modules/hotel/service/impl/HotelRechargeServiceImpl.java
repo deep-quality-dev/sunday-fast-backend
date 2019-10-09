@@ -109,6 +109,7 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 	public WxPayMpOrderResult cardRecharge(Long userId, CardRechargeForm cardRechargeForm) {
 		BigDecimal amount = new BigDecimal(0);
 		HotelRechargeEntity hotelRechargeEntity = new HotelRechargeEntity();
+		HotelMemberLevelEntity hotelMemberLevelEntity = hotelMemberLevelDao.selectById(cardRechargeForm.getCardId());
 		hotelRechargeEntity.setZsMoney(new BigDecimal(0));
 		if (null == cardRechargeForm.getRechargeConfigId() || -1 == cardRechargeForm.getRechargeConfigId()) {
 			if (null == cardRechargeForm.getAmount() || cardRechargeForm.getAmount() == BigDecimal.ZERO) {
@@ -123,12 +124,12 @@ public class HotelRechargeServiceImpl extends ServiceImpl<HotelRechargeDao, Hote
 		hotelRechargeEntity.setCzMoney(amount);
 		hotelRechargeEntity.setUserId(userId);
 		hotelRechargeEntity.setCardId(cardRechargeForm.getCardId());
+		hotelRechargeEntity.setSellerId(hotelMemberLevelEntity.getSellerId());
 		hotelRechargeEntity.setTime(DateTime.now().getTime());
 		hotelRechargeEntity.setState(0);
 		hotelRechargeEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS"));
 		baseMapper.insert(hotelRechargeEntity);
 		// 返回微信支付参数
-		HotelMemberLevelEntity hotelMemberLevelEntity = hotelMemberLevelDao.selectById(cardRechargeForm.getCardId());
 		HotelMemberEntity hotelMemberEntity = hotelMemberDao.selectById(userId);
 		HotelSellerEntity hotelSellerEntity = hotelSellerDao.selectById(hotelMemberLevelEntity.getSellerId());
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());

@@ -224,11 +224,12 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 	public void setPayPwd(Long userId, String pwd, String mobile, String vcode) {
 		HotelMemberEntity hotelMemberEntity = baseMapper.selectById(userId);
 		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + mobile);
-		if (tempCode == null || vcode.equals(tempCode.toString())) {
+		if (tempCode == null || !vcode.equals(tempCode.toString())) {
 			throw new RRException("验证码错误");
 		}
 		hotelMemberEntity.setPayPwd(SecureUtil.md5(pwd));
 		baseMapper.updateById(hotelMemberEntity);
+		
 	}
 
 	@Override

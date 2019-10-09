@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -71,10 +74,14 @@ public class HotelOrderEntity implements Serializable {
 	/**
 	 * 入住时间
 	 */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date arrivalTime;
 	/**
 	 * 离店时间
 	 */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy/MM/dd")
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private Date departureTime;
 	/**
 	 * 到店时间

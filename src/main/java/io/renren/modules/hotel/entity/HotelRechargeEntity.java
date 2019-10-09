@@ -57,5 +57,7 @@ public class HotelRechargeEntity implements Serializable {
 	 * 
 	 */
 	private Long cardId;
+	
+	private Long sellerId;
 
 }

@@ -16,6 +16,7 @@
 		<result property="state" column="state" />
 		<result property="time" column="time" />
 		<result property="cardId" column="card_id" />
+		<result property="sellerId" column="seller_id" />
 	</resultMap>
 
 	<select id="consumptionRecord"
@@ -24,7 +25,8 @@
 		t.amount,
 		t.note,
 		t.create_date
-		From t_hotel_consumption_record t where t.card_id =#{cardId} and t.user_id
+		From
+		t_hotel_consumption_record t where t.card_id =#{cardId} and t.user_id
 		= #{userId} order by create_date desc
 	</select>
 </mapper>

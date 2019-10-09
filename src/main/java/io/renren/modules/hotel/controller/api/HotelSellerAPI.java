@@ -112,7 +112,7 @@ public class HotelSellerAPI extends BaseController {
 	 */
 	@ApiOperation("商家入驻申请")
 	@PostMapping("/sellerApply")
-	public R sellerApply(SellerApplyForm sellerApplyForm) {
+	public R sellerApply(@RequestBody SellerApplyForm sellerApplyForm) {
 		hotelSellerService.sellerApply(sellerApplyForm);
 		return R.ok();
 	}

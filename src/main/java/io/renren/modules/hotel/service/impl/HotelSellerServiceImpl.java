@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
@@ -181,6 +182,12 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	@Override
 	public void sellerApply(SellerApplyForm sellerApplyForm) {
 		HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
+		BeanUtil.copyProperties(sellerApplyForm, hotelSellerEntity);
+		hotelSellerEntity.setBrandId(sellerApplyForm.getBrand().get(1));
+		hotelSellerEntity.setTel(sellerApplyForm.getTel());
+		hotelSellerEntity.setStar(sellerApplyForm.getType());
+		hotelSellerEntity.setSqTime(DateUtil.date().getTime());
+		hotelSellerEntity.setTime(DateUtil.date().getTime());
 		hotelSellerEntity.setState(1);
 		baseMapper.insert(hotelSellerEntity);
 

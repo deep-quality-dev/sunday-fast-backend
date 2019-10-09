@@ -37,7 +37,7 @@ public class HotelSellerEntity implements Serializable {
 	/**
 	 * 品牌ID
 	 */
-	private String brandId;
+	private Long brandId;
 	/**
 	 * 1后台添加,2入住
 	 */
@@ -143,7 +143,7 @@ public class HotelSellerEntity implements Serializable {
 	/**
 	 * 时间
 	 */
-	private Integer time;
+	private Long time;
 	/**
 	 * 经纬度
 	 */
@@ -179,7 +179,7 @@ public class HotelSellerEntity implements Serializable {
 	/**
 	 * 申请时间
 	 */
-	private Integer sqTime;
+	private Long sqTime;
 	/**
 	 * 平台优惠券使用
 	 */

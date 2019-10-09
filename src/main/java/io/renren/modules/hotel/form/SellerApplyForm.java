@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.form;
 
+import java.util.List;
+
 import javax.validation.constraints.NotBlank;
 
 import io.swagger.annotations.ApiModelProperty;
@@ -23,7 +25,7 @@ public class SellerApplyForm {
 	 */
 	@ApiModelProperty(value = "酒店星级")
 	@NotBlank(message = "酒店星级不能为空")
-	private String star;
+	private String type;
 	/**
 	 * 地址
 	 */
@@ -78,7 +80,7 @@ public class SellerApplyForm {
 	 */
 	@ApiModelProperty(value = "品牌ID")
 	@NotBlank(message = "品牌ID不能为空")
-	private String brandId;
+	private List<Long> brand;
 	
 	/**
 	 * 酒店介绍

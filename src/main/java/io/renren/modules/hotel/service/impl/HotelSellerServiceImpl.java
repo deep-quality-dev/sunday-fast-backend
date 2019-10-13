@@ -198,7 +198,11 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Override
 	public void sellerApply(SellerApplyForm sellerApplyForm) {
-		HotelSellerEntity hotelSellerEntity = new HotelSellerEntity();
+		HotelSellerEntity hotelSellerEntity = baseMapper.selectOne(Wrappers.<HotelSellerEntity>lambdaQuery().eq(HotelSellerEntity::getLinkTel, sellerApplyForm.getLinkTel()));
+		if (null != hotelSellerEntity) {
+			throw new RRException("商户信息已存在");
+		}
+		hotelSellerEntity = new HotelSellerEntity();
 		BeanUtil.copyProperties(sellerApplyForm, hotelSellerEntity);
 		hotelSellerEntity.setBrandId(sellerApplyForm.getBrand().get(1));
 		hotelSellerEntity.setTel(sellerApplyForm.getTel());
@@ -249,7 +253,7 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		sysUserDao.insert(sysUserEntity);
 		// 保存用户与角色关系
 		sysUserRoleService.saveOrUpdate(sysUserEntity.getUserId(), sysUserEntity.getRoleIdList());
-		//更新商家信息
+		// 更新商家信息
 		hotelSellerEntity.setUserId(sysUserEntity.getUserId());
 		this.updateById(hotelSellerEntity);
 		// 给商家发送短信

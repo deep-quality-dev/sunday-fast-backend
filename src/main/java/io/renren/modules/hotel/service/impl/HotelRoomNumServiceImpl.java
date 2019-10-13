@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -96,6 +97,18 @@ public class HotelRoomNumServiceImpl extends ServiceImpl<HotelRoomNumDao, HotelR
 			lDate.add(DateUtil.formatDate(calBegin.getTime()));
 		}
 		return lDate;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update4Day(Map<String, Object> params) {
+		String date = params.get("date").toString();
+		Object priceId = params.get("priceId");
+		// Object sellerId = params.get("sellerId");
+		String num = params.get("num").toString();
+		HotelRoomNumEntity roomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getMoneyId, priceId).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(date).getTime()));
+		roomNumEntity.setNums(Integer.valueOf(num));
+		hotelRoomNumDao.updateById(roomNumEntity);
 	}
 
 }

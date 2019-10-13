@@ -40,7 +40,7 @@ public class HotelRoomPriceEntity implements Serializable {
 	/**
 	 * 当天日期 时间戳格式
 	 */
-	private Integer roomdate;
+	private Long roomdate;
 	/**
 	 * 当天日期 日期格式
 	 */

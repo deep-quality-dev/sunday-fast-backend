@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,19 @@ public class HotelRoomNumController extends AbstractController {
 	@Autowired
 	private HotelRoomNumService hotelRoomNumService;
 
+	
+	/**
+	 * 更新某天的房量
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping("/update4Day")
+	@RequiresPermissions("hotel:hotelroomnum:update4Day")
+	public R update4Day(@RequestBody Map<String, Object> params) {
+		hotelRoomNumService.update4Day(params);
+		return R.ok();
+	}
+	
 	/**
 	 * 列表
 	 */

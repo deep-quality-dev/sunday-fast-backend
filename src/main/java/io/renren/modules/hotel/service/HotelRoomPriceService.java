@@ -30,4 +30,10 @@ public interface HotelRoomPriceService extends IService<HotelRoomPriceEntity> {
 	 * @return
 	 */
 	RoomPriceVo roomPrice(Long sellerId, String startDate, String endDate, Page page);
+
+	/**
+	 * 修改某一天的房价
+	 * @param params
+	 */
+	void update4Day(Map<String, Object> params);
 }

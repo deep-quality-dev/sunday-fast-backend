@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,19 @@ public class HotelRoomPriceController extends AbstractController {
 	private HotelRoomPriceService hotelRoomPriceService;
 
 	/**
+	 * 更新某天的房价
+	 * 
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping("/update4Day")
+	@RequiresPermissions("hotel:hotelroomprice:update4Day")
+	public R update4Day(@RequestBody Map<String, Object> params) {
+		hotelRoomPriceService.update4Day(params);
+		return R.ok();
+	}
+
+	/**
 	 * 列表
 	 */
 	@RequestMapping("/list")
@@ -40,7 +54,7 @@ public class HotelRoomPriceController extends AbstractController {
 		int page = 1;
 		int limt = 10;
 		Long sellerId = 0L;
-		if(!isAdmin()) {
+		if (!isAdmin()) {
 			sellerId = getSellerId();
 		}
 		RoomPriceVo roomPriceVo = hotelRoomPriceService.roomPrice(sellerId, startDate, endDate, new Page(page, limt));

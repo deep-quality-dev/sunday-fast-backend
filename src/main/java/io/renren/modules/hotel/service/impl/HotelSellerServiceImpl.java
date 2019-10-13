@@ -1,9 +1,12 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.exception.RRException;
+import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.AssessTagDao;
@@ -44,6 +48,10 @@ import io.renren.modules.hotel.vo.HotelInfo;
 import io.renren.modules.hotel.vo.HotelItemVo;
 import io.renren.modules.hotel.vo.HotelSearchCondition;
 import io.renren.modules.hotel.vo.HotelSearchVo;
+import io.renren.modules.sys.dao.SysUserDao;
+import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysRoleService;
+import io.renren.modules.sys.service.SysUserRoleService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -52,6 +60,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private HotelMemberCollectDao hotelMemberCollectDao;
+
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
 
 	@Autowired
 	private HotelAssessDao hotelAssessDao;
@@ -70,6 +81,12 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private HotelBrandTypeService hotelBrandTypeService;
+
+	@Autowired
+	private SysRoleService sysRoleService;
+
+	@Autowired
+	private SysUserDao sysUserDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -208,19 +225,61 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 // 1待审核,2通过，3拒绝
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void auditPass(Long id) {
+	public void auditPass(Long id, Long createUserId) {
 		HotelSellerEntity hotelSellerEntity = this.getById(id);
 		if (null == hotelSellerEntity) {
 			throw new RRException("未找到数据");
 		}
 		hotelSellerEntity.setState(2);
+		// 创建系统用户
+		SysUserEntity sysUserEntity = new SysUserEntity();
+		sysUserEntity.setCreateUserId(createUserId);
+		sysUserEntity.setCreateTime(DateUtil.date());
+		sysUserEntity.setUsername(hotelSellerEntity.getLinkTel());
+		log.debug("====,{},---{}", hotelSellerEntity.getLinkTel(), hotelSellerEntity.getLinkTel().substring(hotelSellerEntity.getLinkTel().length() - 6, hotelSellerEntity.getLinkTel().length()));
+		sysUserEntity.setPassword(hotelSellerEntity.getLinkTel().substring(hotelSellerEntity.getLinkTel().length() - 6, hotelSellerEntity.getLinkTel().length()));
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		sysUserEntity.setPassword(new Sha256Hash(sysUserEntity.getPassword(), salt).toHex());
+		sysUserEntity.setSalt(salt);
+		sysUserEntity.setMobile(hotelSellerEntity.getLinkTel());
+		sysUserEntity.setRoleIdList(Arrays.asList(Long.valueOf(String.valueOf(Constant.SELLER_ROLE))));
+		sysUserEntity.setStatus(1);
+		// 检查是否越权
+		checkRole(sysUserEntity);
+		sysUserDao.insert(sysUserEntity);
+		// 保存用户与角色关系
+		sysUserRoleService.saveOrUpdate(sysUserEntity.getUserId(), sysUserEntity.getRoleIdList());
+		//更新商家信息
+		hotelSellerEntity.setUserId(sysUserEntity.getUserId());
 		this.updateById(hotelSellerEntity);
+		// 给商家发送短信
+	}
+
+	/**
+	 * 检查角色是否越权
+	 */
+	private void checkRole(SysUserEntity user) {
+		if (user.getRoleIdList() == null || user.getRoleIdList().size() == 0) {
+			return;
+		}
+		// 如果不是超级管理员，则需要判断用户的角色是否自己创建
+		if (user.getCreateUserId() == Constant.SUPER_ADMIN) {
+			return;
+		}
+
+		// 查询用户创建的角色列表
+		List<Long> roleIdList = sysRoleService.queryRoleIdList(user.getCreateUserId());
+
+		// 判断是否越权
+		if (!roleIdList.containsAll(user.getRoleIdList())) {
+			throw new RRException("新增用户所选角色，不是本人创建");
+		}
 	}
 
 	// 1待审核,2通过，3拒绝
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void auditRefuse(Long id) {
+	public void auditRefuse(Long id, Long createUserId) {
 		HotelSellerEntity hotelSellerEntity = this.getById(id);
 		if (null == hotelSellerEntity) {
 			throw new RRException("未找到数据");

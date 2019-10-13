@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,10 +43,10 @@ public class HotelSellerController extends AbstractController {
 	 * @return
 	 */
 	@ApiOperation("通过审核")
-	@RequestMapping("/auditPass")
+	@PostMapping("/auditPass/{id}")
 	@RequiresPermissions("hotel:hotelseller:auditPass")
-	public R auditPass(@RequestParam Long id) {
-		hotelSellerService.auditPass(id);
+	public R auditPass(@PathVariable Long id) {
+		hotelSellerService.auditPass(id,getUserId());
 		return R.ok();
 	}
 
@@ -55,10 +56,10 @@ public class HotelSellerController extends AbstractController {
 	 * @return
 	 */
 	@ApiOperation("拒绝审核")
-	@RequestMapping("/auditRefuse")
+	@PostMapping("/auditRefuse/{id}")
 	@RequiresPermissions("hotel:hotelseller:auditRefuse")
-	public R auditRefuse(@RequestParam Long id) {
-		hotelSellerService.auditRefuse(id);
+	public R auditRefuse(@PathVariable Long id) {
+		hotelSellerService.auditRefuse(id,getUserId());
 		return R.ok();
 	}
 

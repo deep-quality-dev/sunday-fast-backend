@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -71,14 +73,11 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 					// 查询特殊价格
 					roomPriceEntity = hotelRoomPriceDao.selectOne(Wrappers.<HotelRoomPriceEntity>lambdaQuery().eq(HotelRoomPriceEntity::getMoneyId, hotelRoomMoneyEntity.getId()).eq(HotelRoomPriceEntity::getRoomdate, DateUtil.parse(day).getTime()));
 					if (null != roomPriceEntity) {
-						roomData.put(day, roomPriceEntity.getOprice());
+						roomData.put(day, roomPriceEntity.getMprice());
 					}
 				}
 				roomDataList.add(roomData);
 			}
-		}
-		for (Map<String, Object> roomPrice : roomDataList) {
-			
 		}
 		roomPriceVo.setDataList(roomDataList);
 		return roomPriceVo;
@@ -104,6 +103,29 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 
 	public static void main(String[] args) {
 		System.out.println(DateTime.now().getTime());
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void update4Day(Map<String, Object> params) {
+		String date = params.get("date").toString();
+		Object priceId = params.get("priceId");
+		Object sellerId = params.get("sellerId");
+		String money = params.get("money").toString();
+		HotelRoomPriceEntity roomPriceEntity = this.getOne(Wrappers.<HotelRoomPriceEntity>lambdaQuery().eq(HotelRoomPriceEntity::getMoneyId, priceId).eq(HotelRoomPriceEntity::getRoomdate, DateUtil.parse(date).getTime()));
+		if(null == roomPriceEntity) {
+			HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyDao.selectById(Long.valueOf(priceId.toString()));
+			roomPriceEntity = new HotelRoomPriceEntity();
+			roomPriceEntity.setMprice(new BigDecimal(money));
+			roomPriceEntity.setSellerId(hotelRoomMoneyEntity.getSellerId());
+			roomPriceEntity.setRoomId(hotelRoomMoneyEntity.getRoomId());
+			roomPriceEntity.setMoneyId(hotelRoomMoneyEntity.getId());
+			roomPriceEntity.setRoomdate(DateUtil.parse(date).getTime());
+			this.save(roomPriceEntity);
+			return;
+		}
+		roomPriceEntity.setMprice(new BigDecimal(money));
+		this.updateById(roomPriceEntity);
 	}
 
 }

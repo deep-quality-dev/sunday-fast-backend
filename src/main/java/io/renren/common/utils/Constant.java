@@ -16,7 +16,10 @@ package io.renren.common.utils;
 public class Constant {
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
-
+	
+	/**商家角色ID**/
+	public static final int SELLER_ROLE = 2;
+	
 	/**
 	 * 当前页码
 	 */

@@ -88,7 +88,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			roomVO.setAmountItems(roomMoneyVos);
 			int nums = roomMoneyVos.stream().mapToInt(RoomMoneyVo::getHasRoom).sum();
 			// 日期区间是否有满房情况
-			int result = hotelRoomNumDao.selectCount(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).between(HotelRoomNumEntity::getDateday, DateUtil.parse(startTime).getTime(), DateUtil.parse(endTime).getTime()).lt(HotelRoomNumEntity::getNums, 1).or().eq(HotelRoomNumEntity::getNums, 0));
+			int result = hotelRoomNumDao.selectCount(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).between(HotelRoomNumEntity::getDateday, DateUtil.parse(startTime).getTime(), DateUtil.parse(endTime).getTime()).lt(HotelRoomNumEntity::getNums, 1));
 			roomVO.setHasRoom(result == 0 && nums > 0);
 			return roomVO;
 		}).collect(Collectors.toList());

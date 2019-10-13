@@ -61,7 +61,10 @@ public class HotelRechargeConfigController extends AbstractController{
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelrechargeconfig:save")
 	public R save(@RequestBody HotelRechargeConfigEntity hotelRechargeConfig) {
-		hotelRechargeConfig.setSellerId(1L);
+		if (!isAdmin()) {
+			hotelRechargeConfig.setSellerId(getSellerId());
+		}
+		
 		hotelRechargeConfigService.save(hotelRechargeConfig);
 
 		return R.ok();

@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import io.renren.common.exception.RRException;
@@ -198,7 +199,7 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Override
 	public void sellerApply(SellerApplyForm sellerApplyForm) {
-		HotelSellerEntity hotelSellerEntity = baseMapper.selectOne(Wrappers.<HotelSellerEntity>lambdaQuery().eq(HotelSellerEntity::getLinkTel, sellerApplyForm.getLinkTel()));
+		HotelSellerEntity hotelSellerEntity = baseMapper.selectOne(Wrappers.<HotelSellerEntity>lambdaQuery().eq(HotelSellerEntity::getLinkTel, sellerApplyForm.getLinkTel()).notIn(HotelSellerEntity::getState, Arrays.asList(3)));
 		if (null != hotelSellerEntity) {
 			throw new RRException("商户信息已存在");
 		}
@@ -210,6 +211,15 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		hotelSellerEntity.setSqTime(DateUtil.date().getTime());
 		hotelSellerEntity.setTime(DateUtil.date().getTime());
 		hotelSellerEntity.setState(1);
+
+		hotelSellerEntity.setSfzImg1(sellerApplyForm.getIdCardPicList().get(0));
+		if (sellerApplyForm.getIdCardPicList().size() > 2) {
+			hotelSellerEntity.setSfzImg2(sellerApplyForm.getIdCardPicList().get(1));
+		}
+		hotelSellerEntity.setYyImg(CollectionUtil.join(sellerApplyForm.getCompanyIdCardPic(), ","));
+		hotelSellerEntity.setLat(sellerApplyForm.getLat());
+		hotelSellerEntity.setLnt(sellerApplyForm.getLng());
+		hotelSellerEntity.setCoordinates(sellerApplyForm.getLng() + "," + sellerApplyForm.getLat());
 		baseMapper.insert(hotelSellerEntity);
 
 	}

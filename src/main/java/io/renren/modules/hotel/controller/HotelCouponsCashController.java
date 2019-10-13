@@ -62,7 +62,10 @@ public class HotelCouponsCashController extends AbstractController{
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelcouponscash:save")
 	public R save(@RequestBody HotelCouponsCashEntity hotelCouponsCash) {
-		hotelCouponsCash.setSellerId(1L);
+		hotelCouponsCash.setSellerId(-1L);
+		if (!isAdmin()) {
+			hotelCouponsCash.setSellerId(getSellerId());
+		}
 		hotelCouponsCashService.save(hotelCouponsCash);
 
 		return R.ok();

@@ -110,7 +110,6 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 	public void update4Day(Map<String, Object> params) {
 		String date = params.get("date").toString();
 		Object priceId = params.get("priceId");
-		Object sellerId = params.get("sellerId");
 		String money = params.get("money").toString();
 		HotelRoomPriceEntity roomPriceEntity = this.getOne(Wrappers.<HotelRoomPriceEntity>lambdaQuery().eq(HotelRoomPriceEntity::getMoneyId, priceId).eq(HotelRoomPriceEntity::getRoomdate, DateUtil.parse(date).getTime()));
 		if(null == roomPriceEntity) {

@@ -104,9 +104,18 @@ public class HotelRoomNumServiceImpl extends ServiceImpl<HotelRoomNumDao, HotelR
 	public void update4Day(Map<String, Object> params) {
 		String date = params.get("date").toString();
 		Object priceId = params.get("priceId");
-		// Object sellerId = params.get("sellerId");
 		String num = params.get("num").toString();
 		HotelRoomNumEntity roomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getMoneyId, priceId).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(date).getTime()));
+		if (null == roomNumEntity) {
+			HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyDao.selectById(Long.valueOf(priceId.toString()));
+			roomNumEntity = new HotelRoomNumEntity();
+			roomNumEntity.setNums(Integer.valueOf(num));
+			roomNumEntity.setRid(hotelRoomMoneyEntity.getRoomId());
+			roomNumEntity.setDateday(DateUtil.parse(date).getTime());
+			roomNumEntity.setMoneyId(Long.valueOf(priceId.toString()));
+			hotelRoomNumDao.insert(roomNumEntity);
+			return;
+		}
 		roomNumEntity.setNums(Integer.valueOf(num));
 		hotelRoomNumDao.updateById(roomNumEntity);
 	}

@@ -86,5 +86,15 @@ public class SellerApplyForm {
 	 * 酒店介绍
 	 */
 	private String introduction;
+	
+	private List<String> idCardPicList;
+	
+	private List<String> companyIdCardPic;
+	
+	private String lat;
+	
+	private String lng;
+	
+	private int roomCount;
 
 }

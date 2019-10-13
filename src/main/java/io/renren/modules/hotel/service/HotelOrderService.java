@@ -136,4 +136,11 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * 订单自动离店
 	 */
 	void orderAutoCheckOut();
+
+	/**
+	 * 订单入住
+	 * 
+	 * @param orderId
+	 */
+	void orderCheckIn(Long orderId);
 }

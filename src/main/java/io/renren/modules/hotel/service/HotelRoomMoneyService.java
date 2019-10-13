@@ -25,4 +25,10 @@ public interface HotelRoomMoneyService extends IService<HotelRoomMoneyEntity> {
 	 * @param roomNum
 	 */
 	void updateRoomNum(HotelRoomMoneyEntity hotelRoomMoneyEntity, int roomNum);
+
+	/**
+	 * 保存房价
+	 * @param hotelRoomMoney
+	 */
+	void saveRoomMoney(HotelRoomMoneyEntity hotelRoomMoney);
 }

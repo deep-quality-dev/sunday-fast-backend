@@ -24,7 +24,7 @@ public class GoodsSpecEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 商品ID
 	 */

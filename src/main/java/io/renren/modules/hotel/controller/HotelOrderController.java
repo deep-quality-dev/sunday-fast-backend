@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -85,6 +86,18 @@ public class HotelOrderController extends AbstractController {
 	public R delete(@RequestBody Integer[] ids) {
 		hotelOrderService.removeByIds(Arrays.asList(ids));
 
+		return R.ok();
+	}
+	
+	/**
+	 * 订单入住
+	 * @param orderId
+	 * @return
+	 */
+	@PostMapping("/orderCheckIn/{orderId}")
+	@RequiresPermissions("hotel:hotelorder:ordercheckin")
+	public R orderCheckIn(@PathVariable(required = true,name = "orderId") Long orderId) {
+		hotelOrderService.orderCheckIn(orderId);
 		return R.ok();
 	}
 

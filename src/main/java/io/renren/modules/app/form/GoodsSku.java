@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class GoodsSku {
 
+	private Long id;
+
 	private Integer goodsId;
 
 	private String goodsNo;

@@ -36,6 +36,7 @@ public class HotelCouponsCashController extends AbstractController{
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelcouponscash:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		params.put("seller_id", -1L);
 		if (!isAdmin()) {
 			params.put("seller_id", getSellerId());
 		}

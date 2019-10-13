@@ -58,8 +58,7 @@ public class HotelRoomMoneyController extends AbstractController {
 	@RequiresPermissions("hotel:hotelroommoney:save")
 	public R save(@RequestBody HotelRoomMoneyEntity hotelRoomMoney) {
 		hotelRoomMoney.setSellerId(getSellerId());
-		hotelRoomMoneyService.save(hotelRoomMoney);
-
+		hotelRoomMoneyService.saveRoomMoney(hotelRoomMoney);
 		return R.ok();
 	}
 

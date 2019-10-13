@@ -38,7 +38,6 @@ public class HotelMemberLevelDetailServiceImpl extends ServiceImpl<HotelMemberLe
 		Object sellerId = params.get("seller_id");
 		Object name = params.get("name");
 		Object mobile = params.get("mobile");
-		System.out.println(StrUtil.isNotEmpty(String.valueOf(mobile)));
 		IPage<HotelMemberLevelDetailEntity> page = this.page(new Query<HotelMemberLevelDetailEntity>().getPage(params), new QueryWrapper<HotelMemberLevelDetailEntity>().eq(sellerId != null, "seller_id", sellerId).like(StrUtil.isNotEmpty(String.valueOf(name)), "name", name).like(StrUtil.isNotEmpty(String.valueOf(mobile)), "mobile", mobile));
 		List<HotelMemberLevelDetailEntity> memberLevelDetailEntities = page.getRecords();
 		List<HotelMemberLevelDetailDto> hotelMemberLevelDetailDtos = memberLevelDetailEntities.stream().map((HotelMemberLevelDetailEntity item) -> {

@@ -40,6 +40,7 @@ public class HotelMemberLevelController extends AbstractController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelmemberlevel:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		params.put("seller_id", 0L);
 		if (!isAdmin()) {
 			params.put("seller_id", getSellerId());
 		}

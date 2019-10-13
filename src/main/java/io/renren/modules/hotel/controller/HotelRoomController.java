@@ -51,6 +51,7 @@ public class HotelRoomController extends AbstractController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelroom:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		params.put("seller_id", 0L);
 		if (!isAdmin()) {
 			params.put("seller_id", getSellerId());
 		}

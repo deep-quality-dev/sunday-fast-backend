@@ -143,4 +143,6 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param orderId
 	 */
 	void orderCheckIn(Long orderId);
+
+	void orderCheckIn(Long orderId, Long userId);
 }

@@ -820,4 +820,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setStatus(HotelOrderStatus.CHECK_IN);
 		baseMapper.updateById(hotelOrderEntity);
 	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void orderCheckIn(Long orderId, Long userId) {
+		HotelOrderEntity hotelOrderEntity = baseMapper.selectOne(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getUserId, userId).eq(HotelOrderEntity::getId, orderId));
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		if (hotelRoomMoneyEntity.getPrepay() == 1 && hotelOrderEntity.getStatus().intValue() != HotelOrderStatus.PAYED) {
+			throw new RRException("非法操作，订单状态不正确");
+		}
+		hotelOrderEntity.setStatus(HotelOrderStatus.CHECK_IN);
+		baseMapper.updateById(hotelOrderEntity);
+	}
 }

@@ -46,6 +46,9 @@ public abstract class AbstractController {
 
 	protected Long getSellerId() {
 		HotelSellerEntity hotelSeller = hotelSellerService.getOne(new QueryWrapper<HotelSellerEntity>().eq("user_id", getUserId()).eq("state", 2));
+		if (null == hotelSeller) {
+			return 0L;
+		}
 		return hotelSeller.getId();
 	}
 }

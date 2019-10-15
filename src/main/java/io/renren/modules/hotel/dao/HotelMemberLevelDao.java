@@ -1,11 +1,16 @@
 package io.renren.modules.hotel.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import io.renren.modules.hotel.dto.HotelSellerMemberDto;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.vo.VipCardItemVo;
 
@@ -44,5 +49,13 @@ public interface HotelMemberLevelDao extends BaseMapper<HotelMemberLevelEntity> 
 	 * @return
 	 */
 	VipCardItemVo userCardDetailById(Long userId, Long sellerId);
+
+	/**
+	 * 商家会员列表
+	 * @param page
+	 * @param params
+	 * @return
+	 */
+	IPage<HotelSellerMemberDto> pageList(Page<HotelSellerMemberDto> page, @Param("params") Map<String, Object> params);
 
 }

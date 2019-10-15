@@ -1,16 +1,23 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.datetime.DateFormatter;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
@@ -43,6 +50,20 @@ public class HotelCouponsController extends AbstractController {
 		PageUtils page = hotelCouponsService.queryPage(params);
 
 		return R.ok().put("page", page);
+	}
+
+	/**
+	 * 列表
+	 */
+	@RequestMapping("/listAll")
+	@RequiresPermissions("hotel:hotelcoupons:list")
+	public R listAll(@RequestParam Map<String, Object> params) {
+		params.put("seller_id", -1L);
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
+		List<HotelCouponsEntity> hotelCouponsEntities = hotelCouponsService.list(Wrappers.<HotelCouponsEntity>lambdaQuery().eq(HotelCouponsEntity::getSellerId, getSellerId()).gt(HotelCouponsEntity::getEndTime, DateUtil.formatDate(DateUtil.date())));
+		return R.ok(hotelCouponsEntities);
 	}
 
 	/**

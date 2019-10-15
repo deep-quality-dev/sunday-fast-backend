@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
@@ -34,6 +36,18 @@ public class HotelMemberLevelController extends AbstractController {
 	@Autowired
 	private HotelMemberLevelService hotelMemberLevelService;
 
+	/**
+	 * 获取商家下面的会员等级
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/sellerLevleList")
+	@RequiresPermissions("hotel:hotelmemberlevel:sellerlevlelist")
+	public R sellerLevleList() {
+		List<HotelMemberLevelEntity> hotelMemberLevelEntities = hotelMemberLevelService.list(Wrappers.<HotelMemberLevelEntity>lambdaQuery().eq(HotelMemberLevelEntity::getSellerId, getSellerId()));
+		return R.ok(hotelMemberLevelEntities);
+	}
+	
 	/**
 	 * 列表
 	 */

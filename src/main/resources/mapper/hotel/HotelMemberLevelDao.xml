@@ -38,19 +38,23 @@
 		t.card_no,
 		t.balance,
 		t.qr_code,
-		t2.id as seller_id,
+		t2.id as
+		seller_id,
 		t2.`name` as
 		seller_name
 		from
-		t_hotel_member_level_detail t inner join
+		t_hotel_member_level_detail t
+		inner join
 		t_hotel_member_level t1
 		on
 		t.level_id = t1.id
-		inner join t_hotel_seller
+		inner join
+		t_hotel_seller
 		t2 on t1.seller_id = t2.id
-		where t.member_id = #{userId} and t.status =  1
+		where t.member_id = #{userId}
+		and t.status = 1
 	</select>
-	
+
 	<select id="userCardDetailById"
 		resultType="io.renren.modules.hotel.vo.VipCardItemVo">
 		SELECT
@@ -75,7 +79,8 @@
 		t.level_id = t1.id
 		inner join t_hotel_seller
 		t2 on t1.seller_id = t2.id
-		where t.member_id = #{userId} and t.seller_id = #{sellerId}
+		where t.member_id = #{userId} and
+		t.seller_id = #{sellerId}
 	</select>
 
 	<select resultType="io.renren.modules.hotel.vo.VipCardItemVo"
@@ -93,14 +98,77 @@
 		t.rgb,
 		t1.`name`
 		as seller_name,
-		t1.id as seller_id
+		t1.id as
+		seller_id
 		From t_hotel_member_level t
 		inner JOIN
-		t_hotel_seller t1 on t.seller_id = t1.id
+		t_hotel_seller t1 on
+		t.seller_id = t1.id
 		where t.seller_id =
 		#{sellerId}
 		<if test='levelId !=null'>
-			and t.level>(select l.level from t_hotel_member_level l where l.id  = #{levelId})
+			and t.level>(select l.level from t_hotel_member_level l
+			where l.id = #{levelId})
 		</if>
+	</select>
+
+	<select id="pageList" resultType="io.renren.modules.hotel.dto.HotelSellerMemberDto">
+		SELECT
+		m.id as user_id,
+		m.gender,
+		temp.id,
+		m.img,
+		m.`name` as nick,
+		(case temp.mobile
+		when not null then temp.mobile else m.tel end) as tel,
+		(case temp.name
+		when not null then temp.name else m.zs_name end) as
+		name,
+		temp.card_no,
+		temp.level_name,
+		temp.certificate_no,
+		temp.level,
+		temp.score,
+		temp.balance,
+		temp.salesman,
+		m.join_time as join_time,
+		temp.create_date
+		FROM
+		t_hotel_member m
+		LEFT JOIN
+		(
+		SELECT
+		t.id,
+		t.member_id,
+		t.card_no,
+		t1.`name` as level_name,
+		t1.`level`
+		as `level`,
+		t.score,
+		t.balance,
+		t.mobile,
+		t.salesman,
+		t.certificate_no,
+		t.`name`,
+		t.create_date
+		FROM
+		t_hotel_member_level_detail t
+		INNER JOIN
+		t_hotel_member_level t1 ON t.level_id = t1.id and t.seller_id = #{params.seller_id}
+		) temp on m.id = temp.member_id
+		<where>
+			<if test="params.name !=null and params.name!=''">
+				and (temp.`name` like CONCAT('%',#{params.name},'%') or
+				m.zs_name like
+				CONCAT('%',#{params.name},'%'))
+			</if>
+			<if test="params.mobile !=null and params.mobile != '' ">
+				and (temp.`mobile` like CONCAT('%',#{params.mobile},'%')
+				or
+				m.tel like
+				CONCAT('%',#{params.mobile},'%'))
+			</if>
+		</where>
+		ORDER BY temp.card_no desc
 	</select>
 </mapper>

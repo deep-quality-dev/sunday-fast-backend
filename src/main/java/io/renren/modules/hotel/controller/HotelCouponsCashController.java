@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -11,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity;
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
 import io.renren.modules.sys.controller.AbstractController;
@@ -26,7 +31,7 @@ import io.renren.modules.sys.controller.AbstractController;
  */
 @RestController
 @RequestMapping("hotel/hotelcouponscash")
-public class HotelCouponsCashController extends AbstractController{
+public class HotelCouponsCashController extends AbstractController {
 	@Autowired
 	private HotelCouponsCashService hotelCouponsCashService;
 
@@ -43,6 +48,20 @@ public class HotelCouponsCashController extends AbstractController{
 		PageUtils page = hotelCouponsCashService.queryPage(params);
 
 		return R.ok().put("page", page);
+	}
+
+	/**
+	 * 列表
+	 */
+	@RequestMapping("/listAll")
+	@RequiresPermissions("hotel:hotelcouponscash:list")
+	public R listAll(@RequestParam Map<String, Object> params) {
+		params.put("seller_id", -1L);
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
+		List<HotelCouponsCashEntity> couponsCashEntities = hotelCouponsCashService.list(Wrappers.<HotelCouponsCashEntity>lambdaQuery().eq(HotelCouponsCashEntity::getSellerId, getSellerId()).gt(HotelCouponsCashEntity::getEndTime, DateUtil.formatDate(DateUtil.date())));
+		return R.ok(couponsCashEntities);
 	}
 
 	/**

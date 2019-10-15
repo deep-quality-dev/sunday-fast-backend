@@ -1,29 +1,22 @@
 package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import io.renren.common.exception.RRException;
-import io.renren.common.utils.PageUtils;
-import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelMemberLevelDao;
 import io.renren.modules.hotel.dao.HotelMemberLevelDetailDao;
-import io.renren.modules.hotel.dto.HotelMemberLevelDetailDto;
+import io.renren.modules.hotel.dto.HotelSellerMemberDto;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 
@@ -34,26 +27,12 @@ public class HotelMemberLevelDetailServiceImpl extends ServiceImpl<HotelMemberLe
 	private HotelMemberLevelDao hotelMemberLevelDao;
 
 	@Override
-	public PageUtils queryPage(Map<String, Object> params) {
-		Object sellerId = params.get("seller_id");
-		Object name = params.get("name");
-		Object mobile = params.get("mobile");
-		IPage<HotelMemberLevelDetailEntity> page = this.page(new Query<HotelMemberLevelDetailEntity>().getPage(params), new QueryWrapper<HotelMemberLevelDetailEntity>().eq(sellerId != null, "seller_id", sellerId).like(StrUtil.isNotEmpty(String.valueOf(name)), "name", name).like(StrUtil.isNotEmpty(String.valueOf(mobile)), "mobile", mobile));
-		List<HotelMemberLevelDetailEntity> memberLevelDetailEntities = page.getRecords();
-		List<HotelMemberLevelDetailDto> hotelMemberLevelDetailDtos = memberLevelDetailEntities.stream().map((HotelMemberLevelDetailEntity item) -> {
-			HotelMemberLevelDetailDto hotelMemberLevelDetailDto = new HotelMemberLevelDetailDto();
-			BeanUtil.copyProperties(item, hotelMemberLevelDetailDto);
-			hotelMemberLevelDetailDto.setLevelName(hotelMemberLevelDao.selectById(item.getLevelId()).getName());
-			return hotelMemberLevelDetailDto;
-		}).collect(Collectors.toList());
-
-		IPage<HotelMemberLevelDetailDto> resultPage = new Page<HotelMemberLevelDetailDto>();
-		resultPage.setRecords(hotelMemberLevelDetailDtos);
-		resultPage.setCurrent(page.getCurrent());
-		resultPage.setPages(page.getPages());
-		resultPage.setSize(page.getSize());
-		resultPage.setTotal(page.getTotal());
-		return new PageUtils(resultPage);
+	public IPage<HotelSellerMemberDto> queryPage(Map<String, Object> params) {
+		int pageNum = Integer.valueOf(params.get("page").toString());
+		int limit = Integer.valueOf(params.get("limit").toString());
+		Page<HotelSellerMemberDto> page = new Page<HotelSellerMemberDto>(pageNum, limit);
+		IPage<HotelSellerMemberDto> result = hotelMemberLevelDao.pageList(page, params);
+		return result;
 	}
 
 	@Override

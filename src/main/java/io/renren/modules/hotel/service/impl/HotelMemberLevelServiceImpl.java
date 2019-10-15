@@ -126,6 +126,8 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 			hotelMemberLevelDetailEntity.setCardNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS") + userId);
 			hotelMemberLevelDetailEntity.setSellerId(hotelMemberLevelEntity.getSellerId());
 			hotelMemberLevelDetailEntity.setMobile(hotelMemberEntity.getTel());
+
+			hotelMemberLevelDetailEntity.setCreateDate(DateUtil.date());
 			if (StrUtil.isNotEmpty(becomeVipForm.getMobile())) {
 				hotelMemberLevelDetailEntity.setMobile(becomeVipForm.getMobile());
 			}

@@ -172,4 +172,12 @@ public class HotelOrderAPI extends BaseController {
 		}
 		return R.error();
 	}
+
+	@Login
+	@ApiOperation("订单入住")
+	@PostMapping("/orderCheckIn/{orderId}")
+	public R orderCheckIn(@RequestAttribute("userId") Long userId, @PathVariable Long orderId) {
+		hotelOrderService.orderCheckIn(orderId,userId);
+		return R.ok();
+	}
 }

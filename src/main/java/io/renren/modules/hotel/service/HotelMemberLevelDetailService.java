@@ -3,9 +3,11 @@ package io.renren.modules.hotel.service;
 import java.math.BigDecimal;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import io.renren.common.utils.PageUtils;
+import io.renren.modules.hotel.dto.HotelSellerMemberDto;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 
 /**
@@ -17,7 +19,7 @@ import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
  */
 public interface HotelMemberLevelDetailService extends IService<HotelMemberLevelDetailEntity> {
 
-	PageUtils queryPage(Map<String, Object> params);
+	IPage<HotelSellerMemberDto> queryPage(Map<String, Object> params);
 
 	/**
 	 * 用户是否有会员卡

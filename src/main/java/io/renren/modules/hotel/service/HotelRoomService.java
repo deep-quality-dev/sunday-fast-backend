@@ -30,7 +30,7 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @param sellerId
 	 * @param startTime
 	 * @param endTime
-	 * @param roomType 
+	 * @param roomType
 	 * @return
 	 */
 	List<RoomVO> roomList(Long userId, Long sellerId, String startTime, String endTime, int roomType);
@@ -45,9 +45,26 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 
 	/**
 	 * 更新房间数量
-	 * @param hotelRoomEntity 
+	 * 
+	 * @param hotelRoomEntity
 	 * @param hotelRoomMoneyEntity
 	 * @param roomNum
 	 */
-	void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity,Long dateTime, int roomNum);
+	void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, Long dateTime, int roomNum);
+
+	/**
+	 * 启用房型
+	 * 
+	 * @param sellerId
+	 * @param id
+	 */
+	void show(Long sellerId, Long id);
+
+	/**
+	 * 禁用房型
+	 * 
+	 * @param sellerId
+	 * @param id
+	 */
+	void hide(Long sellerId, Long id);
 }

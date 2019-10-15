@@ -33,6 +33,20 @@ public class HotelRoomController extends AbstractController {
 	@Autowired
 	private HotelRoomService hotelRoomService;
 
+	@RequestMapping("/show/{id}")
+	@RequiresPermissions("hotel:hotelroom:update")
+	public R show(@PathVariable Long id) {
+		hotelRoomService.show(getSellerId(),id);
+		return R.ok();
+	}
+
+	@RequestMapping("/hide/{id}")
+	@RequiresPermissions("hotel:hotelroom:update")
+	public R hide(@PathVariable Long id) {
+		hotelRoomService.hide(getSellerId(),id);
+		return R.ok();
+	}
+
 	/**
 	 * 房价数据
 	 * 

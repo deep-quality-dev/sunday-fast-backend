@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelMemberLevelDao;
@@ -78,7 +79,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			levelId = hotelMemberLevelDetailEntity.getLevelId();
 		}
 		HotelMemberLevelEntity memberLevelEntity = hotelMemberLevelDao.selectById(levelId);
-		List<HotelRoomEntity> hotelRoomEntities = this.list(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getClassify, roomType));
+		List<HotelRoomEntity> hotelRoomEntities = this.list(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getClassify, roomType).eq(HotelRoomEntity::getState, 1));
 		List<RoomVO> roomVOs = hotelRoomEntities.stream().map((HotelRoomEntity item) -> {
 			RoomVO roomVO = new RoomVO();
 			BeanUtil.copyProperties(item, roomVO);
@@ -152,6 +153,29 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	public void updateRoomNum(HotelRoomEntity hotelRoomEntity, HotelRoomMoneyEntity hotelRoomMoneyEntity, Long dateTime, int roomNum) {
 		HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getDateday, dateTime).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()));
 		hotelRoomNumDao.updateRoomNum(hotelRoomNumEntity, roomNum);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void show(Long sellerId, Long id) {
+		HotelRoomEntity hotelRoomEntity = baseMapper.selectById(id);
+		if (hotelRoomEntity.getSellerId().intValue() != sellerId.intValue()) {
+			throw new RRException("启用失败");
+		}
+		hotelRoomEntity.setState(1);
+		baseMapper.updateById(hotelRoomEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void hide(Long sellerId, Long id) {
+		HotelRoomEntity hotelRoomEntity = baseMapper.selectById(id);
+		if (hotelRoomEntity.getSellerId().intValue() != sellerId.intValue()) {
+			throw new RRException("禁用失败");
+		}
+		hotelRoomEntity.setState(0);
+		baseMapper.updateById(hotelRoomEntity);
+
 	}
 
 }

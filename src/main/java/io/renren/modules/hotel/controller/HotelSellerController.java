@@ -37,6 +37,20 @@ public class HotelSellerController extends AbstractController {
 	@Autowired
 	private HotelSellerService hotelSellerService;
 
+	@PostMapping("/show/{id}")
+	@RequiresPermissions("hotel:hotelseller:update")
+	public R show(@PathVariable Long id) {
+		hotelSellerService.show(id);
+		return R.ok();
+	}
+
+	@PostMapping("/hide/{id}")
+	@RequiresPermissions("hotel:hotelseller:update")
+	public R hide(@PathVariable Long id) {
+		hotelSellerService.hide(id);
+		return R.ok();
+	}
+
 	/**
 	 * 通过审核
 	 * 
@@ -46,7 +60,7 @@ public class HotelSellerController extends AbstractController {
 	@PostMapping("/auditPass/{id}")
 	@RequiresPermissions("hotel:hotelseller:auditPass")
 	public R auditPass(@PathVariable Long id) {
-		hotelSellerService.auditPass(id,getUserId());
+		hotelSellerService.auditPass(id, getUserId());
 		return R.ok();
 	}
 
@@ -59,7 +73,7 @@ public class HotelSellerController extends AbstractController {
 	@PostMapping("/auditRefuse/{id}")
 	@RequiresPermissions("hotel:hotelseller:auditRefuse")
 	public R auditRefuse(@PathVariable Long id) {
-		hotelSellerService.auditRefuse(id,getUserId());
+		hotelSellerService.auditRefuse(id, getUserId());
 		return R.ok();
 	}
 

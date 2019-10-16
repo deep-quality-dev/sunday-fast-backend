@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,12 +15,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.hotel.dao.HotelCouponsBreakfastDao;
 import io.renren.modules.hotel.dao.HotelCouponsCashDao;
 import io.renren.modules.hotel.dao.HotelCouponsDao;
+import io.renren.modules.hotel.dao.HotelMemberCouponsDao;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.vo.UserCoupons;
 import io.renren.modules.hotel.vo.WalletDataVo;
@@ -32,6 +36,9 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 
 	@Autowired
 	private HotelCouponsBreakfastDao hotelCouponsBreakfastDao;
+
+	@Autowired
+	private HotelMemberCouponsDao hotelMemberCouponsDao;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -59,7 +66,7 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 
 	@Override
 	public Page<UserCoupons> userCoupons(Long userId, int status, Page<UserCoupons> page) {
-		return baseMapper.userCoupons(page,status, userId);
+		return baseMapper.userCoupons(page, status, userId);
 	}
 
 	@Override
@@ -69,7 +76,7 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 
 	@Override
 	public Page<UserCoupons> userCashCoupons(Long userId, int status, Page<UserCoupons> page) {
-		return hotelCouponsCashDao.userCashCouponsPage(page, status,userId);
+		return hotelCouponsCashDao.userCashCouponsPage(page, status, userId);
 	}
 
 	@Override
@@ -80,6 +87,24 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 	@Override
 	public List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount) {
 		return hotelCouponsCashDao.canUseCoupons(userId, sellerId, amount);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void sendCoupons(Long sellerId, List<Long> memberIds, List<Long> couponsIds, int couponsType) {
+		HotelMemberCouponsEntity hotelMemberCouponsEntity = null;
+		for (Long memberId : memberIds) {
+			for (Long couponsId : couponsIds) {
+				hotelMemberCouponsEntity = new HotelMemberCouponsEntity();
+				hotelMemberCouponsEntity.setCouponsType(couponsType);
+				hotelMemberCouponsEntity.setSellerId(sellerId);
+				hotelMemberCouponsEntity.setTime(DateUtil.date().getTime());
+				hotelMemberCouponsEntity.setState(1);
+				hotelMemberCouponsEntity.setCouponsId(couponsId);
+				hotelMemberCouponsEntity.setUserId(memberId);
+				hotelMemberCouponsDao.insert(hotelMemberCouponsEntity);
+			}
+		}
 	}
 
 }

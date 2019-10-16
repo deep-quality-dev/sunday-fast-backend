@@ -39,15 +39,15 @@ public class HotelMemberCouponsEntity implements Serializable {
 	/**
 	 * 领取时间
 	 */
-	private Integer time;
+	private long time;
 	/**
 	 * 使用时间
 	 */
-	private Integer syTime;
+	private long syTime;
 	/**
 	 * 商家ID
 	 */
-	private String sellerId;
+	private Long sellerId;
 	
 	/**
 	 * 优惠券类型 1-优惠券，2-代金券，3-早餐券

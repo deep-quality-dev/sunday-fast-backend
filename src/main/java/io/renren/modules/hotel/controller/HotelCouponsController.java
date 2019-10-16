@@ -6,10 +6,8 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.datetime.DateFormatter;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +19,7 @@ import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.form.SendCouponsForm;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.sys.controller.AbstractController;
 
@@ -36,6 +35,13 @@ import io.renren.modules.sys.controller.AbstractController;
 public class HotelCouponsController extends AbstractController {
 	@Autowired
 	private HotelCouponsService hotelCouponsService;
+
+	@PostMapping("/sendCoupons")
+	@RequiresPermissions("hotel:hotelcoupons:save")
+	public R sendCoupons(@RequestBody SendCouponsForm couponsForm) {
+		hotelCouponsService.sendCoupons(getSellerId(), couponsForm.getMemberIds(), couponsForm.getCouponsIds(), couponsForm.getType());
+		return R.ok();
+	}
 
 	/**
 	 * 列表

@@ -53,6 +53,7 @@
 		<result property="ddOpen" column="dd_open" />
 		<result property="lnt" column="lnt" />
 		<result property="lat" column="lat" />
+		<result property="enabled" column="enabled" />
 		<result property="reserveRemind" column="reserve_remind" />
 	</resultMap>
 
@@ -73,6 +74,7 @@
 		left join t_hotel_brand b on t.brand_id = b.id
 		left join t_hotel_brand_type bt on b.type_id = bt.id
 		<where>
+			and t.enabled = 1
 			<if test='params.levelSort !=null'>
 				and t.star in
 				<foreach item="item" collection="params.levelSort"

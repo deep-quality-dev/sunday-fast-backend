@@ -80,4 +80,13 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 */
 	List<UserCoupons> canUseCoupons(Long userId, Long sellerId, BigDecimal amount);
 
+	/**
+	 * 发放优惠券
+	 * @param sellerId
+	 * @param memberIds
+	 * @param couponsIds
+	 * @param type
+	 */
+	void sendCoupons(Long sellerId, List<Long> memberIds, List<Long> couponsIds, int type);
+
 }

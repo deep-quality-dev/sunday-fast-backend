@@ -211,4 +211,6 @@ public class HotelSellerEntity implements Serializable {
 
 	private String reserveRemind;
 
+	private int enabled = 1;
+
 }

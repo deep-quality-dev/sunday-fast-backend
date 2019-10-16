@@ -302,4 +302,21 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		this.updateById(hotelSellerEntity);
 	}
 
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void show(Long id) {
+		HotelSellerEntity hotelSellerEntity = this.getById(id);
+		hotelSellerEntity.setEnabled(1);
+		this.updateById(hotelSellerEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void hide(Long id) {
+		HotelSellerEntity hotelSellerEntity = this.getById(id);
+		hotelSellerEntity.setEnabled(-1);
+		this.updateById(hotelSellerEntity);
+
+	}
+
 }

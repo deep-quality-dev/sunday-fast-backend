@@ -12,8 +12,8 @@ import lombok.Data;
  * 
  * 
  * @author taoz
- * @email 18819175397@163.com
- * @date 2019-03-20 12:49:32
+ * @email 18819175397@gmail.com
+ * @date 2019-10-17 14:42:35
  */
 @Data
 @TableName("t_hotel_system")
@@ -24,7 +24,7 @@ public class HotelSystemEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * appid
 	 */
@@ -213,5 +213,13 @@ public class HotelSystemEntity implements Serializable {
 	 * 
 	 */
 	private String tid4;
+
+	private String companyName;
+	private String companyPhone;
+	private String companyEmail;
+	private String companyAddress;
+	private String businessLicense;
+	private String licence;
+	private String platformInfo;
 
 }

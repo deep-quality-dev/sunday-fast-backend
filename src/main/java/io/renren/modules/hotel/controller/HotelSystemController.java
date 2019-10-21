@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelSystemEntity;
@@ -43,11 +45,10 @@ public class HotelSystemController {
 	/**
 	 * 信息
 	 */
-	@RequestMapping("/info/{id}")
+	@RequestMapping("/info")
 	@RequiresPermissions("hotel:hotelsystem:info")
-	public R info(@PathVariable("id") Integer id) {
-		HotelSystemEntity hotelSystem = hotelSystemService.getById(id);
-
+	public R info() {
+		HotelSystemEntity hotelSystem = hotelSystemService.getOne(Wrappers.lambdaQuery());
 		return R.ok().put("hotelSystem", hotelSystem);
 	}
 
@@ -57,8 +58,38 @@ public class HotelSystemController {
 	@RequestMapping("/save")
 	@RequiresPermissions("hotel:hotelsystem:save")
 	public R save(@RequestBody HotelSystemEntity hotelSystem) {
-		hotelSystemService.save(hotelSystem);
+		HotelSystemEntity dbHotelSystemEntity = hotelSystemService.getOne(Wrappers.lambdaQuery());
+		if (null == dbHotelSystemEntity) {
+			dbHotelSystemEntity = new HotelSystemEntity();
+		}
+		dbHotelSystemEntity.setCompanyAddress(hotelSystem.getCompanyAddress());
+		dbHotelSystemEntity.setCompanyEmail(hotelSystem.getCompanyEmail());
+		dbHotelSystemEntity.setCompanyName(hotelSystem.getCompanyName());
+		dbHotelSystemEntity.setCompanyPhone(hotelSystem.getCompanyPhone());
+		dbHotelSystemEntity.setBusinessLicense(hotelSystem.getBusinessLicense());
+		dbHotelSystemEntity.setLicence(hotelSystem.getLicence());
+		dbHotelSystemEntity.setPlatformInfo(hotelSystem.getPlatformInfo());
+		dbHotelSystemEntity.setLinkName(hotelSystem.getLinkName());
+		dbHotelSystemEntity.setLinkLogo(hotelSystem.getLinkLogo());
+		hotelSystemService.saveOrUpdate(dbHotelSystemEntity);
+		return R.ok();
+	}
 
+	/**
+	 * 修改
+	 */
+	@RequestMapping("/withdrawSetting")
+	@RequiresPermissions("hotel:hotelsystem:update")
+	public R withdrawSetting(@RequestBody HotelSystemEntity hotelSystem) {
+		HotelSystemEntity dbHotelSystemEntity = hotelSystemService.getOne(Wrappers.lambdaQuery());
+		if (null == dbHotelSystemEntity) {
+			dbHotelSystemEntity = new HotelSystemEntity();
+		}
+		dbHotelSystemEntity.setZdMoney(hotelSystem.getZdMoney());
+		dbHotelSystemEntity.setTxMode(hotelSystem.getTxMode());
+		dbHotelSystemEntity.setTxNotice(hotelSystem.getTxNotice());
+		dbHotelSystemEntity.setTxSxf(hotelSystem.getTxSxf());
+		hotelSystemService.saveOrUpdate(dbHotelSystemEntity);
 		return R.ok();
 	}
 

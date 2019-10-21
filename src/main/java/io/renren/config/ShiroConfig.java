@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2016-2019 人人开源 All rights reserved.
- *
- * https://www.renren.io
- *
- * 版权所有，侵权必究！
- */
-
 package io.renren.config;
 
 import java.util.HashMap;
@@ -25,11 +17,6 @@ import org.springframework.context.annotation.Configuration;
 import io.renren.modules.sys.oauth2.OAuth2Filter;
 import io.renren.modules.sys.oauth2.OAuth2Realm;
 
-/**
- * Shiro配置
- *
- * @author Mark sunlightcs@gmail.com
- */
 @Configuration
 public class ShiroConfig {
 
@@ -61,6 +48,8 @@ public class ShiroConfig {
 		filterMap.put("/wx/user/**", "anon");
 		filterMap.put("/pay/**", "anon");
 		filterMap.put("/sys/login", "anon");
+		filterMap.put("/hotel/hotelfriendlink/allList", "anon");
+		filterMap.put("/hotel/hotelhelepmenu/helpMenus", "anon");
 		filterMap.put("/hotel/common/**", "anon");
 		filterMap.put("/swagger/**", "anon");
 		filterMap.put("/v2/api-docs", "anon");

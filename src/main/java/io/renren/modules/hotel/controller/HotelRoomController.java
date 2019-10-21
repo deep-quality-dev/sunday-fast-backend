@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
+import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.sys.controller.AbstractController;
 
@@ -33,18 +37,32 @@ public class HotelRoomController extends AbstractController {
 	@Autowired
 	private HotelRoomService hotelRoomService;
 
+	@Autowired
+	private HotelRoomMoneyService hotelRoomMoneyService;
+
 	@RequestMapping("/show/{id}")
 	@RequiresPermissions("hotel:hotelroom:update")
 	public R show(@PathVariable Long id) {
-		hotelRoomService.show(getSellerId(),id);
+		hotelRoomService.show(getSellerId(), id);
 		return R.ok();
 	}
 
 	@RequestMapping("/hide/{id}")
 	@RequiresPermissions("hotel:hotelroom:update")
 	public R hide(@PathVariable Long id) {
-		hotelRoomService.hide(getSellerId(),id);
+		hotelRoomService.hide(getSellerId(), id);
 		return R.ok();
+	}
+
+	@GetMapping("/getAllRooms")
+	@RequiresPermissions("hotel:hotelroom:list")
+	public R getAllRooms() {
+		List<HotelRoomEntity> hotelRoomEntities = hotelRoomService.list(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getState, 1).eq(HotelRoomEntity::getSellerId, getSellerId()));
+		for (HotelRoomEntity hotelRoomEntity : hotelRoomEntities) {
+			List<HotelRoomMoneyEntity> hotelRoomMoney = hotelRoomMoneyService.list(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, hotelRoomEntity.getId()));
+			hotelRoomEntity.setHotelRoomMoney(hotelRoomMoney);
+		}
+		return R.ok(hotelRoomEntities);
 	}
 
 	/**

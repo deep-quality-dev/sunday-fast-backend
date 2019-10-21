@@ -3,6 +3,8 @@ package io.renren.modules.hotel.controller.api;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,18 +73,30 @@ public class CommonAPI {
 	public R maQrCode(@PathVariable String appid, String path) throws WxErrorException {
 		final WxMaService wxService = WxMaConfiguration.getMaService(appid);
 		File file = wxService.getQrcodeService().createWxaCode(path);
+		String url = OSSFactory.build().uploadSuffix(getBytes(file.getPath()), ".jpg");
+		return R.ok().put("data", url);
+	}
+
+	private byte[] getBytes(String filePath) {
 		byte[] buffer = null;
-		FileInputStream fis = new FileInputStream(file);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-		byte[] b = new byte[1000];
-		int n;
-		while ((n = fis.read(b)) != -1) {
-			bos.write(b, 0, n);
+		try {
+			File file = new File(filePath);
+			FileInputStream fis = new FileInputStream(file);
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
+			byte[] b = new byte[1000];
+			int n;
+			while ((n = fis.read(b)) != -1) {
+				bos.write(b, 0, n);
+			}
+			fis.close();
+			bos.close();
+			buffer = bos.toByteArray();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		fis.close();
-		bos.close();
-		buffer = bos.toByteArray();
-		return R.ok(buffer);
+		return buffer;
 	}
 
 }

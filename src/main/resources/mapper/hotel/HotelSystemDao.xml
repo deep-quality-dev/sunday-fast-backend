@@ -4,56 +4,66 @@
 <mapper namespace="io.renren.modules.hotel.dao.HotelSystemDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelSystemEntity" id="hotelSystemMap">
-        <result property="id" column="id"/>
-        <result property="appid" column="appid"/>
-        <result property="appsecret" column="appsecret"/>
-        <result property="mchid" column="mchid"/>
-        <result property="wxkey" column="wxkey"/>
-        <result property="uniacid" column="uniacid"/>
-        <result property="jfRule" column="jf_rule"/>
-        <result property="bqName" column="bq_name"/>
-        <result property="linkName" column="link_name"/>
-        <result property="linkLogo" column="link_logo"/>
-        <result property="support" column="support"/>
-        <result property="bqLogo" column="bq_logo"/>
-        <result property="color" column="color"/>
-        <result property="tzAppid" column="tz_appid"/>
-        <result property="tzName" column="tz_name"/>
-        <result property="ptName" column="pt_name"/>
-        <result property="tel" column="tel"/>
-        <result property="totalNum" column="total_num"/>
-        <result property="appkey" column="appkey"/>
-        <result property="tplId" column="tpl_id"/>
-        <result property="sellerId" column="seller_id"/>
-        <result property="apiclientCert" column="apiclient_cert"/>
-        <result property="apiclientKey" column="apiclient_key"/>
-        <result property="zdMoney" column="zd_money"/>
-        <result property="txSxf" column="tx_sxf"/>
-        <result property="rcTk" column="rc_tk"/>
-        <result property="tid1" column="tid1"/>
-        <result property="txNotice" column="tx_notice"/>
-        <result property="type" column="type"/>
-        <result property="txMode" column="tx_mode"/>
-        <result property="isSjrz" column="is_sjrz"/>
-        <result property="clientIp" column="client_ip"/>
-        <result property="rzNotice" column="rz_notice"/>
-        <result property="hyRule" column="hy_rule"/>
-        <result property="bjLogo" column="bj_logo"/>
-        <result property="mapKey" column="map_key"/>
-        <result property="isDxyz" column="is_dxyz"/>
-        <result property="plScore" column="pl_score"/>
-        <result property="xfScore" column="xf_score"/>
-        <result property="hyImg" column="hy_img"/>
-        <result property="rzTid" column="rz_tid"/>
-        <result property="openMember" column="open_member"/>
-        <result property="jjrzTid" column="jjrz_tid"/>
-        <result property="isSfz" column="is_sfz"/>
-        <result property="tplId2" column="tpl_id2"/>
-        <result property="isOrder" column="is_order"/>
-        <result property="tid3" column="tid3"/>
-        <result property="tid4" column="tid4"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelSystemEntity"
+		id="hotelSystemMap">
+		<result property="id" column="id" />
+		<result property="appid" column="appid" />
+		<result property="appsecret" column="appsecret" />
+		<result property="mchid" column="mchid" />
+		<result property="wxkey" column="wxkey" />
+		<result property="uniacid" column="uniacid" />
+		<result property="jfRule" column="jf_rule" />
+		<result property="bqName" column="bq_name" />
+		<result property="linkName" column="link_name" />
+		<result property="linkLogo" column="link_logo" />
+		<result property="support" column="support" />
+		<result property="bqLogo" column="bq_logo" />
+		<result property="color" column="color" />
+		<result property="tzAppid" column="tz_appid" />
+		<result property="tzName" column="tz_name" />
+		<result property="ptName" column="pt_name" />
+		<result property="tel" column="tel" />
+		<result property="totalNum" column="total_num" />
+		<result property="appkey" column="appkey" />
+		<result property="tplId" column="tpl_id" />
+		<result property="sellerId" column="seller_id" />
+		<result property="apiclientCert" column="apiclient_cert" />
+		<result property="apiclientKey" column="apiclient_key" />
+		<result property="zdMoney" column="zd_money" />
+		<result property="txSxf" column="tx_sxf" />
+		<result property="rcTk" column="rc_tk" />
+		<result property="tid1" column="tid1" />
+		<result property="txNotice" column="tx_notice" />
+		<result property="type" column="type" />
+		<result property="txMode" column="tx_mode" />
+		<result property="isSjrz" column="is_sjrz" />
+		<result property="clientIp" column="client_ip" />
+		<result property="rzNotice" column="rz_notice" />
+		<result property="hyRule" column="hy_rule" />
+		<result property="bjLogo" column="bj_logo" />
+		<result property="mapKey" column="map_key" />
+		<result property="isDxyz" column="is_dxyz" />
+		<result property="plScore" column="pl_score" />
+		<result property="xfScore" column="xf_score" />
+		<result property="hyImg" column="hy_img" />
+		<result property="rzTid" column="rz_tid" />
+		<result property="openMember" column="open_member" />
+		<result property="jjrzTid" column="jjrz_tid" />
+		<result property="isSfz" column="is_sfz" />
+		<result property="tplId2" column="tpl_id2" />
+		<result property="isOrder" column="is_order" />
+		<result property="tid3" column="tid3" />
+		<result property="tid4" column="tid4" />
+		<!-- 公司相关信息 -->
+		<result property="companyName" column="company_name" />
+		<result property="companyPhone" column="company_phone" />
+		<result property="companyEmail" column="company_email" />
+		<result property="companyAddress" column="company_address" />
+		<result property="businessLicense" column="business_license" />
+		<result property="platformInfo" column="platform_info" />
+		<result property="licence" column="licence" />
+	</resultMap>
 
 
 </mapper>

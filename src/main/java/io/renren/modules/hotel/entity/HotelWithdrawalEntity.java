@@ -12,8 +12,8 @@ import lombok.Data;
  * 提现记录
  * 
  * @author taoz
- * @email 18819175397@163.com
- * @date 2019-03-20 12:49:33
+ * @email 18819175397@gmail.com
+ * @date 2019-10-17 14:42:34
  */
 @Data
 @TableName("t_hotel_withdrawal")
@@ -24,7 +24,7 @@ public class HotelWithdrawalEntity implements Serializable {
 	 * 
 	 */
 	@TableId
-	private Integer id;
+	private Long id;
 	/**
 	 * 真实姓名
 	 */

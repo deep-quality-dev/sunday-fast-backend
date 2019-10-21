@@ -2,7 +2,9 @@ package io.renren.modules.hotel.entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -77,7 +79,7 @@ public class HotelRoomEntity implements Serializable {
 	 * 
 	 */
 	private String uniacid;
-	
+
 	/**
 	 * 床型尺寸
 	 */
@@ -110,5 +112,8 @@ public class HotelRoomEntity implements Serializable {
 	 * 入住时长
 	 */
 	private String rzTime;
+
+	@TableField(exist = false)
+	private List<HotelRoomMoneyEntity> hotelRoomMoney;
 
 }

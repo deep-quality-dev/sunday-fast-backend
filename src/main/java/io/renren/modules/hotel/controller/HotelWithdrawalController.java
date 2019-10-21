@@ -64,7 +64,7 @@ public class HotelWithdrawalController extends AbstractController {
 	 * @return
 	 */
 	@RequiresPermissions("hotel:hotelwithdrawal:withdrawalapplyaudit")
-	@PostMapping("/handlerWithdrawalApply/{id}")
+	@PostMapping("/withdrawalApplyAudit/{id}")
 	public R withdrawalApplyAudit(@PathVariable Long id) {
 		hotelWithdrawalService.withdrawalApplyAudit(id);
 		return R.ok();

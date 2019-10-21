@@ -10,6 +10,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.modules.hotel.entity.HotelMemberLevelEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.form.SettingRoomStatusForm;
 import io.renren.modules.hotel.vo.RoomMoneyVo;
 import io.renren.modules.hotel.vo.RoomVO;
 
@@ -67,4 +68,11 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @param id
 	 */
 	void hide(Long sellerId, Long id);
+
+	/**
+	 * 批量设置房态
+	 * @param sellerId
+	 * @param settingRoomStatusForms
+	 */
+	void settingRoomStatusBatch(Long sellerId, SettingRoomStatusForm settingRoomStatusForms);
 }

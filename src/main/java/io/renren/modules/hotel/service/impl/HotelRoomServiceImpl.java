@@ -2,6 +2,7 @@ package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,9 @@ import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
 import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
+import io.renren.modules.hotel.form.SettingRoomStatusForm;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
+import io.renren.modules.hotel.service.HotelRoomNumService;
 import io.renren.modules.hotel.service.HotelRoomPriceService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.hotel.vo.RoomMoneyVo;
@@ -53,6 +56,9 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 
 	@Autowired
 	private HotelRoomNumDao hotelRoomNumDao;
+
+	@Autowired
+	private HotelRoomNumService hotelRoomNumService;
 
 	@Autowired
 	private HotelMemberLevelDao hotelMemberLevelDao;
@@ -176,6 +182,73 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 		hotelRoomEntity.setState(0);
 		baseMapper.updateById(hotelRoomEntity);
 
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void settingRoomStatusBatch(Long sellerId, SettingRoomStatusForm settingRoomStatusForms) {
+		List<String> dates = settingRoomStatusForms.getDates();
+		List<Long> moneyIds = settingRoomStatusForms.getMoneyIds();
+		List<Long> roomIds = settingRoomStatusForms.getRoomIds();
+
+		// 房型状态设置
+		if (settingRoomStatusForms.getStatus() > 0 && (settingRoomStatusForms.getStatus() == -1 || settingRoomStatusForms.getStatus() == 1)) {
+			baseMapper.updateRoomStatusBatch(roomIds, settingRoomStatusForms.getStatus());
+		} else {
+			throw new RRException("房价状态参数错误");
+		}
+		List<String> dateList = this.findDates(dates.get(0), dates.get(1));
+		// 房价数量设置
+		if (settingRoomStatusForms.getNumType() != 0) {
+			for (Long moenyId : moneyIds) {
+				HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(moenyId);
+				for (String day : dateList) {
+					HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getMoneyId, moenyId).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(day).getTime()));
+					if (null == hotelRoomNumEntity) {
+						hotelRoomNumEntity = new HotelRoomNumEntity();
+						hotelRoomNumEntity.setDateday(DateUtil.parse(day).getTime());
+						hotelRoomNumEntity.setMoneyId(moenyId);
+						hotelRoomNumEntity.setRid(hotelRoomMoneyEntity.getRoomId());
+						hotelRoomNumEntity.setNums(hotelRoomMoneyEntity.getNum());
+					}
+					// 增加
+					if (settingRoomStatusForms.getNumType() == 1) {
+						hotelRoomNumEntity.setNums(hotelRoomNumEntity.getNums() + settingRoomStatusForms.getNum());
+					}
+					// 减少
+					if (settingRoomStatusForms.getNumType() == 2) {
+						hotelRoomNumEntity.setNums(hotelRoomNumEntity.getNums() - settingRoomStatusForms.getNum());
+						if (hotelRoomNumEntity.getNums() < 0) {
+							throw new RRException(hotelRoomMoneyEntity.getName() + "【" + day + "】数量小于0");
+						}
+					}
+					// 设定
+					if (settingRoomStatusForms.getNumType() == 3) {
+						hotelRoomNumEntity.setNums(settingRoomStatusForms.getNum());
+					}
+					hotelRoomNumService.saveOrUpdate(hotelRoomNumEntity);
+				}
+			}
+		}
+	}
+
+	// 区间日期
+	public List<String> findDates(String dBegin, String dEnd) {
+		List<String> lDate = new ArrayList<String>();
+		lDate.add(dBegin);
+		Calendar calBegin = Calendar.getInstance();
+		// 使用给定的 Date 设置此 Calendar 的时间
+		calBegin.setTime(DateUtil.parse(dBegin));
+		Calendar calEnd = Calendar.getInstance();
+		// 使用给定的 Date 设置此 Calendar 的时间
+		calEnd.setTime(DateUtil.parse(dEnd));
+		// 测试此日期是否在指定日期之后
+		while (DateUtil.parse(dEnd).after(calBegin.getTime())) {
+			// 根据日历的规则，为给定的日历字段添加或减去指定的时间量
+			calBegin.add(Calendar.DAY_OF_MONTH, 1);
+			lDate.add(DateUtil.formatDate(calBegin.getTime()));
+		}
+		return lDate;
 	}
 
 }

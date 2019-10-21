@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -22,5 +24,12 @@ public interface HotelRoomDao extends BaseMapper<HotelRoomEntity> {
 	 * @param roomNum
 	 */
 	void updateRoomNum(HotelRoomEntity params, int roomNum);
+
+	/**
+	 * 批量更新房型状态
+	 * @param roomIds
+	 * @param status
+	 */
+	void updateRoomStatusBatch(List<Long> roomIds, int status);
 
 }

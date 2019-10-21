@@ -36,4 +36,12 @@
 		#{roomNum} where t.id = #{params.id} and t.total_num =
 		#{params.totalNum}
 	</update>
+	<update id="updateRoomStatusBatch">
+		update t_hotel_room t set t.state=#{status} where t.id in
+		<foreach collection="roomIds" item="id" index="index" open="("
+			close=")" separator=",">
+			#{id}
+		</foreach>
+
+	</update>
 </mapper>

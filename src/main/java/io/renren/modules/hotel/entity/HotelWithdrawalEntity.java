@@ -46,7 +46,7 @@ public class HotelWithdrawalEntity implements Serializable {
 	 */
 	private String auditTime;
 	/**
-	 * 1.待审核 2.通过 3.拒绝
+	 * 1.待审核 2.通过 3.转账中 4.拒绝
 	 */
 	private Integer state;
 	/**
@@ -57,13 +57,23 @@ public class HotelWithdrawalEntity implements Serializable {
 	 * 实际金额
 	 */
 	private BigDecimal realityCost;
+
+	/**
+	 * 提现费率
+	 */
+	private double rate;
 	/**
 	 * 商家id
 	 */
-	private Integer sellerId;
+	private Long sellerId;
 	/**
 	 * 1显示,0删除
 	 */
 	private Integer enabled;
+
+	/**
+	 * 交易单号
+	 */
+	private String tradeNo;
 
 }

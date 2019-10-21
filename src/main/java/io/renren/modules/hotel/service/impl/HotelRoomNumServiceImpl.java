@@ -55,26 +55,39 @@ public class HotelRoomNumServiceImpl extends ServiceImpl<HotelRoomNumDao, HotelR
 		roomNumVo.setDate(dates);
 		// 商家所有房型
 		List<Map<String, Object>> roomDataList = new ArrayList<Map<String, Object>>();
-		Map<String, Object> roomData = null;
+		Map<String, Object> rowData = null;
 		HotelRoomNumEntity roomNumEntity = null;
 		List<HotelRoomEntity> hotelRoomEntities = hotelRoomDao.selectList(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getState, 1));
 		for (HotelRoomEntity hotelRoomEntity : hotelRoomEntities) {
+			rowData = new HashMap<String, Object>();
+			rowData.put("id", "room_" + hotelRoomEntity.getId());
+			rowData.put("name", hotelRoomEntity.getName());
+			rowData.put("pid", 0);
+			rowData.put("type", 0);
+			int nums = 0;
+			for (String day : dates) {
+				nums = hotelRoomNumDao.selectCount(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, hotelRoomEntity.getId()).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(day).getTime()).lt(HotelRoomNumEntity::getNums, 1));
+				rowData.put(day, nums > 0 ? 1 : 0); // 是否有房
+			}
+			rowData.put("hasRoom", nums > 0 ? 1 : 0);
+			roomDataList.add(rowData);
 			List<HotelRoomMoneyEntity> hotelRoomMoneyEntities = hotelRoomMoneyDao.selectList(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, hotelRoomEntity.getId()));
 			for (HotelRoomMoneyEntity hotelRoomMoneyEntity : hotelRoomMoneyEntities) {
-				roomData = new HashMap<String, Object>();
-				roomData.put("roomName", hotelRoomEntity.getName());
-				roomData.put("roomId", hotelRoomEntity.getId());
-				roomData.put("priceName", hotelRoomMoneyEntity.getName());
-				roomData.put("priceId", hotelRoomMoneyEntity.getId());
+				rowData = new HashMap<String, Object>();
+				rowData.put("id", "moeny_" + hotelRoomMoneyEntity.getId());
+				rowData.put("name", hotelRoomMoneyEntity.getName());
+				rowData.put("roomName", hotelRoomEntity.getName());
+				rowData.put("pid", "room_" + hotelRoomEntity.getId());
+				rowData.put("type", 1);
 				for (String day : dates) {
-					roomData.put(day, hotelRoomMoneyEntity.getNum());
+					rowData.put(day, hotelRoomMoneyEntity.getNum());
 					// 查询指定日期房量
 					roomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(day).getTime()));
 					if (null != roomNumEntity) {
-						roomData.put(day, roomNumEntity.getNums());
+						rowData.put(day, roomNumEntity.getNums());
 					}
 				}
-				roomDataList.add(roomData);
+				roomDataList.add(rowData);
 			}
 		}
 		roomNumVo.setDataList(roomDataList);

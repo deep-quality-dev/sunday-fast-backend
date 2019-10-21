@@ -20,6 +20,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.form.SettingRoomStatusForm;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomService;
 import io.renren.modules.sys.controller.AbstractController;
@@ -39,6 +40,18 @@ public class HotelRoomController extends AbstractController {
 
 	@Autowired
 	private HotelRoomMoneyService hotelRoomMoneyService;
+
+	/**
+	 * 批量设置房态
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/settingRoomStatusBatch")
+	@RequiresPermissions("hotel:hotelroom:settingroomstatusbatch")
+	public R settingRoomStatusBatch(@RequestBody SettingRoomStatusForm settingRoomStatusForms) {
+		hotelRoomService.settingRoomStatusBatch(getSellerId(), settingRoomStatusForms);
+		return R.ok();
+	}
 
 	@RequestMapping("/show/{id}")
 	@RequiresPermissions("hotel:hotelroom:update")

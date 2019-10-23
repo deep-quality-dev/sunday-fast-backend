@@ -201,9 +201,9 @@ public class HotelMemberLevelServiceImpl extends ServiceImpl<HotelMemberLevelDao
 	}
 
 	@Override
-	public int checkVipStatus(Long userId, Long sellerId) {
+	public boolean checkVipStatus(Long userId, Long sellerId) {
 		HotelMemberLevelDetailEntity hotelMemberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>query().lambda().eq(HotelMemberLevelDetailEntity::getMemberId, userId).eq(HotelMemberLevelDetailEntity::getSellerId, sellerId));
-		return hotelMemberLevelDetailEntity == null ? -1 : 1;
+		return hotelMemberLevelDetailEntity != null;
 	}
 
 	@Override

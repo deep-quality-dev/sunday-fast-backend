@@ -46,7 +46,7 @@ public interface HotelMemberLevelService extends IService<HotelMemberLevelEntity
 	 * @param sellerId
 	 * @return
 	 */
-	int checkVipStatus(Long userId, Long sellerId);
+	boolean checkVipStatus(Long userId, Long sellerId);
 
 	/**
 	 * 会员卡信息

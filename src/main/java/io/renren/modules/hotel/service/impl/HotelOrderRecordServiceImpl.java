@@ -14,18 +14,14 @@ import io.renren.modules.hotel.dao.HotelOrderRecordDao;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 
-
 @Service("hotelOrderRecordService")
 public class HotelOrderRecordServiceImpl extends ServiceImpl<HotelOrderRecordDao, HotelOrderRecordEntity> implements HotelOrderRecordService {
 
-    @Override
-    public PageUtils queryPage(Map<String, Object> params) {
-        IPage<HotelOrderRecordEntity> page = this.page(
-                new Query<HotelOrderRecordEntity>().getPage(params),
-                new QueryWrapper<HotelOrderRecordEntity>()
-        );
+	@Override
+	public PageUtils queryPage(Map<String, Object> params) {
+		IPage<HotelOrderRecordEntity> page = this.page(new Query<HotelOrderRecordEntity>().getPage(params), new QueryWrapper<HotelOrderRecordEntity>());
 
-        return new PageUtils(page);
-    }
+		return new PageUtils(page);
+	}
 
 }

@@ -27,6 +27,8 @@ public class RoomMoneyVo {
 
 	private int prepay;
 
+	private String desc;
+
 	/**
 	 * 会员价列表
 	 */

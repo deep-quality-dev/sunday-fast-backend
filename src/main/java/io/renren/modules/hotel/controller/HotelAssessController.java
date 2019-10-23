@@ -31,6 +31,19 @@ public class HotelAssessController extends AbstractController {
 	private HotelAssessService hotelAssessService;
 
 	/**
+	 * 回复
+	 * 
+	 * @param assessEntity
+	 * @return
+	 */
+	@RequestMapping("/reply")
+	@RequiresPermissions("hotel:hotelassess:reply")
+	public R reply(HotelAssessEntity assessEntity) {
+		hotelAssessService.updateById(assessEntity);
+		return R.ok();
+	}
+
+	/**
 	 * 列表
 	 */
 	@RequestMapping("/list")

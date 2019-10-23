@@ -21,6 +21,7 @@ import io.renren.modules.app.annotation.Login;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.form.SellerApplyForm;
 import io.renren.modules.hotel.service.HotelBrandService;
+import io.renren.modules.hotel.service.HotelMemberLevelService;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.vo.HotelBrandTypeVo;
 import io.renren.modules.hotel.vo.HotelInfo;
@@ -45,6 +46,17 @@ public class HotelSellerAPI extends BaseController {
 
 	@Autowired
 	private HotelBrandService hotelBrandService;
+
+	@Autowired
+	private HotelMemberLevelService hotelMemberLevelService;
+
+	@Login
+	@ApiOperation("是否本店会员")
+	@GetMapping("/memberFlag/{sellerId}")
+	public R memberFlag(@RequestAttribute("userId") Long userId, @PathVariable Long sellerId) {
+		boolean result = hotelMemberLevelService.checkVipStatus(userId, sellerId);
+		return R.ok().put("data", result);
+	}
 
 	@ApiOperation("酒店预定提醒")
 	@GetMapping("/reserveRemind")

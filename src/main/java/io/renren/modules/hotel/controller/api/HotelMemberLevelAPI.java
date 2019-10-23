@@ -81,8 +81,7 @@ public class HotelMemberLevelAPI extends BaseController {
 	@ApiOperation("检查会员状态")
 	@GetMapping("/check")
 	public R check(@RequestAttribute("userId") Long userId, @RequestParam(required = true) Long sellerId) {
-		int result = hotelMemberLevelService.checkVipStatus(userId, sellerId);
-		return R.ok(result);
+		return R.ok().put("data", hotelMemberLevelService.checkVipStatus(userId, sellerId));
 	}
 
 	/**

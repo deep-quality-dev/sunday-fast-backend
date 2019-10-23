@@ -20,7 +20,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.MD5;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
@@ -47,8 +46,10 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		Object name = params.get("name");
-		IPage<HotelMemberEntity> page = this.page(new Query<HotelMemberEntity>().getPage(params), new QueryWrapper<HotelMemberEntity>().like(name != null, "name", name));
+		Object name = null == params.get("name") ? null : StrUtil.trimToNull(params.get("name").toString());
+		Object tel = null == params.get("tel") ? null : StrUtil.trimToNull(params.get("tel").toString());
+		Object identityNo = null == params.get("identityNo") ? null : StrUtil.trimToNull(params.get("identityNo").toString());
+		IPage<HotelMemberEntity> page = this.page(new Query<HotelMemberEntity>().getPage(params), new QueryWrapper<HotelMemberEntity>().like(name != null, "name", name).like(tel != null, "tel", tel).like(identityNo != null, "identity_no", identityNo));
 		return new PageUtils(page);
 	}
 
@@ -229,7 +230,7 @@ public class HotelMemberServiceImpl extends ServiceImpl<HotelMemberDao, HotelMem
 		}
 		hotelMemberEntity.setPayPwd(SecureUtil.md5(pwd));
 		baseMapper.updateById(hotelMemberEntity);
-		
+
 	}
 
 	@Override

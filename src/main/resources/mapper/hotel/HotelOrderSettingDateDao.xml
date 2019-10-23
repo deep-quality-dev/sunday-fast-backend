@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelOrderSettingDateDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelOrderSettingDateEntity" id="hotelOrderSettingDateMap">
+        <result property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="date" column="date"/>
+        <result property="time" column="time"/>
+        <result property="settingId" column="setting_id"/>
+    </resultMap>
+
+
+</mapper>

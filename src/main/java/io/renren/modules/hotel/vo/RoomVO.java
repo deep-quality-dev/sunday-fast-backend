@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.vo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
@@ -57,4 +58,6 @@ public class RoomVO {
 	 * 价格列表
 	 */
 	List<RoomMoneyVo> amountItems;
+	
+	private List<String> imgs = new ArrayList<String>();
 }

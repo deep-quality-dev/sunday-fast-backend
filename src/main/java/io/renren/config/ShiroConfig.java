@@ -51,6 +51,7 @@ public class ShiroConfig {
 		filterMap.put("/hotel/hotelfriendlink/allList", "anon");
 		filterMap.put("/hotel/hotelhelepmenu/helpMenus", "anon");
 		filterMap.put("/hotel/hotelsystem/info", "anon");
+		filterMap.put("/hotel/messageboard/save", "anon");
 		filterMap.put("/hotel/common/**", "anon");
 		filterMap.put("/swagger/**", "anon");
 		filterMap.put("/v2/api-docs", "anon");

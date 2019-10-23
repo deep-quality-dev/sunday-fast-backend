@@ -45,7 +45,6 @@ public class HotelSystemController {
 	 * 信息
 	 */
 	@RequestMapping("/info")
-	@RequiresPermissions("hotel:hotelsystem:info")
 	public R info() {
 		HotelSystemEntity hotelSystem = hotelSystemService.getOne(Wrappers.lambdaQuery());
 		return R.ok().put("hotelSystem", hotelSystem);

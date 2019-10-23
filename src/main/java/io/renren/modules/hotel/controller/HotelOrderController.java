@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -12,9 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
+import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
+import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
 import io.renren.modules.sys.controller.AbstractController;
 
@@ -30,6 +35,15 @@ import io.renren.modules.sys.controller.AbstractController;
 public class HotelOrderController extends AbstractController {
 	@Autowired
 	private HotelOrderService hotelOrderService;
+
+	@Autowired
+	private HotelOrderRecordService hotelOrderRecordService;
+
+	@RequestMapping("/orderSetting")
+	@RequiresPermissions("hotel:hotelorder:ordersetting")
+	public R orderSetting() {
+		return R.ok();
+	}
 
 	/**
 	 * 列表
@@ -52,7 +66,8 @@ public class HotelOrderController extends AbstractController {
 	@RequiresPermissions("hotel:hotelorder:info")
 	public R info(@PathVariable("id") Integer id) {
 		HotelOrderEntity hotelOrder = hotelOrderService.getById(id);
-
+		List<HotelOrderRecordEntity> records = hotelOrderRecordService.list(Wrappers.<HotelOrderRecordEntity>lambdaQuery().eq(HotelOrderRecordEntity::getOrderId, id));
+		hotelOrder.setRecords(records);
 		return R.ok().put("hotelOrder", hotelOrder);
 	}
 
@@ -88,15 +103,16 @@ public class HotelOrderController extends AbstractController {
 
 		return R.ok();
 	}
-	
+
 	/**
 	 * 订单入住
+	 * 
 	 * @param orderId
 	 * @return
 	 */
 	@PostMapping("/orderCheckIn/{orderId}")
 	@RequiresPermissions("hotel:hotelorder:ordercheckin")
-	public R orderCheckIn(@PathVariable(required = true,name = "orderId") Long orderId) {
+	public R orderCheckIn(@PathVariable(required = true, name = "orderId") Long orderId) {
 		hotelOrderService.orderCheckIn(orderId);
 		return R.ok();
 	}

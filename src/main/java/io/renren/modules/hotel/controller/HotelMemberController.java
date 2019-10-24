@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
+import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
@@ -28,6 +32,22 @@ import io.renren.modules.hotel.service.HotelMemberService;
 public class HotelMemberController {
 	@Autowired
 	private HotelMemberService hotelMemberService;
+
+	/**
+	 * 查询平台会员
+	 * 
+	 * @param kw
+	 * @return
+	 */
+	@RequestMapping("/platformMember")
+	@RequiresPermissions("hotel:hotelmember:platformMember")
+	public R platformMember(String kw) {
+		if (StrUtil.isNotEmpty(kw)) {
+			List<HotelMemberEntity> hotelMemberEntities = hotelMemberService.list(Wrappers.<HotelMemberEntity>lambdaQuery().like(HotelMemberEntity::getName, kw).or().like(HotelMemberEntity::getTel, kw));
+			return R.ok(hotelMemberEntities);
+		}
+		return R.ok();
+	}
 
 	/**
 	 * 用户列表列表

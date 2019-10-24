@@ -197,8 +197,10 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 		List<Long> roomIds = settingRoomStatusForms.getRoomIds();
 
 		// 房型状态设置
-		if (settingRoomStatusForms.getStatus() > 0 && (settingRoomStatusForms.getStatus() == -1 || settingRoomStatusForms.getStatus() == 1)) {
-			baseMapper.updateRoomStatusBatch(roomIds, settingRoomStatusForms.getStatus());
+		if (settingRoomStatusForms.getStatus() >= -1 && settingRoomStatusForms.getStatus() < 2) {
+			if (settingRoomStatusForms.getStatus() != -1) {
+				baseMapper.updateRoomStatusBatch(roomIds, settingRoomStatusForms.getStatus());
+			}
 		} else {
 			throw new RRException("房价状态参数错误");
 		}

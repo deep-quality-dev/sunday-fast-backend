@@ -16,5 +16,7 @@ import java.util.Map;
 public interface HotelLiquidationSettingService extends IService<HotelLiquidationSettingEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+    
+    void saveLiquidationSetting(HotelLiquidationSettingEntity hotelLiquidationSettingEntity);
 }
 

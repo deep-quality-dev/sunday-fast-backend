@@ -83,7 +83,7 @@ public class HotelSellerController extends AbstractController {
 		if (isAdmin()) {
 			return R.ok().put("hotelSeller", new HotelSellerEntity());
 		}
-		HotelSellerEntity hotelSeller = hotelSellerService.getOne(new QueryWrapper<HotelSellerEntity>().eq("user_id", getUserId()).eq("state", 2));
+		HotelSellerEntity hotelSeller = hotelSellerService.getById(getSellerId());
 		return R.ok().put("hotelSeller", hotelSeller);
 	}
 

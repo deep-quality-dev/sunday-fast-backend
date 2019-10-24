@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="io.renren.modules.hotel.dao.HotelOrderSettingDao">
+<mapper
+	namespace="io.renren.modules.hotel.dao.HotelOrderSettingDao">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="io.renren.modules.hotel.entity.HotelOrderSettingEntity" id="hotelOrderSettingMap">
-        <result property="id" column="id"/>
-        <result property="autoOrder" column="auto_order"/>
-        <result property="custSetting" column="cust_setting"/>
-        <result property="createTime" column="create_time"/>
-    </resultMap>
+	<resultMap
+		type="io.renren.modules.hotel.entity.HotelOrderSettingEntity"
+		id="hotelOrderSettingMap">
+		<result property="id" column="id" />
+		<result property="autoOrder" column="auto_order" />
+		<result property="custSetting" column="cust_setting" />
+		<result property="createTime" column="create_time" />
+		<result property="num" column="num" />
+		<result property="sellerId" column="seller_id" />
+	</resultMap>
 
 
 </mapper>

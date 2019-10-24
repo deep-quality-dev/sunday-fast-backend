@@ -14,9 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import io.renren.common.utils.Constant;
+import io.renren.modules.hotel.entity.HotelSellerEmployeeEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
+import io.renren.modules.hotel.service.HotelSellerEmployeeService;
 import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.sys.entity.SysUserEntity;
 
@@ -29,6 +32,9 @@ public abstract class AbstractController {
 
 	@Autowired
 	private HotelSellerService hotelSellerService;
+
+	@Autowired
+	private HotelSellerEmployeeService hotelSellerEmployeeService;
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,10 +51,16 @@ public abstract class AbstractController {
 	}
 
 	protected Long getSellerId() {
+		Long sellerId = 0L;
 		HotelSellerEntity hotelSeller = hotelSellerService.getOne(new QueryWrapper<HotelSellerEntity>().eq("user_id", getUserId()).eq("state", 2));
-		if (null == hotelSeller) {
-			return 0L;
+		if (null != hotelSeller) {
+			return hotelSeller.getId();
 		}
-		return hotelSeller.getId();
+		HotelSellerEmployeeEntity employeeEntity = hotelSellerEmployeeService.getOne(Wrappers.<HotelSellerEmployeeEntity>lambdaQuery().eq(HotelSellerEmployeeEntity::getUserId, getUserId()));
+		if (null != employeeEntity) {
+			return employeeEntity.getSellerId();
+		}
+
+		return sellerId;
 	}
 }

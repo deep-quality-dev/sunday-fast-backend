@@ -19,6 +19,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingEntity;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
 import io.renren.modules.sys.controller.AbstractController;
@@ -38,12 +39,6 @@ public class HotelOrderController extends AbstractController {
 
 	@Autowired
 	private HotelOrderRecordService hotelOrderRecordService;
-
-	@RequestMapping("/orderSetting")
-	@RequiresPermissions("hotel:hotelorder:ordersetting")
-	public R orderSetting() {
-		return R.ok();
-	}
 
 	/**
 	 * 列表

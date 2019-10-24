@@ -112,14 +112,16 @@
 		</if>
 	</select>
 
-	<select id="pageList" resultType="io.renren.modules.hotel.dto.HotelSellerMemberDto">
+	<select id="pageList"
+		resultType="io.renren.modules.hotel.dto.HotelSellerMemberDto">
 		SELECT
 		m.id as user_id,
 		m.gender,
 		temp.id,
 		m.img,
 		m.`name` as nick,
-		(case temp.mobile
+		(case
+		temp.mobile
 		when not null then temp.mobile else m.tel end) as tel,
 		(case temp.name
 		when not null then temp.name else m.zs_name end) as
@@ -135,7 +137,7 @@
 		temp.create_date
 		FROM
 		t_hotel_member m
-		LEFT JOIN
+		INNER JOIN
 		(
 		SELECT
 		t.id,
@@ -154,7 +156,8 @@
 		FROM
 		t_hotel_member_level_detail t
 		INNER JOIN
-		t_hotel_member_level t1 ON t.level_id = t1.id and t.seller_id = #{params.seller_id}
+		t_hotel_member_level t1 ON t.level_id = t1.id and t.seller_id =
+		#{params.seller_id}
 		) temp on m.id = temp.member_id
 		<where>
 			<if test="params.name !=null and params.name!=''">

@@ -1,10 +1,13 @@
 package io.renren.modules.hotel.entity;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
 /**
@@ -36,5 +39,13 @@ public class HotelOrderSettingEntity implements Serializable {
 	 * 
 	 */
 	private Date createTime;
+	
+	private Long sellerId;
+
+	@TableField(exist = false)
+	private List<HotelOrderSettingRoomEntity> rooms;
+
+	@TableField(exist = false)
+	private List<HotelOrderSettingDateEntity> days;
 
 }

@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+
+import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 
 /**
@@ -27,6 +31,7 @@ public class HotelLiquidationSettingEntity implements Serializable {
 	/**
 	 * 周期类型
 	 */
+	@NotBlank(message = "周期类型不能为空")
 	private Integer type;
 	/**
 	 * 值
@@ -35,11 +40,13 @@ public class HotelLiquidationSettingEntity implements Serializable {
 	/**
 	 * 会员订单费率
 	 */
-	private Float vipRate;
+	@NotBlank(message = "会员订单费率不能为空")
+	private BigDecimal vipRate;
 	/**
 	 * 普通费率
 	 */
-	private Float rate;
+	@NotBlank(message = "普通费率不能为空")
+	private BigDecimal rate;
 	/**
 	 * 创建时间
 	 */

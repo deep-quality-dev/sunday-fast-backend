@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import io.renren.modules.hotel.entity.HotelLiquidationSettingEntity;
 import io.renren.modules.hotel.service.HotelLiquidationSettingService;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
-
-
 
 /**
  * 结算设置
@@ -28,63 +28,60 @@ import io.renren.common.utils.R;
 @RestController
 @RequestMapping("hotel/hotelliquidationsetting")
 public class HotelLiquidationSettingController {
-    @Autowired
-    private HotelLiquidationSettingService hotelLiquidationSettingService;
+	@Autowired
+	private HotelLiquidationSettingService hotelLiquidationSettingService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    @RequiresPermissions("hotel:hotelliquidationsetting:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = hotelLiquidationSettingService.queryPage(params);
+	/**
+	 * 列表
+	 */
+	@RequestMapping("/list")
+	@RequiresPermissions("hotel:hotelliquidationsetting:list")
+	public R list(@RequestParam Map<String, Object> params) {
+		PageUtils page = hotelLiquidationSettingService.queryPage(params);
 
-        return R.ok().put("page", page);
-    }
+		return R.ok().put("page", page);
+	}
 
+	/**
+	 * 信息
+	 */
+	@RequestMapping("/info")
+	@RequiresPermissions("hotel:hotelliquidationsetting:info")
+	public R info() {
+		HotelLiquidationSettingEntity hotelLiquidationSetting = hotelLiquidationSettingService.getOne(Wrappers.lambdaQuery());
+		return R.ok().put("hotelLiquidationSetting", hotelLiquidationSetting);
+	}
 
-    /**
-     * 信息
-     */
-    @RequestMapping("/info/{id}")
-    @RequiresPermissions("hotel:hotelliquidationsetting:info")
-    public R info(@PathVariable("id") Long id){
-		HotelLiquidationSettingEntity hotelLiquidationSetting = hotelLiquidationSettingService.getById(id);
+	/**
+	 * 保存
+	 */
+	@RequestMapping("/save")
+	@RequiresPermissions("hotel:hotelliquidationsetting:save")
+	public R save(@RequestBody HotelLiquidationSettingEntity hotelLiquidationSetting) {
+		hotelLiquidationSettingService.saveLiquidationSetting(hotelLiquidationSetting);
+		return R.ok();
+	}
 
-        return R.ok().put("hotelLiquidationSetting", hotelLiquidationSetting);
-    }
-
-    /**
-     * 保存
-     */
-    @RequestMapping("/save")
-    @RequiresPermissions("hotel:hotelliquidationsetting:save")
-    public R save(@RequestBody HotelLiquidationSettingEntity hotelLiquidationSetting){
-		hotelLiquidationSettingService.save(hotelLiquidationSetting);
-
-        return R.ok();
-    }
-
-    /**
-     * 修改
-     */
-    @RequestMapping("/update")
-    @RequiresPermissions("hotel:hotelliquidationsetting:update")
-    public R update(@RequestBody HotelLiquidationSettingEntity hotelLiquidationSetting){
+	/**
+	 * 修改
+	 */
+	@RequestMapping("/update")
+	@RequiresPermissions("hotel:hotelliquidationsetting:update")
+	public R update(@RequestBody HotelLiquidationSettingEntity hotelLiquidationSetting) {
 		hotelLiquidationSettingService.updateById(hotelLiquidationSetting);
 
-        return R.ok();
-    }
+		return R.ok();
+	}
 
-    /**
-     * 删除
-     */
-    @RequestMapping("/delete")
-    @RequiresPermissions("hotel:hotelliquidationsetting:delete")
-    public R delete(@RequestBody Long[] ids){
+	/**
+	 * 删除
+	 */
+	@RequestMapping("/delete")
+	@RequiresPermissions("hotel:hotelliquidationsetting:delete")
+	public R delete(@RequestBody Long[] ids) {
 		hotelLiquidationSettingService.removeByIds(Arrays.asList(ids));
 
-        return R.ok();
-    }
+		return R.ok();
+	}
 
 }

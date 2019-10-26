@@ -16,5 +16,17 @@ import java.util.Map;
 public interface HotelOrderSettingService extends IService<HotelOrderSettingEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存接单设置
+     * @param hotelOrderSetting
+     */
+	void saveOrderSetting(HotelOrderSettingEntity hotelOrderSetting);
+
+	/**
+	 * 修改接单设置
+	 * @param hotelOrderSetting
+	 */
+	void updateOrderSetting(HotelOrderSettingEntity hotelOrderSetting);
 }
 

@@ -12,11 +12,11 @@ import lombok.Data;
  * 
  * @author taoz
  * @email 18819175397@gmail.com
- * @date 2019-10-23 19:16:26
+ * @date 2019-10-26 17:47:02
  */
 @Data
-@TableName("t_hotel_order_setting_date")
-public class HotelOrderSettingDateEntity implements Serializable {
+@TableName("t_hotel_order_notification")
+public class HotelOrderNotificationEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -25,20 +25,28 @@ public class HotelOrderSettingDateEntity implements Serializable {
 	@TableId
 	private Long id;
 	/**
-	 *  1 不适用 2 适用星期 ，3适用时段
+	 * 邮件
 	 */
-	private Integer type;
+	private String email;
+	/**
+	 * 手机
+	 */
+	private String mobile;
+	/**
+	 * 短信开关
+	 */
+	private Integer smsSwitch;
+	/**
+	 * 邮件开关
+	 */
+	private Integer emailSwitch;
+	/**
+	 * pc弹窗开关
+	 */
+	private Integer pcSwitch;
 	/**
 	 * 
 	 */
-	private String date;
-	/**
-	 * 
-	 */
-	private String time;
-	/**
-	 * 
-	 */
-	private Long settingId;
+	private Long sellerId;
 
 }

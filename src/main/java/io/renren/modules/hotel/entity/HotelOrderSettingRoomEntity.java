@@ -27,7 +27,7 @@ public class HotelOrderSettingRoomEntity implements Serializable {
 	/**
 	 * 
 	 */
-	private Integer roomId;
+	private Long roomId;
 	/**
 	 * 
 	 */

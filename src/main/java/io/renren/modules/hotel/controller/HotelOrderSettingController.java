@@ -1,11 +1,11 @@
 package io.renren.modules.hotel.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
-import io.renren.modules.hotel.entity.HotelOrderSettingEntity;
-import io.renren.modules.hotel.service.HotelOrderSettingService;
-import io.renren.modules.sys.controller.AbstractController;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.hotel.entity.HotelOrderSettingDateEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingRoomEntity;
+import io.renren.modules.hotel.service.HotelOrderSettingDateService;
+import io.renren.modules.hotel.service.HotelOrderSettingRoomService;
+import io.renren.modules.hotel.service.HotelOrderSettingService;
+import io.renren.modules.sys.controller.AbstractController;
 
 /**
  * 
@@ -31,6 +35,12 @@ import io.renren.common.utils.R;
 public class HotelOrderSettingController extends AbstractController {
 	@Autowired
 	private HotelOrderSettingService hotelOrderSettingService;
+
+	@Autowired
+	private HotelOrderSettingRoomService hotelOrderSettingRoomService;
+
+	@Autowired
+	private HotelOrderSettingDateService hotelOrderSettingDateService;
 
 	/**
 	 * 列表
@@ -50,7 +60,10 @@ public class HotelOrderSettingController extends AbstractController {
 	@RequiresPermissions("hotel:hotelordersetting:info")
 	public R info() {
 		HotelOrderSettingEntity hotelOrderSetting = hotelOrderSettingService.getOne(Wrappers.<HotelOrderSettingEntity>lambdaQuery().eq(HotelOrderSettingEntity::getSellerId, getSellerId()));
-
+		List<HotelOrderSettingDateEntity> orderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSetting.getId()));
+		hotelOrderSetting.setDays(orderSettingDateEntities);
+		List<HotelOrderSettingRoomEntity> hotelOrderSettingRoomEntities = hotelOrderSettingRoomService.list(Wrappers.<HotelOrderSettingRoomEntity>lambdaQuery().eq(HotelOrderSettingRoomEntity::getSettingId, hotelOrderSetting.getId()));
+		hotelOrderSetting.setRooms(hotelOrderSettingRoomEntities);
 		return R.ok().put("hotelOrderSetting", hotelOrderSetting);
 	}
 
@@ -61,7 +74,7 @@ public class HotelOrderSettingController extends AbstractController {
 	@RequiresPermissions("hotel:hotelordersetting:save")
 	public R save(@RequestBody HotelOrderSettingEntity hotelOrderSetting) {
 		hotelOrderSetting.setSellerId(getSellerId());
-		hotelOrderSettingService.save(hotelOrderSetting);
+		hotelOrderSettingService.saveOrderSetting(hotelOrderSetting);
 		return R.ok();
 	}
 
@@ -71,7 +84,7 @@ public class HotelOrderSettingController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelordersetting:update")
 	public R update(@RequestBody HotelOrderSettingEntity hotelOrderSetting) {
-		hotelOrderSettingService.updateById(hotelOrderSetting);
+		hotelOrderSettingService.updateOrderSetting(hotelOrderSetting);
 
 		return R.ok();
 	}

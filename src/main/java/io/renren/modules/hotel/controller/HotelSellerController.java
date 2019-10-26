@@ -72,8 +72,8 @@ public class HotelSellerController extends AbstractController {
 	@ApiOperation("拒绝审核")
 	@PostMapping("/auditRefuse/{id}")
 	@RequiresPermissions("hotel:hotelseller:auditRefuse")
-	public R auditRefuse(@PathVariable Long id) {
-		hotelSellerService.auditRefuse(id, getUserId());
+	public R auditRefuse(@PathVariable Long id, String reason) {
+		hotelSellerService.auditRefuse(id, getUserId(), reason);
 		return R.ok();
 	}
 

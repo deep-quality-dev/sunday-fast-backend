@@ -134,11 +134,16 @@ public class HotelInfo {
 	private String commentRate = "0.00%";
 
 	private BigDecimal score;
-	
+
 	/**
 	 * 等级类型
 	 */
 	private String levelType;
+
+	/**
+	 * 房价最低金额
+	 */
+	private BigDecimal zdMoney;
 
 	private List<AssessTagEntity> tags;
 }

@@ -81,7 +81,7 @@ public interface HotelSellerService extends IService<HotelSellerEntity> {
 	 * 
 	 * @param id
 	 */
-	void auditRefuse(Long id, Long createUserId);
+	void auditRefuse(Long id, Long createUserId,String reason);
 
 	/**
 	 * 酒店上架

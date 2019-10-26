@@ -49,6 +49,7 @@ public class ShiroConfig {
 		filterMap.put("/pay/**", "anon");
 		filterMap.put("/sys/login", "anon");
 		filterMap.put("/hotel/hotelfriendlink/allList", "anon");
+		filterMap.put("/websocket/**", "anon");
 		filterMap.put("/hotel/hotelhelepmenu/helpMenus", "anon");
 		filterMap.put("/hotel/hotelsystem/info", "anon");
 		filterMap.put("/hotel/messageboard/save", "anon");

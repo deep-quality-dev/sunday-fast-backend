@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -26,6 +28,7 @@ import io.renren.common.exception.RRException;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.constants.CommonConstant;
 import io.renren.modules.hotel.dao.AssessTagDao;
 import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.dao.HotelMemberCollectDao;
@@ -37,7 +40,10 @@ import io.renren.modules.hotel.entity.HotelBrandTypeEntity;
 import io.renren.modules.hotel.entity.HotelMemberCollectEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelTopicEntity;
+import io.renren.modules.hotel.enums.EnumSmsChannelTemplate;
 import io.renren.modules.hotel.form.SellerApplyForm;
+import io.renren.modules.hotel.handler.message.SmsMessageHandler;
+import io.renren.modules.hotel.handler.message.template.MobileMsgTemplate;
 import io.renren.modules.hotel.service.HotelBrandService;
 import io.renren.modules.hotel.service.HotelBrandTypeService;
 import io.renren.modules.hotel.service.HotelFacilityService;
@@ -88,6 +94,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 
 	@Autowired
 	private SysUserDao sysUserDao;
+
+	@Autowired
+	private Map<String, SmsMessageHandler> messageHandlerMap;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -266,7 +275,22 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		// 更新商家信息
 		hotelSellerEntity.setUserId(sysUserEntity.getUserId());
 		this.updateById(hotelSellerEntity);
-		// 给商家发送短信
+		// 给商家发送短信 //TODO
+		JSONObject contextJson = new JSONObject();
+		contextJson.put("name", hotelSellerEntity.getLinkName());
+		contextJson.put("jdname", hotelSellerEntity.getName());
+		contextJson.put("Uname", hotelSellerEntity.getLinkTel());
+		contextJson.put("phone", hotelSellerEntity.getLinkTel().substring(hotelSellerEntity.getLinkTel().length() - 6, hotelSellerEntity.getLinkTel().length()));
+		log.info("短信发送请求消息中心 -> 手机号:{}", hotelSellerEntity.getLinkTel());
+		// TODO 组装数据采用MQ发送
+		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(hotelSellerEntity.getLinkTel(), contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.VALIDATE_CODE.getSignName(), EnumSmsChannelTemplate.SELLER_AUDIT_PASS_CHANNEL.getTemplate());
+		String channel = mobileMsgTemplate.getChannel();
+		SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
+		if (messageHandler == null) {
+			log.error("没有找到指定的路由通道，不进行发送处理完毕！");
+			return;
+		}
+		messageHandler.execute(mobileMsgTemplate);
 	}
 
 	/**
@@ -293,13 +317,27 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 	// 1待审核,2通过，3拒绝
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public void auditRefuse(Long id, Long createUserId) {
+	public void auditRefuse(Long id, Long createUserId, String reason) {
 		HotelSellerEntity hotelSellerEntity = this.getById(id);
 		if (null == hotelSellerEntity) {
 			throw new RRException("未找到数据");
 		}
 		hotelSellerEntity.setState(3);
 		this.updateById(hotelSellerEntity);
+		JSONObject contextJson = new JSONObject();
+		contextJson.put("name", hotelSellerEntity.getLinkName());
+		contextJson.put("jdname", hotelSellerEntity.getName());
+		contextJson.put("Reason", reason);
+		log.info("短信发送请求消息中心 -> 手机号:{}", hotelSellerEntity.getLinkTel());
+		// TODO 组装数据采用MQ发送
+		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(hotelSellerEntity.getLinkTel(), contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.VALIDATE_CODE.getSignName(), EnumSmsChannelTemplate.SELLERAUDITREFUSE_CHANNEL.getTemplate());
+		String channel = mobileMsgTemplate.getChannel();
+		SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
+		if (messageHandler == null) {
+			log.error("没有找到指定的路由通道，不进行发送处理完毕！");
+			return;
+		}
+		messageHandler.execute(mobileMsgTemplate);
 	}
 
 	@Override

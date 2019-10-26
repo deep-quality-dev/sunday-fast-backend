@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.hotel.dao.HotelOrderNotificationDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.hotel.entity.HotelOrderNotificationEntity" id="hotelOrderNotificationMap">
+        <result property="id" column="id"/>
+        <result property="email" column="email"/>
+        <result property="mobile" column="mobile"/>
+        <result property="smsSwitch" column="sms_switch"/>
+        <result property="emailSwitch" column="email_switch"/>
+        <result property="pcSwitch" column="pc_switch"/>
+        <result property="sellerId" column="seller_id"/>
+    </resultMap>
+
+
+</mapper>

@@ -145,4 +145,12 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	void orderCheckIn(Long orderId);
 
 	void orderCheckIn(Long orderId, Long userId);
+
+	/**
+	 * 确认订单
+	 * 
+	 * @param id
+	 * @param sellerId
+	 */
+	void orderAffirm(Long id, Long sellerId);
 }

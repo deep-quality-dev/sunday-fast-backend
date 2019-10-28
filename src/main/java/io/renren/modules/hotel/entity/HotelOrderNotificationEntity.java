@@ -35,15 +35,15 @@ public class HotelOrderNotificationEntity implements Serializable {
 	/**
 	 * 短信开关
 	 */
-	private Integer smsSwitch;
+	private int smsSwitch;
 	/**
 	 * 邮件开关
 	 */
-	private Integer emailSwitch;
+	private int emailSwitch;
 	/**
 	 * pc弹窗开关
 	 */
-	private Integer pcSwitch;
+	private int pcSwitch;
 	/**
 	 * 
 	 */

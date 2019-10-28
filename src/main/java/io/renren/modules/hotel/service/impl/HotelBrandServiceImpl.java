@@ -32,7 +32,13 @@ public class HotelBrandServiceImpl extends ServiceImpl<HotelBrandDao, HotelBrand
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
 		IPage<HotelBrandEntity> page = this.page(new Query<HotelBrandEntity>().getPage(params), new QueryWrapper<HotelBrandEntity>());
-
+		List<HotelBrandEntity> brandEntities = page.getRecords();
+		for (HotelBrandEntity hotelBrandEntity : brandEntities) {
+			HotelBrandTypeEntity brandTypeEntity = hotelBrandTypeDao.selectById(hotelBrandEntity.getTypeId());
+			if (null != brandTypeEntity) {
+				hotelBrandEntity.setTypeName(brandTypeEntity.getName());
+			}
+		}
 		return new PageUtils(page);
 	}
 

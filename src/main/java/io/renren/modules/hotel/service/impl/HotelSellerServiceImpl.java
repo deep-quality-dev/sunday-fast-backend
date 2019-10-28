@@ -275,7 +275,6 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		// 更新商家信息
 		hotelSellerEntity.setUserId(sysUserEntity.getUserId());
 		this.updateById(hotelSellerEntity);
-		// 给商家发送短信 //TODO
 		JSONObject contextJson = new JSONObject();
 		contextJson.put("name", hotelSellerEntity.getLinkName());
 		contextJson.put("jdname", hotelSellerEntity.getName());
@@ -283,7 +282,7 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		contextJson.put("phone", hotelSellerEntity.getLinkTel().substring(hotelSellerEntity.getLinkTel().length() - 6, hotelSellerEntity.getLinkTel().length()));
 		log.info("短信发送请求消息中心 -> 手机号:{}", hotelSellerEntity.getLinkTel());
 		// TODO 组装数据采用MQ发送
-		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(hotelSellerEntity.getLinkTel(), contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.VALIDATE_CODE.getSignName(), EnumSmsChannelTemplate.SELLER_AUDIT_PASS_CHANNEL.getTemplate());
+		MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(hotelSellerEntity.getLinkTel(), contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.SELLER_AUDIT_PASS_CHANNEL.getSignName(), EnumSmsChannelTemplate.SELLER_AUDIT_PASS_CHANNEL.getTemplate());
 		String channel = mobileMsgTemplate.getChannel();
 		SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
 		if (messageHandler == null) {

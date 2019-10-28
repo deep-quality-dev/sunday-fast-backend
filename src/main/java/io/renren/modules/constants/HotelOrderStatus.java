@@ -12,5 +12,6 @@ public interface HotelOrderStatus {
 	public static final int REFUSE_REFUND = 8;
 	public static final int WAIT_CHECK_IN = 9;
 	public static final int WAIT_COMMENT = 10;
+	public static final int WAIT_AFFIRM = 11;
 	// TODO 新增11 逻辑
 }

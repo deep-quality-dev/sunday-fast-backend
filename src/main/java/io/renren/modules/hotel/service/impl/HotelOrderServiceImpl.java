@@ -2,19 +2,19 @@ package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -35,9 +35,12 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.mail.MailUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.constants.CommonConstant;
 import io.renren.modules.constants.HotelOrderStatus;
 import io.renren.modules.constants.HotelWxMsgTemplate;
 import io.renren.modules.constants.OrderTypeConstants;
@@ -54,7 +57,11 @@ import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
 import io.renren.modules.hotel.entity.HotelMemberLevelDetailEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
+import io.renren.modules.hotel.entity.HotelOrderNotificationEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingDateEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingEntity;
+import io.renren.modules.hotel.entity.HotelOrderSettingRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
 import io.renren.modules.hotel.entity.HotelRoomNumEntity;
@@ -62,15 +69,22 @@ import io.renren.modules.hotel.entity.HotelRoomPriceEntity;
 import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelWxConfigEntity;
 import io.renren.modules.hotel.entity.HotelWxTemplateEntity;
+import io.renren.modules.hotel.enums.EnumSmsChannelTemplate;
 import io.renren.modules.hotel.form.BuildOrderForm;
 import io.renren.modules.hotel.form.CreateOrderForm;
+import io.renren.modules.hotel.handler.message.SmsMessageHandler;
+import io.renren.modules.hotel.handler.message.template.MobileMsgTemplate;
 import io.renren.modules.hotel.service.HotelContactsService;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
 import io.renren.modules.hotel.service.HotelMemberCouponsService;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberService;
+import io.renren.modules.hotel.service.HotelOrderNotificationService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
+import io.renren.modules.hotel.service.HotelOrderSettingDateService;
+import io.renren.modules.hotel.service.HotelOrderSettingRoomService;
+import io.renren.modules.hotel.service.HotelOrderSettingService;
 import io.renren.modules.hotel.service.HotelRechargeService;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomNumService;
@@ -83,6 +97,7 @@ import io.renren.modules.hotel.service.HotelWxTemplateService;
 import io.renren.modules.hotel.service.TransactionService;
 import io.renren.modules.hotel.vo.HotelOrderVo;
 import io.renren.modules.hotel.vo.OrderDetail;
+import io.renren.modules.hotel.ws.NotificationServer;
 import io.renren.modules.wx.OrderType;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -147,6 +162,21 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Autowired
 	private HotelInvoiceDao hotelInvoiceDao;
+
+	@Autowired
+	private HotelOrderNotificationService hotelOrderNotificationService;
+
+	@Autowired
+	private HotelOrderSettingService hotelOrderSettingService;
+
+	@Autowired
+	private HotelOrderSettingRoomService hotelOrderSettingRoomService;
+
+	@Autowired
+	private HotelOrderSettingDateService hotelOrderSettingDateService;
+
+	@Autowired
+	private Map<String, SmsMessageHandler> messageHandlerMap;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -326,7 +356,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setContactsId(createOrderForm.getContactsId());
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
 		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
-		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+		hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
 		hotelOrderEntity.setInvoiceId(createOrderForm.getInvoiceId());
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());
@@ -348,9 +378,80 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
 			}
 		}
+		// 查看订单是否需要确认
+		HotelOrderSettingEntity hotelOrderSettingEntity = hotelOrderSettingService.getOne(Wrappers.<HotelOrderSettingEntity>lambdaQuery().eq(HotelOrderSettingEntity::getSellerId, createOrderForm.getSellerId()));
+		if (null != hotelOrderSettingEntity && hotelOrderSettingEntity.getAutoOrder().intValue() == 1) {
+			if (hotelOrderSettingEntity.getCustSetting().intValue() == 2) {
+				// 适用房型
+				List<HotelOrderSettingRoomEntity> hotelOrderSettingRoomEntities = hotelOrderSettingRoomService.list(Wrappers.<HotelOrderSettingRoomEntity>lambdaQuery().eq(HotelOrderSettingRoomEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingRoomEntity::getRoomId, createOrderForm.getRoomId()));
+				if (!CollectionUtil.isNotEmpty(hotelOrderSettingRoomEntities)) {
+					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+				}
+				// 适用时间
+				DateTime now = DateUtil.parse(createOrderForm.getCheckInDate());
+				int day = now.dayOfWeek(); // 1-周日 以此类推
+				List<HotelOrderSettingDateEntity> hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 2).eq(HotelOrderSettingDateEntity::getDate, day));
+				if (!CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
+					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+				}
+				// 不适用时间
+				hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 1).eq(HotelOrderSettingDateEntity::getDate, createOrderForm.getCheckInDate()));
+				if (CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
+					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+				}
+			} else {
+				hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+			}
+		}
+		// 保存订单
 		this.save(hotelOrderEntity);
 		// 保存订单明细
 		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
+
+		ThreadUtil.execute(new Runnable() {
+
+			@Override
+			@SneakyThrows
+			public void run() {
+				// 订单通知
+				HotelOrderNotificationEntity hotelOrderNotificationEntity = hotelOrderNotificationService.getOne(Wrappers.<HotelOrderNotificationEntity>lambdaQuery().eq(HotelOrderNotificationEntity::getSellerId, createOrderForm.getSellerId()));
+				if (null != hotelOrderNotificationEntity) {
+					// 发送短信
+					if (hotelOrderNotificationEntity.getSmsSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getMobile())) {
+						List<String> mobiles = Arrays.asList(hotelOrderNotificationEntity.getMobile().split(","));
+						JSONObject contextJson = new JSONObject();
+						contextJson.put("jdname", hotelOrderEntity.getSellerName());
+						contextJson.put("product", hotelOrderEntity.getRoomType());
+						// TODO 组装数据采用MQ发送
+						for (String mobile : mobiles) {
+							MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(mobile, contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getSignName(), EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getTemplate());
+							String channel = mobileMsgTemplate.getChannel();
+							SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
+							if (messageHandler != null) {
+								messageHandler.execute(mobileMsgTemplate);
+							} else {
+								log.error("没有找到指定的路由通道，不进行发送处理完毕！");
+							}
+						}
+
+					}
+					// 发送邮件
+					if (hotelOrderNotificationEntity.getEmailSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getEmail())) {
+						List<String> emails = Arrays.asList(hotelOrderNotificationEntity.getEmail().split(","));
+						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
+						for (String email : emails) {
+							MailUtil.send(email, "房间预定提醒", emailContent, false);
+						}
+					}
+					// ws通知
+					if (hotelOrderNotificationEntity.getPcSwitch() == 1) {
+						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
+						NotificationServer.sendInfo(emailContent, hotelOrderEntity.getUserId().toString());
+					}
+				}
+
+			}
+		});
 		log.info("创建酒店订单--end,result,orderId:{}", hotelOrderEntity.getId());
 		return hotelOrderEntity;
 	}
@@ -830,6 +931,17 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			throw new RRException("非法操作，订单状态不正确");
 		}
 		hotelOrderEntity.setStatus(HotelOrderStatus.CHECK_IN);
+		baseMapper.updateById(hotelOrderEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void orderAffirm(Long id, Long sellerId) {
+		HotelOrderEntity hotelOrderEntity = baseMapper.selectOne(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getSellerId, sellerId).eq(HotelOrderEntity::getId, id));
+		if (null == hotelOrderEntity) {
+			throw new RRException("非法操作");
+		}
+		hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
 		baseMapper.updateById(hotelOrderEntity);
 	}
 }

@@ -47,7 +47,7 @@ public class HotelOrderNotificationController extends AbstractController {
 	 */
 	@RequestMapping("/info")
 	@RequiresPermissions("hotel:hotelordernotification:info")
-	public R info(@PathVariable("id") Long id) {
+	public R info() {
 		HotelOrderNotificationEntity hotelOrderNotification = hotelOrderNotificationService.getOne(Wrappers.<HotelOrderNotificationEntity>lambdaQuery().eq(HotelOrderNotificationEntity::getSellerId, getSellerId()));
 		return R.ok().put("hotelOrderNotification", hotelOrderNotification);
 	}

@@ -41,6 +41,16 @@ public class HotelOrderController extends AbstractController {
 	private HotelOrderRecordService hotelOrderRecordService;
 
 	/**
+	 * 订单确认
+	 */
+	@RequiresPermissions("hotel:hotelorder:orderaffirm")
+	@PostMapping("/orderAffirm/{id}")
+	public R orderAffirm(@PathVariable Long id) {
+		hotelOrderService.orderAffirm(id, getSellerId());
+		return R.ok();
+	}
+
+	/**
 	 * 列表
 	 */
 	@RequestMapping("/list")

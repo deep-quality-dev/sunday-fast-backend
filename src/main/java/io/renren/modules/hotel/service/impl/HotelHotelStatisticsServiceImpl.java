@@ -48,7 +48,6 @@ public class HotelHotelStatisticsServiceImpl implements HotelHotelStatisticsServ
 
 		StatisticsPlatfrom statisticsPlatfrom = new StatisticsPlatfrom();
 		// 入驻数据
-		System.out.println(CollectionUtil.isNotEmpty(dates));
 		StatisticsApply statisticsApply = new StatisticsApply();
 		int applyNum = hotelSellerDao.selectCount(Wrappers.<HotelSellerEntity>lambdaQuery().eq(HotelSellerEntity::getState, 1).between(CollectionUtil.isNotEmpty(dates), HotelSellerEntity::getTime, DateUtil.parse(dates.get(0)).getTime(), DateUtil.parse(dates.get(1)).getTime()));
 		int passNum = hotelSellerDao.selectCount(Wrappers.<HotelSellerEntity>lambdaQuery().eq(HotelSellerEntity::getState, 2).between(CollectionUtil.isNotEmpty(dates), HotelSellerEntity::getTime, DateUtil.parse(dates.get(0)).getTime(), DateUtil.parse(dates.get(1)).getTime()));

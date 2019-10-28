@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -28,6 +29,9 @@ public class HotelBrandEntity implements Serializable {
 	 * 
 	 */
 	private String name;
+	
+	@TableField(exist = false)
+	private String typeName;
 	/**
 	 * 
 	 */

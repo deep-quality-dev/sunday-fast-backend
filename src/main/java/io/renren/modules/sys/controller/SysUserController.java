@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import io.renren.common.annotation.SysLog;
+import io.renren.common.exception.RRException;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -31,6 +36,7 @@ import io.renren.common.validator.Assert;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.UpdateGroup;
+import io.renren.modules.constants.CommonConstant;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.PasswordForm;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -48,6 +54,9 @@ public class SysUserController extends AbstractController {
 	private SysUserService sysUserService;
 	@Autowired
 	private SysUserRoleService sysUserRoleService;
+
+	@Autowired
+	private RedisTemplate<String, Object> redisTemplate;
 
 	/**
 	 * 所有用户列表
@@ -91,6 +100,24 @@ public class SysUserController extends AbstractController {
 			return R.error("原密码不正确");
 		}
 
+		return R.ok();
+	}
+
+	@PostMapping("/findPwd")
+	public R findPwd(@RequestBody PasswordForm form) {
+		SysUserEntity sysUserEntity = sysUserService.getOne(Wrappers.<SysUserEntity>lambdaQuery().eq(SysUserEntity::getUsername, form.getMobile()));
+		if (null == sysUserEntity) {
+			return R.error("用户信息不存在");
+		}
+		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + form.getMobile());
+		if (tempCode == null || !form.getCode().equals(tempCode.toString())) {
+			throw new RRException("验证码错误");
+		}
+		// sha256加密
+		String salt = RandomStringUtils.randomAlphanumeric(20);
+		sysUserEntity.setPassword(new Sha256Hash(form.getNewPassword(), salt).toHex());
+		sysUserEntity.setSalt(salt);
+		sysUserService.updateById(sysUserEntity);
 		return R.ok();
 	}
 

@@ -25,5 +25,9 @@ public class PasswordForm {
 	 * 新密码
 	 */
 	private String newPassword;
-
+	
+	private String mobile;
+	
+	private String code;
+	
 }

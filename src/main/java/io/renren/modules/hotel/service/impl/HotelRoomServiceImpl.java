@@ -94,7 +94,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			if (StrUtil.isNotEmpty(item.getImg())) {
 				roomVO.setImgs(Arrays.asList(item.getImg().split(",")));
 			}
-			roomVO.setPrice(NumberUtil.decimalFormat("0.00", item.getPrice().doubleValue()));
+			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice()?0:item.getPrice().doubleValue()));
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);

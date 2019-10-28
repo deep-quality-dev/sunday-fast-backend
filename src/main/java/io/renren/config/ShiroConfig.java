@@ -48,6 +48,7 @@ public class ShiroConfig {
 		filterMap.put("/wx/user/**", "anon");
 		filterMap.put("/pay/**", "anon");
 		filterMap.put("/sys/login", "anon");
+		filterMap.put("/sys/user/findPwd", "anon");
 		filterMap.put("/hotel/hotelfriendlink/allList", "anon");
 		filterMap.put("/websocket/**", "anon");
 		filterMap.put("/hotel/hotelhelepmenu/helpMenus", "anon");

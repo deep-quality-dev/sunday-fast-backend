@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,13 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.hutool.core.thread.ThreadUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.R;
+import io.renren.modules.constants.CommonConstant;
 import io.renren.modules.hotel.config.WxMaConfiguration;
 import io.renren.modules.hotel.service.HotelMemberService;
 import io.renren.modules.oss.cloud.OSSFactory;
 import io.renren.modules.oss.entity.SysOssEntity;
 import io.renren.modules.oss.service.SysOssService;
+import io.renren.modules.sys.service.SysCaptchaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
@@ -38,12 +42,50 @@ public class CommonAPI {
 	private HotelMemberService hotelMemberService;
 
 	@Autowired
+	private SysCaptchaService sysCaptchaService;
+
+	@Autowired
 	private SysOssService sysOssService;
+
+	@Autowired
+	private RedisTemplate<String, Object> redisTemplate;
 
 	@ApiOperation("发送验证码")
 	@GetMapping("/sendSmsCode")
 	public R sendSmsCode(String mobile) {
-		hotelMemberService.sendSmsCode(mobile);
+		ThreadUtil.execute(new Runnable() {
+			@Override
+			public void run() {
+				hotelMemberService.sendSmsCode(mobile);
+			}
+		});
+		return R.ok();
+	}
+
+	@ApiOperation("发送验证码")
+	@GetMapping("/smsCode")
+	public R sendSmsCode(String mobile, String uuid, String captchaCode) {
+		boolean captcha = sysCaptchaService.validate(uuid, captchaCode);
+		if (!captcha) {
+			return R.error("验证码不正确");
+		}
+		ThreadUtil.execute(new Runnable() {
+			@Override
+			public void run() {
+				hotelMemberService.sendSmsCode(mobile);
+			}
+		});
+
+		return R.ok();
+	}
+
+	@ApiOperation("校验短信验证码")
+	@GetMapping("/checkSmsCode")
+	public R checkSmsCode(String mobile, String vcode) {
+		Object tempCode = redisTemplate.opsForValue().get(CommonConstant.DEFAULT_CODE_KEY + mobile);
+		if (tempCode == null || !vcode.equals(tempCode.toString())) {
+			throw new RRException("验证码错误");
+		}
 		return R.ok();
 	}
 

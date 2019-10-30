@@ -18,9 +18,18 @@ public interface HotelRoomNumDao extends BaseMapper<HotelRoomNumEntity> {
 
 	/**
 	 * 更新房量
+	 * 
 	 * @param hotelRoomNumEntity
 	 * @param roomNum
 	 */
 	void updateRoomNum(HotelRoomNumEntity params, int roomNum);
+
+	/**
+	 * 查询某天，某房型是否有房
+	 * 
+	 * @param id
+	 * @param time
+	 */
+	int hasRoomNumWithDay(Long roomId, long time);
 
 }

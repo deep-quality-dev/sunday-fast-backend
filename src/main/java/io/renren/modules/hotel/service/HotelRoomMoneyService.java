@@ -31,4 +31,5 @@ public interface HotelRoomMoneyService extends IService<HotelRoomMoneyEntity> {
 	 * @param hotelRoomMoney
 	 */
 	void saveRoomMoney(HotelRoomMoneyEntity hotelRoomMoney);
+
 }

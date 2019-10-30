@@ -50,7 +50,7 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 	}
 
 	@Override
-	public RoomPriceVo roomPrice(Long sellerId, String startDate, String endDate, Page page) {
+	public RoomPriceVo roomPrice(Long sellerId, String startDate, String endDate, int roomType, Page page) {
 		RoomPriceVo roomPriceVo = new RoomPriceVo();
 		// 加载区间日期
 		List<String> dates = findDates(startDate, endDate);
@@ -59,7 +59,7 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 		List<Map<String, Object>> roomDataList = new ArrayList<Map<String, Object>>();
 		Map<String, Object> roomData = null;
 		HotelRoomPriceEntity roomPriceEntity = null;
-		List<HotelRoomEntity> hotelRoomEntities = hotelRoomDao.selectList(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getState, 1));
+		List<HotelRoomEntity> hotelRoomEntities = hotelRoomDao.selectList(Wrappers.<HotelRoomEntity>lambdaQuery().eq(HotelRoomEntity::getSellerId, sellerId).eq(HotelRoomEntity::getClassify, roomType));
 		for (HotelRoomEntity hotelRoomEntity : hotelRoomEntities) {
 			List<HotelRoomMoneyEntity> hotelRoomMoneyEntities = hotelRoomMoneyDao.selectList(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, hotelRoomEntity.getId()));
 			for (HotelRoomMoneyEntity hotelRoomMoneyEntity : hotelRoomMoneyEntities) {
@@ -112,7 +112,7 @@ public class HotelRoomPriceServiceImpl extends ServiceImpl<HotelRoomPriceDao, Ho
 		Object priceId = params.get("priceId");
 		String money = params.get("money").toString();
 		HotelRoomPriceEntity roomPriceEntity = this.getOne(Wrappers.<HotelRoomPriceEntity>lambdaQuery().eq(HotelRoomPriceEntity::getMoneyId, priceId).eq(HotelRoomPriceEntity::getRoomdate, DateUtil.parse(date).getTime()));
-		if(null == roomPriceEntity) {
+		if (null == roomPriceEntity) {
 			HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyDao.selectById(Long.valueOf(priceId.toString()));
 			roomPriceEntity = new HotelRoomPriceEntity();
 			roomPriceEntity.setMprice(new BigDecimal(money));

@@ -75,4 +75,18 @@ public interface HotelRoomService extends IService<HotelRoomEntity> {
 	 * @param settingRoomStatusForms
 	 */
 	void settingRoomStatusBatch(Long sellerId, SettingRoomStatusForm settingRoomStatusForms);
+
+	/**
+	 * 房间开关
+	 * @param roomId
+	 * @param status
+	 */
+	void roomSwitch(Long roomId, int status,String date);
+
+	/**
+	 * 价格开关
+	 * @param moenyId
+	 * @param status
+	 */
+	void moneySwitch(Long roomId, int status,String date);
 }

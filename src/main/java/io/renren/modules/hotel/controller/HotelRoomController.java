@@ -8,6 +8,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
 import io.renren.modules.hotel.entity.HotelRoomMoneyEntity;
+import io.renren.modules.hotel.form.RoomSwitchForm;
 import io.renren.modules.hotel.form.SettingRoomStatusForm;
 import io.renren.modules.hotel.service.HotelRoomMoneyService;
 import io.renren.modules.hotel.service.HotelRoomService;
@@ -40,6 +42,18 @@ public class HotelRoomController extends AbstractController {
 
 	@Autowired
 	private HotelRoomMoneyService hotelRoomMoneyService;
+
+	@PostMapping("/roomSwitch")
+	public R roomSwitch(@RequestBody RoomSwitchForm switchForm) {
+		hotelRoomService.roomSwitch(switchForm.getId(), switchForm.getStatus(),switchForm.getDate());
+		return R.ok();
+	}
+
+	@PostMapping("/moneySwitch")
+	public R moneySwitch(@RequestBody RoomSwitchForm switchForm) {
+		hotelRoomService.moneySwitch(switchForm.getId(), switchForm.getStatus(),switchForm.getDate());
+		return R.ok();
+	}
 
 	/**
 	 * 批量设置房态

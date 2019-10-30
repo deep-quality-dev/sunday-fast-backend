@@ -29,7 +29,7 @@ import io.renren.modules.sys.controller.AbstractController;
 public class HotelRoomMoneyController extends AbstractController {
 	@Autowired
 	private HotelRoomMoneyService hotelRoomMoneyService;
-
+	
 	/**
 	 * 列表
 	 */

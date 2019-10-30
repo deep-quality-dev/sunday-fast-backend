@@ -29,7 +29,7 @@ public interface HotelRoomNumService extends IService<HotelRoomNumEntity> {
 	 * @param page
 	 * @return
 	 */
-	RoomNumVo roomNumData(Long sellerId, String startDate, String endDate, Page page);
+	RoomNumVo roomNumData(Long sellerId, String startDate, String endDate,int roomType, Page page);
 
 	/**
 	 * 更新制定日期的房量

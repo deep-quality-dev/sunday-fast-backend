@@ -94,7 +94,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			if (StrUtil.isNotEmpty(item.getImg())) {
 				roomVO.setImgs(Arrays.asList(item.getImg().split(",")));
 			}
-			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice()?0:item.getPrice().doubleValue()));
+			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice() ? 0 : item.getPrice().doubleValue()));
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);
@@ -256,6 +256,47 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			lDate.add(DateUtil.formatDate(calBegin.getTime()));
 		}
 		return lDate;
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void roomSwitch(Long roomId, int status, String date) {
+		if (status < 0 || status > 1) {
+			throw new RRException("参数错误");
+		}
+		// 关闭指定日期价格
+		List<HotelRoomMoneyEntity> hotelRoomMoneyEntities = hotelRoomMoneyService.list(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, roomId));
+		for (HotelRoomMoneyEntity hotelRoomMoneyEntity : hotelRoomMoneyEntities) {
+			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumService.getOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, roomId).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(date).getTime()));
+			if (null == hotelRoomNumEntity) {
+				hotelRoomNumEntity = new HotelRoomNumEntity();
+				hotelRoomNumEntity.setDateday(DateUtil.parse(date).getTime());
+				hotelRoomNumEntity.setMoneyId(hotelRoomMoneyEntity.getId());
+				hotelRoomNumEntity.setNums(hotelRoomMoneyEntity.getNum());
+				hotelRoomNumEntity.setRid(roomId);
+			}
+			hotelRoomNumEntity.setStatus(status);
+			hotelRoomNumService.saveOrUpdate(hotelRoomNumEntity);
+		}
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void moneySwitch(Long moenyId, int status, String date) {
+		if (status < 0 || status > 1) {
+			throw new RRException("参数错误");
+		}
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(moenyId);
+		HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumService.getOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, hotelRoomMoneyEntity.getRoomId()).eq(HotelRoomNumEntity::getMoneyId, hotelRoomMoneyEntity.getId()).eq(HotelRoomNumEntity::getDateday, DateUtil.parse(date).getTime()));
+		if (null == hotelRoomNumEntity) {
+			hotelRoomNumEntity = new HotelRoomNumEntity();
+			hotelRoomNumEntity.setDateday(DateUtil.parse(date).getTime());
+			hotelRoomNumEntity.setMoneyId(hotelRoomMoneyEntity.getId());
+			hotelRoomNumEntity.setRid(hotelRoomMoneyEntity.getRoomId());
+		}
+		hotelRoomNumEntity.setStatus(status);
+		hotelRoomNumService.saveOrUpdate(hotelRoomNumEntity);
+
 	}
 
 }

@@ -17,6 +17,8 @@
 		<result property="isVip" column="is_vip" />
 		<result property="prepay" column="prepay" />
 		<result property="integral" column="integral" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
 	</resultMap>
 
 	<update id="updateRoomNum">

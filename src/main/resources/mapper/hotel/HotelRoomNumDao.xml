@@ -12,11 +12,14 @@
 		<result property="nums" column="nums" />
 		<result property="dateday" column="dateday" />
 		<result property="moneyId" column="money_id" />
+		<result property="status" column="status" />
 	</resultMap>
 	<update id="updateRoomNum">
 		update t_hotel_room_num t set t.nums =
 		t.nums+#{roomNum} where t.id = #{params.id} and t.nums =
 		#{params.nums}
 	</update>
-
+	<select id="hasRoomNumWithDay" resultType="int">
+		SELECT count(*) FROM t_hotel_room_num t where t.rid =#{roomId} and t.dateday=#{time}  and (t.nums &lt; 1 or t.`status` =0)
+	</select>
 </mapper>

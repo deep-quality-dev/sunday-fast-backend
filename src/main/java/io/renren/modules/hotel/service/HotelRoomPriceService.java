@@ -22,17 +22,19 @@ public interface HotelRoomPriceService extends IService<HotelRoomPriceEntity> {
 
 	/**
 	 * 房价维护
-	 * @param sellerId 
+	 * 
+	 * @param sellerId
 	 * 
 	 * @param startDate
 	 * @param endDate
 	 * @param page
 	 * @return
 	 */
-	RoomPriceVo roomPrice(Long sellerId, String startDate, String endDate, Page page);
+	RoomPriceVo roomPrice(Long sellerId, String startDate, String endDate, int roomType, Page page);
 
 	/**
 	 * 修改某一天的房价
+	 * 
 	 * @param params
 	 */
 	void update4Day(Map<String, Object> params);

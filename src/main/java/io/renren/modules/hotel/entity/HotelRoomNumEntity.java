@@ -42,4 +42,9 @@ public class HotelRoomNumEntity implements Serializable {
 	 */
 	private Long moneyId;
 
+	/**
+	 * 价格状态 0 关闭，1启用
+	 */
+	private int status = 1;
+
 }

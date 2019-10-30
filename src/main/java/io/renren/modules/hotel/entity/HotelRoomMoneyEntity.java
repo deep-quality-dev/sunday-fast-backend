@@ -41,7 +41,6 @@ public class HotelRoomMoneyEntity implements Serializable {
 	 * 价格
 	 */
 	private BigDecimal price;
-	
 
 	private int num;
 	/**
@@ -57,10 +56,20 @@ public class HotelRoomMoneyEntity implements Serializable {
 	 * 预付标示
 	 */
 	private int prepay = 0;
-	
+
 	/**
 	 * 积分换房
 	 */
 	private BigDecimal integral;
+
+	/**
+	 * 钟点房开始时间
+	 */
+	private String startTime;
+
+	/**
+	 * 钟点房结束时间
+	 */
+	private String endTime;
 
 }

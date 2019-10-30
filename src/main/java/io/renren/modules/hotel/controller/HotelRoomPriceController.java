@@ -49,7 +49,7 @@ public class HotelRoomPriceController extends AbstractController {
 	 */
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelroomprice:list")
-	public R list(@RequestParam String startDate, @RequestParam String endDate) {
+	public R list(@RequestParam String startDate, @RequestParam String endDate, int roomType) {
 //		PageUtils page = hotelRoomPriceService.queryPage(params);
 		int page = 1;
 		int limt = 10;
@@ -57,7 +57,7 @@ public class HotelRoomPriceController extends AbstractController {
 		if (!isAdmin()) {
 			sellerId = getSellerId();
 		}
-		RoomPriceVo roomPriceVo = hotelRoomPriceService.roomPrice(sellerId, startDate, endDate, new Page(page, limt));
+		RoomPriceVo roomPriceVo = hotelRoomPriceService.roomPrice(sellerId, startDate, endDate,roomType, new Page(page, limt));
 		return R.ok(roomPriceVo);
 	}
 

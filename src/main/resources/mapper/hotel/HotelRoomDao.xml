@@ -29,6 +29,7 @@
 		<result property="state" column="state" />
 		<result property="classify" column="classify" />
 		<result property="rzTime" column="rz_time" />
+		<result property="discounts" column="discounts" />
 	</resultMap>
 
 	<update id="updateRoomNum">

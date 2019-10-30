@@ -9,7 +9,7 @@ import lombok.Data;
 public class RoomVO {
 
 	private Long id;
-	
+
 	private String name;
 
 	private String amount;
@@ -43,21 +43,23 @@ public class RoomVO {
 	 * 床型尺寸
 	 */
 	private String size;
-	
+
 	/**
 	 * 最低价格
 	 */
 	private String price;
-	
+
 	/**
 	 * 是否有房
 	 */
 	private boolean hasRoom;
 
+	private int discounts;
+
 	/**
 	 * 价格列表
 	 */
 	List<RoomMoneyVo> amountItems;
-	
+
 	private List<String> imgs = new ArrayList<String>();
 }

@@ -41,6 +41,10 @@ sms:
     channels:
       loginCodeChannel: SMS_162220476
       validateCode: SMS_171858888
+      sellerAuditPassChannel: SMS_175532441
+      sellerAuditRefuseChannel: SMS_175532443
+      sellerReserveSuccessChannel: SMS_175532453
+      sellerReserveCancelCHannel: SMS_175537478
 fdfs:
   file-host: http://photo.xqtinfo.cn/
   tracker-list: 

@@ -213,4 +213,14 @@ public class HotelSellerEntity implements Serializable {
 
 	private int enabled = 1;
 
+	/**
+	 * 地铁周边
+	 */
+	private int metro = 0;
+
+	/**
+	 * 餐饮
+	 */
+	private int repast = 0;
+
 }

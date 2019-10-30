@@ -29,4 +29,14 @@ public class HotelItemVo {
 	private BigDecimal score;
 
 	private String levelType;
+	
+	/**
+	 * 地铁周边
+	 */
+	private int metro = 0;
+
+	/**
+	 * 餐饮
+	 */
+	private int repast = 0;
 }

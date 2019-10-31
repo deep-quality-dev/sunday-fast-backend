@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -95,13 +96,15 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 				roomVO.setImgs(Arrays.asList(item.getImg().split(",")));
 			}
 			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice() ? 0 : item.getPrice().doubleValue()));
+
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);
-			int nums = roomMoneyVos.stream().mapToInt(RoomMoneyVo::getHasRoom).sum();
-			// 日期区间是否有满房情况
-			int result = hotelRoomNumDao.selectCount(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getId()).between(HotelRoomNumEntity::getDateday, DateUtil.parse(startTime).getTime(), DateUtil.parse(endTime).getTime()).lt(HotelRoomNumEntity::getNums, 1));
-			roomVO.setHasRoom(result == 0 && nums > 0);
+			int nums = 0;
+			if (CollectionUtil.isNotEmpty(roomMoneyVos)) {
+				nums = roomMoneyVos.stream().mapToInt(RoomMoneyVo::getHasRoom).sum();
+			}
+			roomVO.setHasRoom(nums > 0);
 			return roomVO;
 		}).collect(Collectors.toList());
 		log.debug("获取酒店房型列表--end,result:{}", JSON.toJSONString(roomVOs));
@@ -112,7 +115,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 	public List<RoomMoneyVo> roomMoneys(HotelMemberLevelEntity memberLevelEntity, List<HotelMemberLevelEntity> hotelMemberLevelEntities, Long roomId, Date startTime, Date endTime) {
 		log.debug("查询酒店房价列表--start，roomId:{},startTime:{},endTime:{}", roomId, startTime, endTime);
 		List<RoomMoneyVo> roomMoneyVos = new ArrayList<RoomMoneyVo>();
-		List<HotelRoomMoneyEntity> moneyEntities = hotelRoomMoneyService.list(new QueryWrapper<HotelRoomMoneyEntity>().eq("room_id", roomId).eq("status", 1));
+		List<HotelRoomMoneyEntity> moneyEntities = hotelRoomMoneyService.list(new QueryWrapper<HotelRoomMoneyEntity>().eq("room_id", roomId));
 		roomMoneyVos = moneyEntities.stream().map((HotelRoomMoneyEntity item) -> {
 			RoomMoneyVo roomMoneyVo = new RoomMoneyVo();
 			// 先set会员价格
@@ -122,12 +125,20 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			roomMoneyVo.setName(item.getName());
 			roomMoneyVo.setVipPrice(item.getIsVip());
 			roomMoneyVo.setPrepay(item.getPrepay());
-			roomMoneyVo.setHasRoom(item.getNum());
-			// 查询特殊房量
-			HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getRoomId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
-			if (null != hotelRoomNumEntity) {
-				roomMoneyVo.setHasRoom(hotelRoomNumEntity.getNums());
+
+			// 日期区间是否有满房情况 canReserve 大于0 说明时间点 有小于1 的价格数量或者手动设置为满房
+			int canReserve = hotelRoomNumDao.hasRoomMoneyNumWithBetweenDay(item.getId(), startTime.getTime(), endTime.getTime());
+			// 区间不存在满房情况
+			if (canReserve == 0) {
+				// 查询特殊房量
+				HotelRoomNumEntity hotelRoomNumEntity = hotelRoomNumDao.selectOne(Wrappers.<HotelRoomNumEntity>lambdaQuery().eq(HotelRoomNumEntity::getRid, item.getRoomId()).eq(HotelRoomNumEntity::getDateday, startTime.getTime()).eq(HotelRoomNumEntity::getMoneyId, item.getId()));
+				if (null != hotelRoomNumEntity) {
+					roomMoneyVo.setHasRoom(hotelRoomNumEntity.getNums());
+				}
+			} else {
+				roomMoneyVo.setHasRoom(0);
 			}
+
 			// 查询是否有设置特殊价格
 			log.debug("查询特殊房价--start，moneyId:{},roomId:{},date:{}", item.getId(), roomId, startTime.getTime());
 			HotelRoomPriceEntity hotelRoomPriceEntity = hotelRoomPriceService.getOne(new QueryWrapper<HotelRoomPriceEntity>().eq("money_id", item.getId()).eq("room_id", roomId).eq("roomdate", startTime.getTime()));

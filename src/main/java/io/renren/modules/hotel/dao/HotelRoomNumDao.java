@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.dao;
 
+import java.util.Date;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -31,5 +33,21 @@ public interface HotelRoomNumDao extends BaseMapper<HotelRoomNumEntity> {
 	 * @param time
 	 */
 	int hasRoomNumWithDay(Long roomId, long time);
+
+	/**
+	 * 查询区间日期，某房型是否有房
+	 * 
+	 * @param id
+	 * @param time
+	 */
+	int hasRoomNumWithBetweenDay(Long roomId, long startTime, long endTime);
+
+	/**
+	 * 查询区间日期，某价格房间是否有房
+	 * 
+	 * @param moneyId
+	 * @param time
+	 */
+	int hasRoomMoneyNumWithBetweenDay(Long moneyId, long startTime, long endTime);
 
 }

@@ -18,7 +18,7 @@
 	</select>
 	
 	<select id="queryByUserName" resultType="io.renren.modules.sys.entity.SysUserEntity">
-		select * from sys_user where username = #{username}
+		select * from sys_user where username = #{username} or mobile = #{username}
 	</select>
 
 </mapper>

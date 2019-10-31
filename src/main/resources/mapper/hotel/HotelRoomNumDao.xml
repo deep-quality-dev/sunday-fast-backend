@@ -22,4 +22,11 @@
 	<select id="hasRoomNumWithDay" resultType="int">
 		SELECT count(*) FROM t_hotel_room_num t where t.rid =#{roomId} and t.dateday=#{time}  and (t.nums &lt; 1 or t.`status` =0)
 	</select>
+	
+	<select id="hasRoomNumWithBetweenDay" resultType="int">
+		SELECT count(*) FROM t_hotel_room_num t where t.rid =#{roomId} and t.dateday BETWEEN #{startTime} and #{endTime} and (t.nums &lt; 1 or t.`status` =0)
+	</select>
+	<select id="hasRoomMoneyNumWithBetweenDay" resultType="int">
+		SELECT count(*) FROM t_hotel_room_num t where t.money_id =#{moneyId} and t.dateday BETWEEN #{startTime} and #{endTime} and (t.nums &lt; 1 or t.`status` =0)
+	</select>
 </mapper>

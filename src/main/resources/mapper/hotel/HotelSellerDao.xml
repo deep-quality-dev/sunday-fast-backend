@@ -57,6 +57,8 @@
 		<result property="reserveRemind" column="reserve_remind" />
 		<result property="metro" column="metro" />
 		<result property="repast" column="repast" />
+		<result property="balance" column="balance" />
+		<result property="freezeBalance" column="freeze_balance" />
 	</resultMap>
 
 	<select id="hotelPage"
@@ -67,13 +69,15 @@
 		SELECT count(*) FROM
 		t_hotel_assess a WHERE a.seller_id=t.id) AS
 		comment_count,
-		bt.name as levelType,
+		bt.name as
+		levelType,
 		(6371*acos(cos(radians(#{params.latitude}))*cos(radians(t.lat))*cos(radians(t.lnt)-radians(#{params.longitude}))+sin(radians(#{params.latitude}))*sin(radians(lat))))
 		AS distance FROM t_hotel_seller t INNER JOIN (
 		SELECT
 		t.seller_id,MIN(t.price) AS price FROM t_hotel_room_money t GROUP BY
 		t.seller_id) t1 ON t.id=t1.seller_id
-		left join t_hotel_brand b on t.brand_id = b.id
+		left join t_hotel_brand b on
+		t.brand_id = b.id
 		left join t_hotel_brand_type bt on b.type_id = bt.id
 		<where>
 			and t.enabled = 1

@@ -26,7 +26,7 @@ public interface HotelWithdrawalService extends IService<HotelWithdrawalEntity> 
 	 * @param sellerId
 	 * @return
 	 */
-	BigDecimal withdrawalApplyData(Long sellerId);
+	Map<String, Object> withdrawalApplyData(Long sellerId);
 
 	/**
 	 * 提交提现申请

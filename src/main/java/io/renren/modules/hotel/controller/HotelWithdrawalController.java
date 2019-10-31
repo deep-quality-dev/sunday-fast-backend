@@ -1,7 +1,7 @@
 package io.renren.modules.hotel.controller;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.hotel.entity.HotelSellerEntity;
 import io.renren.modules.hotel.entity.HotelWithdrawalEntity;
 import io.renren.modules.hotel.form.WithdrawalApplyForm;
+import io.renren.modules.hotel.service.HotelSellerService;
 import io.renren.modules.hotel.service.HotelWithdrawalService;
 import io.renren.modules.sys.controller.AbstractController;
 
@@ -34,6 +36,9 @@ public class HotelWithdrawalController extends AbstractController {
 	@Autowired
 	private HotelWithdrawalService hotelWithdrawalService;
 
+	@Autowired
+	private HotelSellerService hotelSellerService;
+
 	/**
 	 * 提现申请数据
 	 * 
@@ -42,8 +47,8 @@ public class HotelWithdrawalController extends AbstractController {
 	@GetMapping("/withdrawalApplyData")
 	@RequiresPermissions("hotel:hotelwithdrawal:withdrawalapplydata")
 	public R withdrawalApplyData() {
-		BigDecimal amount = hotelWithdrawalService.withdrawalApplyData(getSellerId());
-		return R.ok().put("data", amount);
+		Map<String, Object> datas = hotelWithdrawalService.withdrawalApplyData(getSellerId());
+		return R.ok().put("data", datas);
 	}
 
 	/**
@@ -76,8 +81,15 @@ public class HotelWithdrawalController extends AbstractController {
 	@RequestMapping("/list")
 	@RequiresPermissions("hotel:hotelwithdrawal:list")
 	public R list(@RequestParam Map<String, Object> params) {
+		if (!isAdmin()) {
+			params.put("seller_id", getSellerId());
+		}
 		PageUtils page = hotelWithdrawalService.queryPage(params);
-
+		List<HotelWithdrawalEntity> hotelWithdrawalEntities = (List<HotelWithdrawalEntity>) page.getList();
+		for (HotelWithdrawalEntity hotelWithdrawalEntity : hotelWithdrawalEntities) {
+			HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelWithdrawalEntity.getSellerId());
+			hotelWithdrawalEntity.setSellerName(hotelSellerEntity.getName());
+		}
 		return R.ok().put("page", page);
 	}
 

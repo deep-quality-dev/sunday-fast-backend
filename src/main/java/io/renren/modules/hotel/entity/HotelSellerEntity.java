@@ -223,4 +223,14 @@ public class HotelSellerEntity implements Serializable {
 	 */
 	private int repast = 0;
 
+	/**
+	 * 商家余额
+	 */
+	private BigDecimal balance;
+
+	/**
+	 * 冻结余额
+	 */
+	private BigDecimal freezeBalance;
+
 }

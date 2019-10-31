@@ -1,6 +1,7 @@
 package io.renren.modules.hotel.service.impl;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,21 +38,34 @@ public class HotelWithdrawalServiceImpl extends ServiceImpl<HotelWithdrawalDao, 
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
-		IPage<HotelWithdrawalEntity> page = this.page(new Query<HotelWithdrawalEntity>().getPage(params), new QueryWrapper<HotelWithdrawalEntity>());
+		Object sellerName = params.get("sellerName");
+		IPage<HotelWithdrawalEntity> page = this.page(new Query<HotelWithdrawalEntity>().getPage(params), new QueryWrapper<HotelWithdrawalEntity>().eq(null != params.get("seller_id"), "seller_id", params.get("seller_id")).like(null != sellerName, "name", sellerName));
 
 		return new PageUtils(page);
 	}
 
 	@Override
-	public BigDecimal withdrawalApplyData(Long sellerId) {
-		BigDecimal amount = new BigDecimal(0);
-		return amount;
+	public Map<String, Object> withdrawalApplyData(Long sellerId) {
+		Map<String, Object> datas = new HashMap<String, Object>();
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
+		datas.put("amount", hotelSellerEntity.getBalance());
+		// 系统最低提现金额
+		datas.put("system", "0.00");
+		datas.put("rate", "0.00");
+		HotelSystemEntity hotelSystemEntity = hotelSystemService.getOne(Wrappers.lambdaQuery());
+		if (null != hotelSystemEntity) {
+			datas.put("system", hotelSystemEntity.getZdMoney());
+			datas.put("rate", hotelSystemEntity.getTxSxf());
+		}
+
+		return datas;
 	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public void withdrawalApply(Long sellerId, WithdrawalApplyForm withdrawalApplyForm) {
-		BigDecimal canWitdhDrawal = this.withdrawalApplyData(sellerId);
+		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
+		BigDecimal canWitdhDrawal = hotelSellerEntity.getBalance();
 		if (NumberUtil.compare(withdrawalApplyForm.getAmount().doubleValue(), canWitdhDrawal.doubleValue()) == 1) {
 			throw new RRException("提现金额大于可提现金额");
 		}
@@ -61,7 +75,6 @@ public class HotelWithdrawalServiceImpl extends ServiceImpl<HotelWithdrawalDao, 
 				throw new RRException("提现金额不能低于系统提现金额：" + hotelSystemEntity.getZdMoney().doubleValue());
 			}
 		}
-		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(sellerId);
 		HotelWithdrawalEntity hotelWithdrawalEntity = new HotelWithdrawalEntity();
 		hotelWithdrawalEntity.setEnabled(1);
 		hotelWithdrawalEntity.setName(hotelSellerEntity.getLinkName() + "-" + hotelSellerEntity.getName());
@@ -71,13 +84,19 @@ public class HotelWithdrawalServiceImpl extends ServiceImpl<HotelWithdrawalDao, 
 		hotelWithdrawalEntity.setTime(DateUtil.now());
 		hotelWithdrawalEntity.setUsername(withdrawalApplyForm.getAccount());
 		hotelWithdrawalEntity.setWithdrawCost(withdrawalApplyForm.getAmount()); // 实际金额
-		//
 		hotelWithdrawalEntity.setRealityCost(withdrawalApplyForm.getAmount());
+		// 计算手续费
 		if (null != hotelSystemEntity) {
-			hotelWithdrawalEntity.setRealityCost(NumberUtil.mul(withdrawalApplyForm.getAmount(), NumberUtil.sub(1, new BigDecimal(hotelSystemEntity.getTxSxf()))));
+			BigDecimal realityCost = NumberUtil.sub(withdrawalApplyForm.getAmount(), NumberUtil.div(withdrawalApplyForm.getAmount(), new BigDecimal(hotelSystemEntity.getTxSxf())));
+			hotelWithdrawalEntity.setRealityCost(realityCost);
+			if (null != hotelSystemEntity) {
+				hotelWithdrawalEntity.setRealityCost(NumberUtil.mul(withdrawalApplyForm.getAmount(), NumberUtil.sub(1, new BigDecimal(hotelSystemEntity.getTxSxf()))));
+			}
 		}
 		hotelWithdrawalEntity.setRate(new BigDecimal(hotelSystemEntity.getTxSxf()).floatValue());
 		baseMapper.insert(hotelWithdrawalEntity);
+		hotelSellerEntity.setBalance(NumberUtil.sub(hotelSellerEntity.getBalance(), withdrawalApplyForm.getAmount()));
+		hotelSellerService.updateById(hotelSellerEntity);
 	}
 
 	@Override

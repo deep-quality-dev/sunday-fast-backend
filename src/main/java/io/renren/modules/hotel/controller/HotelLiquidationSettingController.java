@@ -68,8 +68,7 @@ public class HotelLiquidationSettingController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelliquidationsetting:update")
 	public R update(@RequestBody HotelLiquidationSettingEntity hotelLiquidationSetting) {
-		hotelLiquidationSettingService.updateById(hotelLiquidationSetting);
-
+		hotelLiquidationSettingService.saveLiquidationSetting(hotelLiquidationSetting);
 		return R.ok();
 	}
 

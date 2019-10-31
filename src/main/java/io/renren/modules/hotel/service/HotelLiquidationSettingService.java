@@ -15,8 +15,19 @@ import java.util.Map;
  */
 public interface HotelLiquidationSettingService extends IService<HotelLiquidationSettingEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
-    
-    void saveLiquidationSetting(HotelLiquidationSettingEntity hotelLiquidationSettingEntity);
-}
+	PageUtils queryPage(Map<String, Object> params);
 
+	/**
+	 * 添加结算设置
+	 * 
+	 * @param hotelLiquidationSettingEntity
+	 */
+	void saveLiquidationSetting(HotelLiquidationSettingEntity hotelLiquidationSettingEntity);
+
+	/**
+	 * 修改结算设置
+	 * 
+	 * @param hotelLiquidationSetting
+	 */
+	void updateLiquidationSetting(HotelLiquidationSettingEntity hotelLiquidationSetting);
+}

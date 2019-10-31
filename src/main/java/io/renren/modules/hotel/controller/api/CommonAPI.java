@@ -19,11 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.json.JSONObject;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.R;
 import io.renren.modules.constants.CommonConstant;
 import io.renren.modules.hotel.config.WxMaConfiguration;
 import io.renren.modules.hotel.service.HotelMemberService;
+import io.renren.modules.hotel.ws.NotificationServer;
 import io.renren.modules.oss.cloud.OSSFactory;
 import io.renren.modules.oss.entity.SysOssEntity;
 import io.renren.modules.oss.service.SysOssService;
@@ -49,6 +51,15 @@ public class CommonAPI {
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
+
+	@GetMapping("/testWs")
+	@SneakyThrows
+	public R testWs(String id) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("orderId", 1);
+		NotificationServer.sendInfo(jsonObject.toString(), id);
+		return R.ok();
+	}
 
 	@ApiOperation("发送验证码")
 	@GetMapping("/sendSmsCode")

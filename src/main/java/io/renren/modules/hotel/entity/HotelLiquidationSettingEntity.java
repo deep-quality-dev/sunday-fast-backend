@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -31,8 +32,7 @@ public class HotelLiquidationSettingEntity implements Serializable {
 	/**
 	 * 周期类型
 	 */
-	@NotBlank(message = "周期类型不能为空")
-	private Integer type;
+	private int type;
 	/**
 	 * 值
 	 */
@@ -40,12 +40,12 @@ public class HotelLiquidationSettingEntity implements Serializable {
 	/**
 	 * 会员订单费率
 	 */
-	@NotBlank(message = "会员订单费率不能为空")
+	@NotNull(message = "会员订单费率不能为空")
 	private BigDecimal vipRate;
 	/**
 	 * 普通费率
 	 */
-	@NotBlank(message = "普通费率不能为空")
+	@NotNull(message = "普通费率不能为空")
 	private BigDecimal rate;
 	/**
 	 * 创建时间

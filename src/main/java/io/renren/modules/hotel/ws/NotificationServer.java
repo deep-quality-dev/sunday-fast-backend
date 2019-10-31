@@ -32,6 +32,7 @@ public class NotificationServer {
 	@OnOpen
 	public void onOpen(Session session, @PathParam("sid") String sid) {
 		this.session = session;
+		this.sid = sid;
 		webSocketSet.add(this); 
 		addOnlineCount(); // 在线数加1
 		log.info("有新窗口开始监听:" + sid + ",当前在线人数为" + getOnlineCount());

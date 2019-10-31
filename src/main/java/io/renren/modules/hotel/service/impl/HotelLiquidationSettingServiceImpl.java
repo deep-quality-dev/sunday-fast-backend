@@ -1,5 +1,6 @@
 package io.renren.modules.hotel.service.impl;
 
+import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +21,16 @@ import io.renren.modules.hotel.entity.HotelLiquidationSettingEntity;
 import io.renren.modules.hotel.service.HotelLiquidationSettingService;
 import io.renren.modules.job.entity.ScheduleJobEntity;
 import io.renren.modules.job.service.ScheduleJobService;
+import io.renren.modules.job.utils.ScheduleUtils;
 
 @Service("hotelLiquidationSettingService")
 public class HotelLiquidationSettingServiceImpl extends ServiceImpl<HotelLiquidationSettingDao, HotelLiquidationSettingEntity> implements HotelLiquidationSettingService {
 
 	@Autowired
 	private ScheduleJobService scheduleJobService;
+
+	@Autowired
+	private Scheduler scheduler;
 
 	@Override
 	public PageUtils queryPage(Map<String, Object> params) {
@@ -51,11 +56,22 @@ public class HotelLiquidationSettingServiceImpl extends ServiceImpl<HotelLiquida
 			String cronExpression = "0 00 00 L * ?";
 			scheduleJob.setCronExpression(cronExpression);
 		}
+
+		// TODO 测试
+		scheduleJob.setCronExpression("0 */1 * * * ?");
+		scheduleJob.setBeanName(jobKey);
 		scheduleJob.setCreateTime(DateUtil.date());
 		scheduleJob.setStatus(Constant.ScheduleStatus.NORMAL.getValue());
 		scheduleJob.setRemark("商家结算任务");
 		scheduleJobService.saveOrUpdate(scheduleJob);
+		ScheduleUtils.createScheduleJob(scheduler, scheduleJob);
 		this.saveOrUpdate(hotelLiquidationSettingEntity);
+	}
+
+	@Override
+	public void updateLiquidationSetting(HotelLiquidationSettingEntity hotelLiquidationSetting) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

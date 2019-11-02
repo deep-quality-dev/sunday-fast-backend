@@ -356,7 +356,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setContactsId(createOrderForm.getContactsId());
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
 		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
-		hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
 		hotelOrderEntity.setInvoiceId(createOrderForm.getInvoiceId());
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());

@@ -24,6 +24,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.Constant;
 import io.renren.common.utils.PageUtils;
@@ -150,6 +151,9 @@ public class HotelSellerServiceImpl extends ServiceImpl<HotelSellerDao, HotelSel
 		Page<HotelItemVo> pageResult = baseMapper.hotelPage(page, params);
 		List<HotelItemVo> hotelItemVos = pageResult.getRecords();
 		for (HotelItemVo hotelItemVo : hotelItemVos) {
+			if (StrUtil.isNotEmpty(hotelItemVo.getTags())) {
+				hotelItemVo.setTagList(Arrays.asList(hotelItemVo.getTags().split(",")));
+			}
 			hotelItemVo.setKm(NumberUtil.round(hotelItemVo.getDistance(), 2));
 			double score = hotelAssessDao.avgScore(hotelItemVo.getId());
 			hotelItemVo.setScore(NumberUtil.round(score, 2));

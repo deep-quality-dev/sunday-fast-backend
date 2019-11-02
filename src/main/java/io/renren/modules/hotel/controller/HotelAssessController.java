@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelAssessEntity;
@@ -85,7 +86,11 @@ public class HotelAssessController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelassess:update")
 	public R update(@RequestBody HotelAssessEntity hotelAssess) {
-		hotelAssessService.updateById(hotelAssess);
+		HotelAssessEntity dbHotelAssess = hotelAssessService.getById(hotelAssess.getId());
+		dbHotelAssess.setReplyTime(DateUtil.date().getTime());
+		dbHotelAssess.setReply(hotelAssess.getReply());
+		dbHotelAssess.setStatus(2);
+		hotelAssessService.updateById(dbHotelAssess);
 
 		return R.ok();
 	}

@@ -112,10 +112,15 @@ public class HotelRoomEntity implements Serializable {
 	 * 入住时长
 	 */
 	private String rzTime;
-	
+
 	private int discounts = 0;
 
 	@TableField(exist = false)
 	private List<HotelRoomMoneyEntity> hotelRoomMoney;
+
+	private String tags;
+
+	@TableField(exist = false)
+	private List<String> tagList;
 
 }

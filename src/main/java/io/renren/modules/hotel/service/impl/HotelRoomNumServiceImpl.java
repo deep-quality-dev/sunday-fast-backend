@@ -68,8 +68,11 @@ public class HotelRoomNumServiceImpl extends ServiceImpl<HotelRoomNumDao, HotelR
 			int nums = 0;
 			for (String day : dates) {
 				nums = hotelRoomNumDao.hasRoomNumWithDay(hotelRoomEntity.getId(), DateUtil.parse(day).getTime());
+				List<HotelRoomMoneyEntity> hotelRoomMoneyEntities = hotelRoomMoneyDao.selectList(Wrappers.<HotelRoomMoneyEntity>lambdaQuery().eq(HotelRoomMoneyEntity::getRoomId, hotelRoomEntity.getId()));
 				rowData.put(day, 1);
-				rowData.put(day, nums == 0 ? 1 : 0);
+				if (nums > 0 && nums == hotelRoomMoneyEntities.size()) {
+					rowData.put(day, 0);
+				}
 				if (hotelRoomEntity.getState() == 0) {
 					rowData.put(day, 0);
 				}

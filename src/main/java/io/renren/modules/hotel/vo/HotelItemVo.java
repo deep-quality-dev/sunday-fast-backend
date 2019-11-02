@@ -30,13 +30,7 @@ public class HotelItemVo {
 
 	private String levelType;
 	
-	/**
-	 * 地铁周边
-	 */
-	private int metro = 0;
-
-	/**
-	 * 餐饮
-	 */
-	private int repast = 0;
+	private String tags;
+	
+	private List<String> tagList;
 }

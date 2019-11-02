@@ -2,8 +2,12 @@ package io.renren.modules.hotel.entity;
 
 import java.io.Serializable;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -24,6 +28,13 @@ public class HotelAssessEntity implements Serializable {
 	 */
 	@TableId
 	private Long id;
+
+	@TableField(exist = false)
+	private String memberName;
+
+	@TableField(exist = false)
+	private String memberImg;
+
 	/**
 	 * 商家ID
 	 */
@@ -43,6 +54,8 @@ public class HotelAssessEntity implements Serializable {
 	/**
 	 * 创建时间
 	 */
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Long time;
 	/**
 	 * 用户ID
@@ -59,7 +72,9 @@ public class HotelAssessEntity implements Serializable {
 	/**
 	 * 回复时间
 	 */
-	private Integer replyTime;
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private Long replyTime;
 
 	/**
 	 * 评论类型 1-酒店 2-商品

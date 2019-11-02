@@ -59,12 +59,13 @@
 		<result property="repast" column="repast" />
 		<result property="balance" column="balance" />
 		<result property="freezeBalance" column="freeze_balance" />
+		<result property="tags" column="tags" />
 	</resultMap>
 
 	<select id="hotelPage"
 		resultType="io.renren.modules.hotel.vo.HotelItemVo">
 		select temp.* From (
-		SELECT t.id,t.metro,t.repast,t.NAME,t.ewm_logo AS
+		SELECT t.id,t.tags,t.NAME,t.ewm_logo AS
 		logo,t1.price,t.coordinates AS lonLat,(
 		SELECT count(*) FROM
 		t_hotel_assess a WHERE a.seller_id=t.id) AS

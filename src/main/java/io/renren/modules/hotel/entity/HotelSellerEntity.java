@@ -3,9 +3,11 @@ package io.renren.modules.hotel.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -232,5 +234,10 @@ public class HotelSellerEntity implements Serializable {
 	 * 冻结余额
 	 */
 	private BigDecimal freezeBalance;
+
+	private String tags;
+
+	@TableField(exist = false)
+	private List<String> tagList;
 
 }

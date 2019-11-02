@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelRoomEntity;
@@ -45,13 +47,13 @@ public class HotelRoomController extends AbstractController {
 
 	@PostMapping("/roomSwitch")
 	public R roomSwitch(@RequestBody RoomSwitchForm switchForm) {
-		hotelRoomService.roomSwitch(switchForm.getId(), switchForm.getStatus(),switchForm.getDate());
+		hotelRoomService.roomSwitch(switchForm.getId(), switchForm.getStatus(), switchForm.getDate());
 		return R.ok();
 	}
 
 	@PostMapping("/moneySwitch")
 	public R moneySwitch(@RequestBody RoomSwitchForm switchForm) {
-		hotelRoomService.moneySwitch(switchForm.getId(), switchForm.getStatus(),switchForm.getDate());
+		hotelRoomService.moneySwitch(switchForm.getId(), switchForm.getStatus(), switchForm.getDate());
 		return R.ok();
 	}
 
@@ -132,7 +134,9 @@ public class HotelRoomController extends AbstractController {
 	@RequiresPermissions("hotel:hotelroom:info")
 	public R info(@PathVariable("id") Integer id) {
 		HotelRoomEntity hotelRoom = hotelRoomService.getById(id);
-
+		if (StrUtil.isNotEmpty(hotelRoom.getTags())) {
+			hotelRoom.setTagList(Arrays.asList(hotelRoom.getTags().split(",")));
+		}
 		return R.ok().put("hotelroom", hotelRoom);
 	}
 
@@ -143,6 +147,9 @@ public class HotelRoomController extends AbstractController {
 	@RequiresPermissions("hotel:hotelroom:save")
 	public R save(@RequestBody HotelRoomEntity hotelRoom) {
 		hotelRoom.setSellerId(getSellerId());
+		if (CollectionUtil.isNotEmpty(hotelRoom.getTagList())) {
+			hotelRoom.setTags(CollectionUtil.join(hotelRoom.getTagList(), ","));
+		}
 		hotelRoomService.save(hotelRoom);
 
 		return R.ok();
@@ -154,8 +161,12 @@ public class HotelRoomController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelroom:update")
 	public R update(@RequestBody HotelRoomEntity hotelRoom) {
+		if (CollectionUtil.isNotEmpty(hotelRoom.getTagList())) {
+			hotelRoom.setTags(CollectionUtil.join(hotelRoom.getTagList(), ","));
+		} else {
+			hotelRoom.setTags("");
+		}
 		hotelRoomService.updateById(hotelRoom);
-
 		return R.ok();
 	}
 

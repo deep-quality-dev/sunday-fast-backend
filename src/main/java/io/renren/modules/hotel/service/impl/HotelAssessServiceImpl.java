@@ -19,6 +19,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
+import io.renren.modules.constants.HotelOrderStatus;
 import io.renren.modules.hotel.dao.AssessTagRelDao;
 import io.renren.modules.hotel.dao.HotelAssessDao;
 import io.renren.modules.hotel.entity.AssessTagRelEntity;
@@ -56,6 +57,7 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 		if (1 == commentForm.getType()) {
 			HotelOrderEntity hotelOrderEntity = hotelOrderService.getById(commentForm.getBizId());
 			hotelOrderEntity.setCommentFlag(1);
+			hotelOrderEntity.setStatus(HotelOrderStatus.COMPLETE);
 			hotelOrderService.updateById(hotelOrderEntity);
 			sellerId = hotelOrderEntity.getSellerId();
 		}

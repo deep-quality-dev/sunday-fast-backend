@@ -96,7 +96,9 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 				roomVO.setImgs(Arrays.asList(item.getImg().split(",")));
 			}
 			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice() ? 0 : item.getPrice().doubleValue()));
-
+			if (StrUtil.isNotEmpty(item.getTags())) {
+				roomVO.setTagList(Arrays.asList(item.getTags().split(",")));
+			}
 			// 获取房价列表
 			List<RoomMoneyVo> roomMoneyVos = this.roomMoneys(memberLevelEntity, hotelMemberLevelEntities, item.getId(), DateUtil.parse(startTime), DateUtil.parse(endTime));
 			roomVO.setAmountItems(roomMoneyVos);

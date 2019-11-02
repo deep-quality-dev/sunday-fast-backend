@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
@@ -84,6 +85,9 @@ public class HotelSellerController extends AbstractController {
 			return R.ok().put("hotelSeller", new HotelSellerEntity());
 		}
 		HotelSellerEntity hotelSeller = hotelSellerService.getById(getSellerId());
+		if (StrUtil.isNotEmpty(hotelSeller.getTags())) {
+			hotelSeller.setTagList(Arrays.asList(hotelSeller.getTags().split(",")));
+		}
 		return R.ok().put("hotelSeller", hotelSeller);
 	}
 
@@ -116,7 +120,9 @@ public class HotelSellerController extends AbstractController {
 	@RequiresPermissions("hotel:hotelseller:info")
 	public R info(@PathVariable("id") Integer id) {
 		HotelSellerEntity hotelSeller = hotelSellerService.getById(id);
-
+		if (StrUtil.isNotEmpty(hotelSeller.getTags())) {
+			hotelSeller.setTagList(Arrays.asList(hotelSeller.getTags().split(",")));
+		}
 		return R.ok().put("hotelSeller", hotelSeller);
 	}
 
@@ -129,6 +135,10 @@ public class HotelSellerController extends AbstractController {
 		if (StrUtil.isNotEmpty(hotelSeller.getCoordinates())) {
 			hotelSeller.setLat(hotelSeller.getCoordinates().split(",")[1]);
 			hotelSeller.setLnt(hotelSeller.getCoordinates().split(",")[0]);
+		}
+		hotelSeller.setTags("");
+		if (CollectionUtil.isNotEmpty(hotelSeller.getTagList())) {
+			hotelSeller.setTags(CollectionUtil.join(hotelSeller.getTagList(), ","));
 		}
 		hotelSeller.setUserId(getUserId());
 		hotelSellerService.save(hotelSeller);
@@ -145,6 +155,9 @@ public class HotelSellerController extends AbstractController {
 		if (StrUtil.isNotEmpty(hotelSeller.getCoordinates())) {
 			hotelSeller.setLat(hotelSeller.getCoordinates().split(",")[1]);
 			hotelSeller.setLnt(hotelSeller.getCoordinates().split(",")[0]);
+		}
+		if (CollectionUtil.isNotEmpty(hotelSeller.getTagList())) {
+			hotelSeller.setTags(CollectionUtil.join(hotelSeller.getTagList(), ","));
 		}
 		hotelSellerService.updateById(hotelSeller);
 

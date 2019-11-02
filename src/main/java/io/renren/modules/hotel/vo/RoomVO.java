@@ -3,6 +3,8 @@ package io.renren.modules.hotel.vo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import lombok.Data;
 
 @Data
@@ -55,6 +57,8 @@ public class RoomVO {
 	private boolean hasRoom;
 
 	private int discounts;
+	
+	private List<String> tagList;
 
 	/**
 	 * 价格列表

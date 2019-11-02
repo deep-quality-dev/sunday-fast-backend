@@ -73,5 +73,7 @@ public class HotelCouponsCashEntity implements Serializable {
 	 * 
 	 */
 	private Integer time;
+	
+	private String ruleDec;
 
 }

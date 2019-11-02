@@ -87,4 +87,6 @@ public class HotelCouponsEntity implements Serializable {
 	@TableField(exist = false)
 	private List<Long> roomIds;
 
+	private String ruleDec;
+
 }

@@ -21,6 +21,7 @@
 		<result property="lqNum" column="lq_num" />
 		<result property="klqzs" column="klqzs" />
 		<result property="time" column="time" />
+		<result property="ruleDec" column="rule_dec" />
 	</resultMap>
 
 

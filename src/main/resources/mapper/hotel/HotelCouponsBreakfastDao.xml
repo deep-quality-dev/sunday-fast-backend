@@ -21,6 +21,7 @@
 		<result property="lqNum" column="lq_num" />
 		<result property="klqzs" column="klqzs" />
 		<result property="time" column="time" />
+		<result property="ruleDec" column="rule_dec" />
 	</resultMap>
 
 	<select id="userBreakfastCoupons"
@@ -50,7 +51,8 @@
 				and t.state = -1
 			</if>
 			<if test="status == 0">
-				and t.state = 0 and t1.end_time is not null and t1.end_time &lt; now()
+				and t.state = 0 and t1.end_time is not null and
+				t1.end_time &lt; now()
 			</if>
 		</where>
 	</select>

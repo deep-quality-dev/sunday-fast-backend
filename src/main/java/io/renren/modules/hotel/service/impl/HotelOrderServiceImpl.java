@@ -36,6 +36,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
 import io.renren.common.exception.RRException;
 import io.renren.common.utils.PageUtils;
@@ -303,25 +304,85 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(createOrderForm.getMoneyId());
 		if (hotelRoomMoneyEntity.getPrepay() == 0) {
 			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
+			// 商家订单通知
+			sendSellerNotiftion(hotelOrderEntity);
 		}
 		return hotelOrderEntity.getId();
 	}
 
+	public void sendSellerNotiftion(HotelOrderEntity hotelOrderEntity) {
+		ThreadUtil.execute(new Runnable() {
+			@Override
+			@SneakyThrows
+			public void run() {
+				// 订单通知
+				HotelOrderNotificationEntity hotelOrderNotificationEntity = hotelOrderNotificationService.getOne(Wrappers.<HotelOrderNotificationEntity>lambdaQuery().eq(HotelOrderNotificationEntity::getSellerId, hotelOrderEntity.getSellerId()));
+				if (null != hotelOrderNotificationEntity) {
+					// 发送短信
+					if (hotelOrderNotificationEntity.getSmsSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getMobile())) {
+						List<String> mobiles = Arrays.asList(hotelOrderNotificationEntity.getMobile().split(","));
+						JSONObject contextJson = new JSONObject();
+						contextJson.put("jdname", hotelOrderEntity.getSellerName());
+						contextJson.put("product", hotelOrderEntity.getRoomType());
+						// TODO 组装数据采用MQ发送
+						for (String mobile : mobiles) {
+							MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(mobile, contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getSignName(), EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getTemplate());
+							String channel = mobileMsgTemplate.getChannel();
+							SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
+							if (messageHandler != null) {
+								messageHandler.execute(mobileMsgTemplate);
+							} else {
+								log.error("没有找到指定的路由通道，不进行发送处理完毕！");
+							}
+						}
+
+					}
+					// 发送邮件
+					if (hotelOrderNotificationEntity.getEmailSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getEmail())) {
+						List<String> emails = Arrays.asList(hotelOrderNotificationEntity.getEmail().split(","));
+						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
+						MailAccount account = new MailAccount();
+						account.setHost("smtp.qq.com");
+						account.setPort(25);
+						account.setAuth(true);
+						account.setFrom("1137484056@qq.com");
+						account.setUser("1137484056@qq.com");
+						account.setPass("magxdhevrdzdgjjh");
+						MailUtil.send(account, emails, "房间预定提醒", emailContent, false);
+					}
+					// ws通知
+					if (hotelOrderNotificationEntity.getPcSwitch() == 1) {
+						HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
+						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
+						NotificationServer.sendInfo(emailContent, hotelSellerEntity.getUserId().toString());
+					}
+				}
+
+			}
+		});
+	}
+
 	public void sendReserveMessage(HotelOrderEntity hotelOrderEntity, HotelSellerEntity hotelSellerEntity, HotelMemberEntity hotelMemberEntity, HotelWxConfigEntity hotelWxConfigEntity, String formId) throws WxErrorException {
-		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
-		maTemplateDatas.add(new WxMaTemplateData("first", "酒店预订成功通知"));
-		maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
-		maTemplateDatas.add(new WxMaTemplateData("keyword2", DateUtil.format(hotelOrderEntity.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
-		maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
-		maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
-		maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getName()));
-		maTemplateDatas.add(new WxMaTemplateData("keyword6", hotelSellerEntity.getTel()));
-		WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-DAfpKktBMZmWJBPVnMzC3_MlP9Sz0ug4JrFqeg", null, formId, maTemplateDatas, null);
-		try {
-			WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
-		} catch (Exception e) {
-			throw new RRException("发送微信通知失败");
-		}
+		ThreadUtil.execute(new Runnable() {
+			@Override
+			public void run() {
+				List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
+				maTemplateDatas.add(new WxMaTemplateData("first", "酒店预订成功通知"));
+				maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
+				maTemplateDatas.add(new WxMaTemplateData("keyword2", DateUtil.format(hotelOrderEntity.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+				maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
+				maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
+				maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getName()));
+				maTemplateDatas.add(new WxMaTemplateData("keyword6", hotelSellerEntity.getTel()));
+				WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-DAfpKktBMZmWJBPVnMzC3_MlP9Sz0ug4JrFqeg", null, formId, maTemplateDatas, null);
+				try {
+					WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
+				} catch (Exception e) {
+					throw new RRException("发送微信通知失败");
+				}
+
+			}
+		});
 	}
 
 	/**
@@ -407,51 +468,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		this.save(hotelOrderEntity);
 		// 保存订单明细
 		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
-
-		ThreadUtil.execute(new Runnable() {
-
-			@Override
-			@SneakyThrows
-			public void run() {
-				// 订单通知
-				HotelOrderNotificationEntity hotelOrderNotificationEntity = hotelOrderNotificationService.getOne(Wrappers.<HotelOrderNotificationEntity>lambdaQuery().eq(HotelOrderNotificationEntity::getSellerId, createOrderForm.getSellerId()));
-				if (null != hotelOrderNotificationEntity) {
-					// 发送短信
-					if (hotelOrderNotificationEntity.getSmsSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getMobile())) {
-						List<String> mobiles = Arrays.asList(hotelOrderNotificationEntity.getMobile().split(","));
-						JSONObject contextJson = new JSONObject();
-						contextJson.put("jdname", hotelOrderEntity.getSellerName());
-						contextJson.put("product", hotelOrderEntity.getRoomType());
-						// TODO 组装数据采用MQ发送
-						for (String mobile : mobiles) {
-							MobileMsgTemplate mobileMsgTemplate = new MobileMsgTemplate(mobile, contextJson.toJSONString(), CommonConstant.ALIYUN_SMS, EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getSignName(), EnumSmsChannelTemplate.SELLER_RESERVE_SUCCESS_CHANNEL.getTemplate());
-							String channel = mobileMsgTemplate.getChannel();
-							SmsMessageHandler messageHandler = messageHandlerMap.get(channel);
-							if (messageHandler != null) {
-								messageHandler.execute(mobileMsgTemplate);
-							} else {
-								log.error("没有找到指定的路由通道，不进行发送处理完毕！");
-							}
-						}
-
-					}
-					// 发送邮件
-					if (hotelOrderNotificationEntity.getEmailSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getEmail())) {
-						List<String> emails = Arrays.asList(hotelOrderNotificationEntity.getEmail().split(","));
-						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
-						for (String email : emails) {
-							MailUtil.send(email, "房间预定提醒", emailContent, false);
-						}
-					}
-					// ws通知
-					if (hotelOrderNotificationEntity.getPcSwitch() == 1) {
-						String emailContent = String.format("%s ，您有新的%s订单，请及时处理！", hotelOrderEntity.getSellerName(), hotelOrderEntity.getRoomType());
-						NotificationServer.sendInfo(emailContent, hotelOrderEntity.getUserId().toString());
-					}
-				}
-
-			}
-		});
 		log.info("创建酒店订单--end,result,orderId:{}", hotelOrderEntity.getId());
 		return hotelOrderEntity;
 	}
@@ -809,10 +825,29 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		log.info("自动取消订单--start");
 		Map<String, Object> params = new HashMap<String, Object>();
 		// 20分钟自动取消
-		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>().eq("status", HotelOrderStatus.UN_PAY).le("create_time", DateUtil.offset(DateUtil.date(), DateField.MINUTE, -30)));
+		IPage<HotelOrderEntity> page = this.page(new Query<HotelOrderEntity>().getPage(params), new QueryWrapper<HotelOrderEntity>()//
+				.eq("status", HotelOrderStatus.UN_PAY)//
+				.le("create_time", DateUtil.offset(DateUtil.date(), DateField.MINUTE, -30)));
 		List<HotelOrderEntity> hotelOrderEntities = page.getRecords();
 		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
+			HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+			// 恢复房量
+			HotelRoomEntity hotelRoomEntity = hotelRoomService.getById(hotelOrderEntity.getRoomId());
 			hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
+			List<HotelOrderRecordEntity> hotelOrderRecordEntities = hotelOrderRecordService.list(Wrappers.<HotelOrderRecordEntity>lambdaQuery().eq(HotelOrderRecordEntity::getOrderId, hotelOrderEntity.getId()));
+			for (HotelOrderRecordEntity hotelOrderRecordEntity : hotelOrderRecordEntities) {
+				// 恢复每天的房量
+				hotelRoomService.updateRoomNum(hotelRoomEntity, hotelRoomMoneyEntity, hotelOrderRecordEntity.getArrivalTime().getTime(), hotelOrderEntity.getNum());
+			}
+			// 恢复用户优惠券
+			if (null != hotelOrderEntity.getCouponsId() && 0L != hotelOrderEntity.getCouponsId()) {
+				HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 2).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getCouponsId()));
+				if (null == hotelMemberCouponsEntity) {
+					throw new RRException("用户优惠券不存在");
+				}
+				hotelMemberCouponsEntity.setState(1);
+				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+			}
 		}
 		if (CollectionUtil.isNotEmpty(hotelOrderEntities)) {
 			this.updateBatchById(hotelOrderEntities);

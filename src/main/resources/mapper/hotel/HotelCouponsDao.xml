@@ -62,6 +62,7 @@
 		t1.`name`,
 		t1.cost,
 		t1.start_time,
+		t1.rule_dec as rule,
 		t1.end_time,
 		t1.seller_id,
 		s.name as seller_name,

@@ -66,6 +66,7 @@
 		t1.`id`,
 		t.coupons_type,
 		t1.`name`,
+		t1.rule_dec as rule,
 		t1.cost,
 		t1.start_time,
 		t1.rule_dec as rule,

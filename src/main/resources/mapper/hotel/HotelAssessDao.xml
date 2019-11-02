@@ -27,14 +27,10 @@
 		SELECT
 		t.id,
 		t.content,
-		(SELECT from_unixtime(t.time,
-		'%Y-%m-%d %H:%i:%S')) as date,
 		t.img,
 		t.score,
 		t1.`name` as nick,
-		(SELECT
-		from_unixtime(t.time, '%Y-%m-%d %H:%i:%S'))
-		as date,
+		t.time as date,
 		t1.img as
 		head_photo
 		From t_hotel_assess t inner join t_hotel_member t1

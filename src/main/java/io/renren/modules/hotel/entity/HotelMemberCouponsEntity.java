@@ -50,7 +50,7 @@ public class HotelMemberCouponsEntity implements Serializable {
 	private Long sellerId;
 	
 	/**
-	 * 优惠券类型 1-优惠券，2-代金券，3-早餐券
+	 * 优惠券类型 1-免房券，2-代金券，3-早餐券
 	 */
 	private int couponsType;
 

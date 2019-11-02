@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -54,6 +55,15 @@ public class HotelOrderEntity implements Serializable {
 	 */
 	private Long couponsId;
 
+	/**
+	 * 早餐券
+	 */
+	private Long breakCouponId;
+
+	/**
+	 * 免房券
+	 */
+	private Long freeRoomCouponId;
 	/**
 	 * 发票ID
 	 */

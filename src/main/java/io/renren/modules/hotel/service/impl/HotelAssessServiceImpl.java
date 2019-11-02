@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.Query;
 import io.renren.modules.constants.HotelOrderStatus;
@@ -86,6 +87,10 @@ public class HotelAssessServiceImpl extends ServiceImpl<HotelAssessDao, HotelAss
 	@Override
 	public Page<CommentItemVo> hotelCommnetList(Page<CommentItemVo> page, Long sellerId, String type) {
 		Page<CommentItemVo> pageResult = baseMapper.hotelCommnetList(page, sellerId, type);
+		List<CommentItemVo> commentItemVos = pageResult.getRecords();
+		for (CommentItemVo commentItemVo : commentItemVos) {
+			commentItemVo.setDate(DateUtil.format(DateUtil.date(Long.valueOf(commentItemVo.getDate())), "yyyy-MM-dd HH:mm:ss"));
+		}
 		return pageResult;
 	}
 

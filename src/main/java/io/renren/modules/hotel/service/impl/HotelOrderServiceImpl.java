@@ -52,7 +52,9 @@ import io.renren.modules.hotel.config.WxPayConfiguration;
 import io.renren.modules.hotel.dao.HotelInvoiceDao;
 import io.renren.modules.hotel.dao.HotelOrderDao;
 import io.renren.modules.hotel.entity.HotelContactsEntity;
+import io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity;
 import io.renren.modules.hotel.entity.HotelCouponsCashEntity;
+import io.renren.modules.hotel.entity.HotelCouponsEntity;
 import io.renren.modules.hotel.entity.HotelInvoiceEntity;
 import io.renren.modules.hotel.entity.HotelMemberCouponsEntity;
 import io.renren.modules.hotel.entity.HotelMemberEntity;
@@ -76,7 +78,9 @@ import io.renren.modules.hotel.form.CreateOrderForm;
 import io.renren.modules.hotel.handler.message.SmsMessageHandler;
 import io.renren.modules.hotel.handler.message.template.MobileMsgTemplate;
 import io.renren.modules.hotel.service.HotelContactsService;
+import io.renren.modules.hotel.service.HotelCouponsBreakfastService;
 import io.renren.modules.hotel.service.HotelCouponsCashService;
+import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelMemberCouponsService;
 import io.renren.modules.hotel.service.HotelMemberLevelDetailService;
 import io.renren.modules.hotel.service.HotelMemberService;
@@ -132,6 +136,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 	@Autowired
 	private HotelCouponsCashService hotelCouponsCashService;
+
+	@Autowired
+	private HotelCouponsBreakfastService hotelCouponsBreakfastService;
+
+	@Autowired
+	private HotelCouponsService hotelCouponsService;
 
 	@Autowired
 	private HotelMemberCouponsService hotelMemberCouponsService;
@@ -219,6 +229,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		// 酒店信息
 		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelRoomEntity.getSellerId());
 		buildOrderForm.setHotelAddress(hotelSellerEntity.getAddress());
+		buildOrderForm.setRoomId(roomId);
 		buildOrderForm.setSellerName(hotelSellerEntity.getName());
 		for (int i = 0; i < checkInDay; i++) {
 			orderDetail = new OrderDetail();
@@ -439,6 +450,43 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
 			}
 		}
+		// 早餐券
+		if (null != createOrderForm.getBreakCouponId() && 0L != createOrderForm.getBreakCouponId()) {
+			HotelCouponsBreakfastEntity couponsBreakfastEntity = hotelCouponsBreakfastService.getById(createOrderForm.getBreakCouponId());
+			if (null == couponsBreakfastEntity) {
+				throw new RRException("早餐券不存在");
+			}
+			if (DateUtil.parse(couponsBreakfastEntity.getEndTime()).getTime() < DateUtil.date().getTime()) {
+				throw new RRException("早餐券已过期");
+			}
+			hotelOrderEntity.setBreakCouponId(createOrderForm.getBreakCouponId());
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getCouponId()));
+			if (null == hotelMemberCouponsEntity) {
+				throw new RRException("用户优惠券不存在");
+			}
+			hotelMemberCouponsEntity.setState(-1);
+			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+		}
+		// 免房券
+		if (null != createOrderForm.getFreeRoomCouponId() && 0L != createOrderForm.getFreeRoomCouponId()) {
+			HotelCouponsEntity couponsEntity = hotelCouponsService.getById(createOrderForm.getFreeRoomCouponId());
+			if (null == couponsEntity) {
+				throw new RRException("免房券不存在");
+			}
+			if (couponsEntity.getEndTime().getTime() < DateUtil.date().getTime()) {
+				throw new RRException("免房券已过期");
+			}
+			if (createOrderForm.getRoomNum() > 1 || Integer.valueOf(String.valueOf(createOrderForm.getCheckInDay())) > 1) {
+				throw new RRException("入住天数，或房间数只能为1（天/间）");
+			}
+			hotelOrderEntity.setFreeRoomCouponId(createOrderForm.getFreeRoomCouponId());
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 1).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getCouponId()));
+			if (null == hotelMemberCouponsEntity) {
+				throw new RRException("用户优惠券不存在");
+			}
+			hotelMemberCouponsEntity.setState(-1);
+			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+		}
 		// 查看订单是否需要确认
 		HotelOrderSettingEntity hotelOrderSettingEntity = hotelOrderSettingService.getOne(Wrappers.<HotelOrderSettingEntity>lambdaQuery().eq(HotelOrderSettingEntity::getSellerId, createOrderForm.getSellerId()));
 		if (null != hotelOrderSettingEntity && hotelOrderSettingEntity.getAutoOrder().intValue() == 1) {
@@ -640,7 +688,6 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			log.error("取消订单--参数错误，未找到订单信息,userId:{},orderId:{}", userId, orderId);
 			throw new RRException("参数错误，未找到订单信息");
 		}
-		HotelSellerEntity hotelSellerEntity = hotelSellerService.getById(hotelOrderEntity.getSellerId());
 		HotelMemberEntity hotelMemberEntity = hotelMemberService.getById(hotelOrderEntity.getUserId());
 		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
 		// 恢复房量
@@ -697,17 +744,43 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelMemberCouponsEntity.setState(1);
 			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
 		}
+		// 用户早餐券
+		if (null != hotelOrderEntity.getBreakCouponId() && 0L != hotelOrderEntity.getBreakCouponId()) {
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getBreakCouponId()));
+			if (null == hotelMemberCouponsEntity) {
+				throw new RRException("用户早餐券不存在");
+			}
+			hotelMemberCouponsEntity.setState(1);
+			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+		}
+		// 用户免房券
+		if (null != hotelOrderEntity.getFreeRoomCouponId() && 0L != hotelOrderEntity.getFreeRoomCouponId()) {
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 1).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getFreeRoomCouponId()));
+			if (null == hotelMemberCouponsEntity) {
+				throw new RRException("用户免房券不存在");
+			}
+			hotelMemberCouponsEntity.setState(1);
+			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+		}
+
 		HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 		// 发送取消订房通知
-		List<WxMaTemplateData> maTemplateDatas = new ArrayList<WxMaTemplateData>();
-		maTemplateDatas.add(new WxMaTemplateData("first", "订房取消通知"));
-		maTemplateDatas.add(new WxMaTemplateData("keyword1", hotelSellerEntity.getName()));
-		maTemplateDatas.add(new WxMaTemplateData("keyword2", DateUtil.format(hotelOrderEntity.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
-		maTemplateDatas.add(new WxMaTemplateData("keyword3", DateUtil.formatDate(hotelOrderEntity.getArrivalTime())));
-		maTemplateDatas.add(new WxMaTemplateData("keyword4", DateUtil.formatDate(hotelOrderEntity.getDepartureTime())));
-		maTemplateDatas.add(new WxMaTemplateData("keyword5", hotelOrderEntity.getRoomType()));
-		WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "Fd9nEk2KlaHR80YSIYaVNMSZqrR3vG2x1HnhdfcxHVo", null, formId, maTemplateDatas, null);
-		WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
+		List<WxMaTemplateData> data = new ArrayList<WxMaTemplateData>();
+		data.add(new WxMaTemplateData("first", "您好，您的订单已取消"));
+		data.add(new WxMaTemplateData("keyword1", hotelOrderEntity.getOrderNo()));
+		data.add(new WxMaTemplateData("keyword2", hotelOrderEntity.getSellerName()));
+		data.add(new WxMaTemplateData("keyword3", hotelOrderEntity.getRoomType()));
+		data.add(new WxMaTemplateData("keyword4", hotelOrderEntity.getNum().toString()));
+		data.add(new WxMaTemplateData("keyword5", DateUtil.format(hotelOrderEntity.getArrivalTime(), "yyyy-MM-dd")));
+		data.add(new WxMaTemplateData("keyword6", DateUtil.format(hotelOrderEntity.getDepartureTime(), "yyyy-MM-dd")));
+		data.add(new WxMaTemplateData("keyword7", hotelOrderEntity.getTotalCost().toString()));
+		WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-DAfpKktBMZmWJBPVnMzC3_MlP9Sz0ug4JrFqeg", null, formId, data, null);
+		try {
+			WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
+		} catch (WxErrorException e) {
+			log.error("发送取消订单微信模板消息失败：result：{}", e.getMessage());
+			e.printStackTrace();
+		}
 		log.info("取消订单--end,result:success");
 	}
 
@@ -848,6 +921,24 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				hotelMemberCouponsEntity.setState(1);
 				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
 			}
+			// 用户早餐券
+			if (null != hotelOrderEntity.getBreakCouponId() && 0L != hotelOrderEntity.getBreakCouponId()) {
+				HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getBreakCouponId()));
+				if (null == hotelMemberCouponsEntity) {
+					throw new RRException("用户早餐券不存在");
+				}
+				hotelMemberCouponsEntity.setState(1);
+				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+			}
+			// 用户免房券
+			if (null != hotelOrderEntity.getFreeRoomCouponId() && 0L != hotelOrderEntity.getFreeRoomCouponId()) {
+				HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, hotelOrderEntity.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 1).eq(HotelMemberCouponsEntity::getCouponsId, hotelOrderEntity.getFreeRoomCouponId()));
+				if (null == hotelMemberCouponsEntity) {
+					throw new RRException("用户免房券不存在");
+				}
+				hotelMemberCouponsEntity.setState(1);
+				hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
+			}
 		}
 		if (CollectionUtil.isNotEmpty(hotelOrderEntities)) {
 			this.updateBatchById(hotelOrderEntities);
@@ -857,32 +948,30 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			@Override
 			public void run() {
 				// 获取酒店取消订单微信消息模板
-				List<WxMpTemplateData> data = null;
+				List<WxMaTemplateData> data = null;
 				HotelMemberEntity hotelMemberEntity = null;
 				WxMpTemplateMessage templateMessage = null;
 				WxMpService mpService = null;
 				HotelWxTemplateEntity hotelWxTemplateEntity = null;
-				HotelWxConfigEntity hotelWxConfigEntity = null;
+				HotelWxConfigEntity hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
 				for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
-					hotelWxConfigEntity = hotelWxConfigService.getOne(new QueryWrapper<HotelWxConfigEntity>());
+					hotelMemberEntity = hotelMemberService.getById(hotelOrderEntity.getUserId());
 					if (null != hotelWxConfigEntity) {
-						mpService = WxMpConfiguration.getMpServices().get(hotelWxConfigEntity.getAppId());
-						data = new ArrayList<>();
-						data.add(new WxMpTemplateData("first", "您好，您的订单已取消"));
-						data.add(new WxMpTemplateData("keyword1", hotelOrderEntity.getSellerName()));
-						data.add(new WxMpTemplateData("keyword2", hotelOrderEntity.getRoomType()));
-						data.add(new WxMpTemplateData("keyword3", hotelOrderEntity.getName()));
-						data.add(new WxMpTemplateData("keyword4", hotelOrderEntity.getTotalCost().toString()));
-						data.add(new WxMpTemplateData("keyword5", DateUtil.format(hotelOrderEntity.getArrivalTime(), "yyyy-MM-dd")));
-						data.add(new WxMpTemplateData("keyword6", DateUtil.format(hotelOrderEntity.getDepartureTime(), "yyyy-MM-dd")));
-						data.add(new WxMpTemplateData("remark", "您的订单已取消，期待你的下次预定。"));
-						hotelMemberEntity = hotelMemberService.getById(hotelOrderEntity.getUserId());
-						hotelWxTemplateEntity = hotelWxTemplateService.getOne(new QueryWrapper<HotelWxTemplateEntity>().eq("seller_id", hotelOrderEntity.getSellerId()).eq("type", HotelWxMsgTemplate.ORDER_ROOM_CANCEL));
-						templateMessage = new WxMpTemplateMessage(hotelMemberEntity.getOpenid(), hotelWxTemplateEntity.getTemplateId(), null, null, data);
+						// 发送取消订房通知
+						data = new ArrayList<WxMaTemplateData>();
+						data.add(new WxMaTemplateData("first", "您好，您的订单已取消"));
+						data.add(new WxMaTemplateData("keyword1", hotelOrderEntity.getOrderNo()));
+						data.add(new WxMaTemplateData("keyword2", hotelOrderEntity.getSellerName()));
+						data.add(new WxMaTemplateData("keyword3", hotelOrderEntity.getRoomType()));
+						data.add(new WxMaTemplateData("keyword4", hotelOrderEntity.getNum().toString()));
+						data.add(new WxMaTemplateData("keyword5", DateUtil.format(hotelOrderEntity.getArrivalTime(), "yyyy-MM-dd")));
+						data.add(new WxMaTemplateData("keyword6", DateUtil.format(hotelOrderEntity.getDepartureTime(), "yyyy-MM-dd")));
+						data.add(new WxMaTemplateData("keyword7", hotelOrderEntity.getTotalCost().toString()));
+						WxMaTemplateMessage maTemplateMessage = new WxMaTemplateMessage(hotelMemberEntity.getOpenid(), "8Gs6-Fd9nEk2KlaHR80YSIYaVNL1fMg25DDSj4IXkPynorUA", null, hotelOrderEntity.getFormId(), data, null);
 						try {
-							String result = mpService.getTemplateMsgService().sendTemplateMsg(templateMessage);
-							log.info("发送取消订单微信模板消息：result：{}", result);
+							WxMaConfiguration.getMaService(hotelWxConfigEntity.getAppId()).getMsgService().sendTemplateMsg(maTemplateMessage);
 						} catch (WxErrorException e) {
+							log.error("发送取消订单微信模板消息失败：result：{}", e.getMessage());
 							e.printStackTrace();
 						}
 					}

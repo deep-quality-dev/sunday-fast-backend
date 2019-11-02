@@ -53,6 +53,8 @@
 		<result property="totalIntegral" column="total_integral" />
 		<result property="commentFlag" column="comment_flag" />
 		<result property="remark" column="remark" />
+		<result property="breakCouponId" column="break_coupon_id" />
+		<result property="freeRoomCouponId" column="free_room_coupon_id" />
 	</resultMap>
 
 

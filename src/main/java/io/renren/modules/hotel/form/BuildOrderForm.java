@@ -69,6 +69,12 @@ public class BuildOrderForm {
 	// 优惠券ID
 	@ApiModelProperty(value = "优惠券ID")
 	private Long couponId;
+	
+	@ApiModelProperty(value = "早餐券")
+	private Long breakCouponId;
+	
+	@ApiModelProperty(value = "免房券")
+	private Long freeRoomCouponId;
 
 	// 经纬度
 	private String coordinates;

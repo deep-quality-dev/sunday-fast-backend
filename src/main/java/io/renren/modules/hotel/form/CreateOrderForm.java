@@ -3,6 +3,7 @@ package io.renren.modules.hotel.form;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -73,5 +74,9 @@ public class CreateOrderForm {
 
 	// 发票ID
 	private Long invoiceId;
+
+	private Long breakCouponId;
+
+	private Long freeRoomCouponId;
 
 }

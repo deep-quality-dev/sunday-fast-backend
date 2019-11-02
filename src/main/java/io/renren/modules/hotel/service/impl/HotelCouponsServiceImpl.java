@@ -148,4 +148,16 @@ public class HotelCouponsServiceImpl extends ServiceImpl<HotelCouponsDao, HotelC
 		}
 	}
 
+	@Override
+	public List<UserCoupons> sellerCanUseBreakCoupons(Long userId, Long sellerId) {
+		List<UserCoupons> coupons = hotelCouponsBreakfastDao.sellerCanUseBreakCoupons(userId, sellerId);
+		return coupons;
+	}
+
+	@Override
+	public List<UserCoupons> canUseFreeRoomCoupons(Long userId, Long sellerId, Long roomId) {
+		List<UserCoupons> coupons = baseMapper.canUseFreeRoomCoupons(userId, sellerId, roomId);
+		return coupons;
+	}
+
 }

@@ -59,4 +59,32 @@
 		</where>
 	</select>
 
+
+	<select id="sellerCanUseBreakCoupons"
+		resultType="io.renren.modules.hotel.vo.UserCoupons">
+		SELECT
+		t1.`id`,
+		t.coupons_type,
+		t1.`name`,
+		t1.cost,
+		t1.start_time,
+		t1.rule_dec as rule,
+		t1.end_time,
+		t1.seller_id,
+		s.name as seller_name,
+		t1.conditions
+		from
+		t_hotel_member_coupons t
+		inner join
+		t_hotel_coupons_breakfast t1 on
+		t.coupons_id = t1.id
+		inner join
+		t_hotel_seller s on t1.seller_id = s.id
+		<where>
+			t.coupons_type = 3 and t.user_id = #{userId}
+			and t1.seller_id = #{sellerId}
+			and t.state = 1
+		</where>
+	</select>
+
 </mapper>

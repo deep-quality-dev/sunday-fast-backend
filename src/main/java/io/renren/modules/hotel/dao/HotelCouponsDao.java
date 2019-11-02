@@ -1,5 +1,7 @@
 package io.renren.modules.hotel.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -35,5 +37,15 @@ public interface HotelCouponsDao extends BaseMapper<HotelCouponsEntity> {
 	 * @return
 	 */
 	Page<UserCoupons> userCoupons(Page<UserCoupons> page, int status, Long userId);
+
+	/**
+	 * 可用免房券
+	 * 
+	 * @param userId
+	 * @param sellerId
+	 * @param roomId
+	 * @return
+	 */
+	List<UserCoupons> canUseFreeRoomCoupons(Long userId, Long sellerId, Long roomId);
 
 }

@@ -104,4 +104,21 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 	 */
 	void updateCoupons(HotelCouponsEntity hotelCoupons);
 
+	/**
+	 * 商家可用早餐券
+	 * @param userId
+	 * @param sellerId
+	 * @return
+	 */
+	List<UserCoupons> sellerCanUseBreakCoupons(Long userId, Long sellerId);
+
+	/**
+	 * 可用免房券
+	 * @param userId
+	 * @param sellerId
+	 * @param roomId
+	 * @return
+	 */
+	List<UserCoupons> canUseFreeRoomCoupons(Long userId, Long sellerId, Long roomId);
+
 }

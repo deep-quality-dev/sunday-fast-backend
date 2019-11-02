@@ -46,8 +46,24 @@ public class HotelCouponAPI extends BaseController {
 	@Login
 	@ApiOperation("商家可用优惠券")
 	@GetMapping("/sellerCanUseCoupons")
-	public R canUseCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId,@RequestParam(name = "amount", required = true)BigDecimal amount) {
-		List<UserCoupons> coupons = hotelCouponsService.canUseCoupons(userId, sellerId,amount);
+	public R canUseCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId, @RequestParam(name = "amount", required = true) BigDecimal amount) {
+		List<UserCoupons> coupons = hotelCouponsService.canUseCoupons(userId, sellerId, amount);
+		return R.ok(coupons);
+	}
+
+	@Login
+	@ApiOperation("商家可用早餐券")
+	@GetMapping("/sellerCanUseBreakCoupons")
+	public R sellerCanUseBreakCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId) {
+		List<UserCoupons> coupons = hotelCouponsService.sellerCanUseBreakCoupons(userId, sellerId);
+		return R.ok(coupons);
+	}
+
+	@Login
+	@ApiOperation("商家可用免房券")
+	@GetMapping("/canUseFreeRoomCoupons")
+	public R canUseFreeRoomCoupons(@RequestAttribute("userId") Long userId, @RequestParam(name = "sellerId", required = true) Long sellerId, @RequestParam(name = "roomId", required = true) Long roomId) {
+		List<UserCoupons> coupons = hotelCouponsService.canUseFreeRoomCoupons(userId, sellerId, roomId);
 		return R.ok(coupons);
 	}
 }

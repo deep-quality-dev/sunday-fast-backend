@@ -31,6 +31,7 @@
 		<result property="rzTime" column="rz_time" />
 		<result property="discounts" column="discounts" />
 		<result property="tags" column="tags" />
+		<result property="oprice" column="oprice" />
 	</resultMap>
 
 	<update id="updateRoomNum">

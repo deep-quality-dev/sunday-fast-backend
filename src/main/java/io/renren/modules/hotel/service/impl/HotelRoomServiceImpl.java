@@ -96,6 +96,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 				roomVO.setImgs(Arrays.asList(item.getImg().split(",")));
 			}
 			roomVO.setPrice(NumberUtil.decimalFormat("0.00", null == item.getPrice() ? 0 : item.getPrice().doubleValue()));
+			roomVO.setOprice(NumberUtil.decimalFormat("0.00", null == item.getOprice() ? 0 : item.getOprice().doubleValue()));
 			if (StrUtil.isNotEmpty(item.getTags())) {
 				roomVO.setTagList(Arrays.asList(item.getTags().split(",")));
 			}
@@ -122,6 +123,7 @@ public class HotelRoomServiceImpl extends ServiceImpl<HotelRoomDao, HotelRoomEnt
 			RoomMoneyVo roomMoneyVo = new RoomMoneyVo();
 			// 先set会员价格
 			BigDecimal amount = item.getPrice();
+			roomMoneyVo.setOprice(item.getOprice());
 			roomMoneyVo.setAmount(item.getPrice());
 			roomMoneyVo.setId(item.getId());
 			roomMoneyVo.setName(item.getName());

@@ -19,6 +19,7 @@
 		<result property="integral" column="integral" />
 		<result property="startTime" column="start_time" />
 		<result property="endTime" column="end_time" />
+		<result property="oprice" column="oprice" />
 	</resultMap>
 
 	<update id="updateRoomNum">

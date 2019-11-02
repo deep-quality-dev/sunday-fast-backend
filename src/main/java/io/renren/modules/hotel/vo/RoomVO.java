@@ -50,6 +50,8 @@ public class RoomVO {
 	 * 最低价格
 	 */
 	private String price;
+	
+	private String oprice;
 
 	/**
 	 * 是否有房

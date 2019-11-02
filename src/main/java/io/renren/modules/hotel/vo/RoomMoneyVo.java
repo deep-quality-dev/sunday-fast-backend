@@ -21,6 +21,8 @@ public class RoomMoneyVo {
 
 	private String amount; // 价格
 
+	private String oprice;// 原价
+
 	private int hasRoom = 1; // 是否有房 1-有 0-无
 
 	private int vipPrice;
@@ -36,5 +38,9 @@ public class RoomMoneyVo {
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = NumberUtil.decimalFormat("0.00", amount.doubleValue());
+	}
+
+	public void setOprice(BigDecimal amount) {
+		this.oprice = NumberUtil.decimalFormat("0.00", amount.doubleValue());
 	}
 }

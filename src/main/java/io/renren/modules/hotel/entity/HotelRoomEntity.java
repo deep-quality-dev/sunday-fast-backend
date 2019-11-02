@@ -39,6 +39,11 @@ public class HotelRoomEntity implements Serializable {
 	 * 价格
 	 */
 	private BigDecimal price;
+	
+	/**
+	 * 门市价
+	 */
+	private BigDecimal oprice;
 	/**
 	 * 图片
 	 */

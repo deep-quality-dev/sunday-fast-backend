@@ -33,6 +33,7 @@
 		t1.`name`,
 		t1.cost,
 		t1.start_time,
+		t1.rule_dec as rule,
 		t1.seller_id,
 		t1.end_time,
 		s.name as seller_name,
@@ -42,7 +43,8 @@
 		inner join
 		t_hotel_coupons_cash t1 on
 		t.coupons_id = t1.id
-		inner join t_hotel_seller s on t1.seller_id = s.id
+		inner join
+		t_hotel_seller s on t1.seller_id = s.id
 		<where>
 			t.coupons_type = 2 and t.user_id = #{userId}
 			<if test="status == 1 ">
@@ -52,7 +54,8 @@
 				and t.state = -1
 			</if>
 			<if test="status == 0">
-				and t.state = 0 and t1.end_time is not null and t1.end_time &lt; now()
+				and t.state = 0 and t1.end_time is not null and
+				t1.end_time &lt; now()
 			</if>
 		</where>
 	</select>
@@ -65,6 +68,7 @@
 		t1.`name`,
 		t1.cost,
 		t1.start_time,
+		t1.rule_dec as rule,
 		t1.seller_id,
 		t1.end_time,
 		t1.conditions

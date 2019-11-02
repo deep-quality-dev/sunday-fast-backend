@@ -53,4 +53,6 @@ public class UserCoupons {
 	private Long sellerId;
 	
 	private String sellerName;
+	
+	private String rule;
 }

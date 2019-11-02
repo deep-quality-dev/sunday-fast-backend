@@ -82,11 +82,26 @@ public interface HotelCouponsService extends IService<HotelCouponsEntity> {
 
 	/**
 	 * 发放优惠券
+	 * 
 	 * @param sellerId
 	 * @param memberIds
 	 * @param couponsIds
 	 * @param type
 	 */
 	void sendCoupons(Long sellerId, List<Long> memberIds, List<Long> couponsIds, int type);
+
+	/**
+	 * 保存免房券
+	 * 
+	 * @param hotelCoupons
+	 */
+	void saveCoupons(HotelCouponsEntity hotelCoupons);
+
+	/**
+	 * 修改免房券
+	 * 
+	 * @param hotelCoupons
+	 */
+	void updateCoupons(HotelCouponsEntity hotelCoupons);
 
 }

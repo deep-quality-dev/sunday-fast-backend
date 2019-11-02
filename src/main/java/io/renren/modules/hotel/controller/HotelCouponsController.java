@@ -1,8 +1,10 @@
 package io.renren.modules.hotel.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,9 @@ import cn.hutool.core.date.DateUtil;
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 import io.renren.modules.hotel.entity.HotelCouponsEntity;
+import io.renren.modules.hotel.entity.HotelCouponsRoomsEntity;
 import io.renren.modules.hotel.form.SendCouponsForm;
+import io.renren.modules.hotel.service.HotelCouponsRoomsService;
 import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.sys.controller.AbstractController;
 
@@ -35,6 +39,9 @@ import io.renren.modules.sys.controller.AbstractController;
 public class HotelCouponsController extends AbstractController {
 	@Autowired
 	private HotelCouponsService hotelCouponsService;
+
+	@Autowired
+	private HotelCouponsRoomsService hotelCouponsRoomsService;
 
 	@PostMapping("/sendCoupons")
 	@RequiresPermissions("hotel:hotelcoupons:save")
@@ -79,7 +86,12 @@ public class HotelCouponsController extends AbstractController {
 	@RequiresPermissions("hotel:hotelcoupons:info")
 	public R info(@PathVariable("id") Integer id) {
 		HotelCouponsEntity hotelCoupons = hotelCouponsService.getById(id);
-
+		List<Long> roomsIds = new ArrayList<Long>();
+		List<HotelCouponsRoomsEntity> couponsRoomsEntities = hotelCouponsRoomsService.list(Wrappers.<HotelCouponsRoomsEntity>lambdaQuery().eq(HotelCouponsRoomsEntity::getCouponsId, hotelCoupons.getId()));
+		roomsIds = couponsRoomsEntities.stream().map((HotelCouponsRoomsEntity item) -> {
+			return item.getRoomId();
+		}).collect(Collectors.toList());
+		hotelCoupons.setRoomIds(roomsIds);
 		return R.ok().put("hotelCoupons", hotelCoupons);
 	}
 
@@ -93,7 +105,7 @@ public class HotelCouponsController extends AbstractController {
 		if (!isAdmin()) {
 			hotelCoupons.setSellerId(getSellerId());
 		}
-		hotelCouponsService.save(hotelCoupons);
+		hotelCouponsService.saveCoupons(hotelCoupons);
 
 		return R.ok();
 	}
@@ -104,7 +116,7 @@ public class HotelCouponsController extends AbstractController {
 	@RequestMapping("/update")
 	@RequiresPermissions("hotel:hotelcoupons:update")
 	public R update(@RequestBody HotelCouponsEntity hotelCoupons) {
-		hotelCouponsService.updateById(hotelCoupons);
+		hotelCouponsService.updateCoupons(hotelCoupons);
 
 		return R.ok();
 	}

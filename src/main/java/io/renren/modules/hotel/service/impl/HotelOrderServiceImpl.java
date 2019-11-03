@@ -290,6 +290,8 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		BuildOrderForm newBuildOrderForm = this.buildOrder(userId, buildOrderForm.getRoomId(), buildOrderForm.getMoneyId(), buildOrderForm.getContactsId(), buildOrderForm.getCouponId(), buildOrderForm.getRoomNum(), buildOrderForm.getCheckInDate(), buildOrderForm.getCheckOutDate());
 		BeanUtil.copyProperties(newBuildOrderForm, createOrderForm);
 		createOrderForm.setDdTime(buildOrderForm.getDdTime());
+		createOrderForm.setBreakCouponId(buildOrderForm.getBreakCouponId());
+		createOrderForm.setFreeRoomCouponId(buildOrderForm.getFreeRoomCouponId());
 		createOrderForm.setRemark(buildOrderForm.getRemark());
 		createOrderForm.setPayMethod(buildOrderForm.getPayMethod());
 		createOrderForm.setFormId(buildOrderForm.getFormId());
@@ -460,7 +462,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				throw new RRException("早餐券已过期");
 			}
 			hotelOrderEntity.setBreakCouponId(createOrderForm.getBreakCouponId());
-			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getCouponId()));
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 3).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getBreakCouponId()));
 			if (null == hotelMemberCouponsEntity) {
 				throw new RRException("用户优惠券不存在");
 			}
@@ -480,7 +482,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				throw new RRException("入住天数，或房间数只能为1（天/间）");
 			}
 			hotelOrderEntity.setFreeRoomCouponId(createOrderForm.getFreeRoomCouponId());
-			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 1).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getCouponId()));
+			HotelMemberCouponsEntity hotelMemberCouponsEntity = hotelMemberCouponsService.getOne(Wrappers.<HotelMemberCouponsEntity>lambdaQuery().eq(HotelMemberCouponsEntity::getUserId, createOrderForm.getUserId()).eq(HotelMemberCouponsEntity::getCouponsType, 1).eq(HotelMemberCouponsEntity::getCouponsId, createOrderForm.getFreeRoomCouponId()));
 			if (null == hotelMemberCouponsEntity) {
 				throw new RRException("用户优惠券不存在");
 			}

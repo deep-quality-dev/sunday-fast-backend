@@ -34,7 +34,7 @@ public class HotelSearchCondition {
 
 	@ApiModelProperty(value = "酒店服务 1-健身房，2-会议室，")
 	private List<String> hotelService;
-	
+
 	@ApiModelProperty(value = "价格区间")
 	private List<BigDecimal> priceSort;
 
@@ -44,6 +44,16 @@ public class HotelSearchCondition {
 	@ApiModelProperty(value = "主题类型，这里待定，数据可能需要后台配置")
 	private List<String> topic;
 
+	// 品牌
+	private List<Long> brands;
+
+	// 设施
+	private List<Long> facilitys;
+
+	private Double commentScore;
+
+	private Long commentNum;
+
 	@ApiModelProperty(value = "入住时间")
 	private String startDay;
 
@@ -52,8 +62,8 @@ public class HotelSearchCondition {
 
 	private double latitude;
 	private double longitude;
-	
-	private int page =1;
-	
+
+	private int page = 1;
+
 	private int limit = 15;
 }

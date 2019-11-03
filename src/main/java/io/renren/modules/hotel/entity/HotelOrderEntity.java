@@ -234,6 +234,12 @@ public class HotelOrderEntity implements Serializable {
 	 * 备注
 	 */
 	private String remark;
+	
+	@TableField(exist = false)
+	private String	breakCouponName;
+	
+	@TableField(exist = false)
+	private String freeRoomCouponName;
 
 	@TableField(exist = false)
 	private List<HotelOrderRecordEntity> records = new ArrayList<HotelOrderRecordEntity>();

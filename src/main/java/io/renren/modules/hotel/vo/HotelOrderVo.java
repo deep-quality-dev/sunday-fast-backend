@@ -95,6 +95,16 @@ public class HotelOrderVo {
 	private BigDecimal payIntegral;
 
 	/**
+	 * 早餐券
+	 */
+	private String breakCouponName;
+
+	/**
+	 * 免房券
+	 */
+	private String freeRoomCouponName;
+
+	/**
 	 * 订单是否是需要预付
 	 */
 	private int prepay;

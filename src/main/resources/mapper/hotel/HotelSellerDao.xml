@@ -104,7 +104,14 @@
 			</if>
 
 		</where>
-		HAVING distance > 0 <!-- and distance &lt; 100 -->
+		HAVING distance > 0 
+		<if test="params.dis == 0">
+			and distance &lt; 100
+		</if>
+		<if test="params.dis > 0">
+			and distance &lt; #{params.dis}
+		</if>
+		
 		<if test='params.sort == 0'>
 			ORDER BY distance asc
 		</if>

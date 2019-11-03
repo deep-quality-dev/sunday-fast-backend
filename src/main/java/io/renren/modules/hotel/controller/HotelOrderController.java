@@ -17,9 +17,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
+import io.renren.modules.hotel.entity.HotelCouponsBreakfastEntity;
+import io.renren.modules.hotel.entity.HotelCouponsEntity;
 import io.renren.modules.hotel.entity.HotelOrderEntity;
 import io.renren.modules.hotel.entity.HotelOrderRecordEntity;
 import io.renren.modules.hotel.entity.HotelOrderSettingEntity;
+import io.renren.modules.hotel.service.HotelCouponsBreakfastService;
+import io.renren.modules.hotel.service.HotelCouponsService;
 import io.renren.modules.hotel.service.HotelOrderRecordService;
 import io.renren.modules.hotel.service.HotelOrderService;
 import io.renren.modules.sys.controller.AbstractController;
@@ -39,6 +43,12 @@ public class HotelOrderController extends AbstractController {
 
 	@Autowired
 	private HotelOrderRecordService hotelOrderRecordService;
+	
+	@Autowired
+	private HotelCouponsBreakfastService hotelCouponsBreakfastService;
+	
+	@Autowired
+	private HotelCouponsService hotelCouponsService;
 
 	/**
 	 * 订单确认
@@ -73,6 +83,14 @@ public class HotelOrderController extends AbstractController {
 		HotelOrderEntity hotelOrder = hotelOrderService.getById(id);
 		List<HotelOrderRecordEntity> records = hotelOrderRecordService.list(Wrappers.<HotelOrderRecordEntity>lambdaQuery().eq(HotelOrderRecordEntity::getOrderId, id));
 		hotelOrder.setRecords(records);
+		if(null != hotelOrder.getBreakCouponId()) {
+			HotelCouponsBreakfastEntity couponsBreakfastEntity =  hotelCouponsBreakfastService.getById(hotelOrder.getBreakCouponId());
+			hotelOrder.setBreakCouponName(couponsBreakfastEntity.getName());
+		}
+		if(null !=hotelOrder.getFreeRoomCouponId()) {
+			HotelCouponsEntity couponsEntity = hotelCouponsService.getById(hotelOrder.getFreeRoomCouponId());
+			hotelOrder.setFreeRoomCouponName(couponsEntity.getName());
+		}
 		return R.ok().put("hotelOrder", hotelOrder);
 	}
 

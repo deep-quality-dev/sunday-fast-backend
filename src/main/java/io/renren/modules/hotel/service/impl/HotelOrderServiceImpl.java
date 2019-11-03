@@ -330,7 +330,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			public void run() {
 				// 订单通知
 				HotelOrderNotificationEntity hotelOrderNotificationEntity = hotelOrderNotificationService.getOne(Wrappers.<HotelOrderNotificationEntity>lambdaQuery().eq(HotelOrderNotificationEntity::getSellerId, hotelOrderEntity.getSellerId()));
-				if (null != hotelOrderNotificationEntity) {
+				if (null != hotelOrderNotificationEntity && hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.WAIT_AFFIRM) {
 					// 发送短信
 					if (hotelOrderNotificationEntity.getSmsSwitch() == 1 && StrUtil.isNotEmpty(hotelOrderNotificationEntity.getMobile())) {
 						List<String> mobiles = Arrays.asList(hotelOrderNotificationEntity.getMobile().split(","));
@@ -430,7 +430,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		hotelOrderEntity.setContactsId(createOrderForm.getContactsId());
 		hotelOrderEntity.setName(createOrderForm.getCheckInPerson());
 		hotelOrderEntity.setOutTradeNo(DateUtil.format(DateUtil.date(), "yyyyMMddHHmmssSSS" + createOrderForm.getUserId()));
-		hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+		hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
 		hotelOrderEntity.setInvoiceId(createOrderForm.getInvoiceId());
 		hotelOrderEntity.setTel(createOrderForm.getMobile());
 		hotelOrderEntity.setCreateTime(DateUtil.date());
@@ -471,6 +471,12 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		}
 		// 免房券
 		if (null != createOrderForm.getFreeRoomCouponId() && 0L != createOrderForm.getFreeRoomCouponId()) {
+			// 开启自动接单
+			hotelOrderEntity.setStatus(HotelOrderStatus.CHECK_IN);
+			// 订单需要预付
+			if (createOrderForm.getPrepay() == 1) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+			}
 			HotelCouponsEntity couponsEntity = hotelCouponsService.getById(createOrderForm.getFreeRoomCouponId());
 			if (null == couponsEntity) {
 				throw new RRException("免房券不存在");
@@ -489,33 +495,10 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			hotelMemberCouponsEntity.setState(-1);
 			hotelMemberCouponsService.updateById(hotelMemberCouponsEntity);
 		}
-		// 查看订单是否需要确认
-		HotelOrderSettingEntity hotelOrderSettingEntity = hotelOrderSettingService.getOne(Wrappers.<HotelOrderSettingEntity>lambdaQuery().eq(HotelOrderSettingEntity::getSellerId, createOrderForm.getSellerId()));
-		if (null != hotelOrderSettingEntity && hotelOrderSettingEntity.getAutoOrder().intValue() == 1) {
-			if (hotelOrderSettingEntity.getCustSetting().intValue() == 2) {
-				// 适用房型
-				List<HotelOrderSettingRoomEntity> hotelOrderSettingRoomEntities = hotelOrderSettingRoomService.list(Wrappers.<HotelOrderSettingRoomEntity>lambdaQuery().eq(HotelOrderSettingRoomEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingRoomEntity::getRoomId, createOrderForm.getRoomId()));
-				if (!CollectionUtil.isNotEmpty(hotelOrderSettingRoomEntities)) {
-					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
-				}
-				// 适用时间
-				DateTime now = DateUtil.parse(createOrderForm.getCheckInDate());
-				int day = now.dayOfWeek(); // 1-周日 以此类推
-				List<HotelOrderSettingDateEntity> hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 2).eq(HotelOrderSettingDateEntity::getDate, day));
-				if (!CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
-					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
-				}
-				// 不适用时间
-				hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 1).eq(HotelOrderSettingDateEntity::getDate, createOrderForm.getCheckInDate()));
-				if (CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
-					hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
-				}
-			} else {
-				hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
-			}
-		}
 		// 保存订单
 		this.save(hotelOrderEntity);
+		//
+		this.updateOrderStatusWithOrderSetting(hotelOrderEntity);
 		// 保存订单明细
 		this.createOrderRecord(createOrderForm, hotelOrderEntity.getId());
 		log.info("创建酒店订单--end,result,orderId:{}", hotelOrderEntity.getId());
@@ -697,7 +680,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 
 		if (hotelRoomMoneyEntity.getPrepay() == 1) {
 			// 判断订单状态
-			if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.PAYED) {
+			if (hotelOrderEntity.getPayFlag() == 1) {
 				if (hotelOrderEntity.getPayMethod().equals(PayMethodConstants.WX)) {
 					log.info("取消订单--订单已支付，执行退款");
 					Map<String, Object> refundParams = new HashMap<String, Object>();
@@ -723,7 +706,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 					hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "取消订房，" + hotelOrderEntity.getRoomType());
 				}
 			}
-			if (hotelOrderEntity.getStatus().intValue() == HotelOrderStatus.UN_PAY) {
+			if (hotelOrderEntity.getPayFlag() == 0) {
 				log.info("取消订单--订单未支付，直接取消");
 				hotelOrderEntity.setStatus(HotelOrderStatus.CANCEL);
 			}
@@ -787,6 +770,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void updateOrderStatus2Payed(String outTradeNo) {
 		log.info("更新订单为支付成功--start,outTradeNo:{}", outTradeNo);
 		// 这里是否需要增加乐观锁，防止重复更新 TODO
@@ -806,12 +790,16 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 				log.warn("注意，支付回调，微信订单状态异常，wxOrderStatus:{}", wxOrderStatus);
 				return;
 			}
+			hotelOrderEntity.setPayFlag(1); // 支付状态
 
-			hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
 			this.updateById(hotelOrderEntity);
+			this.updateOrderStatusWithOrderSetting(hotelOrderEntity);
 			// 发送模板支付成功通知 TODO 目前采用异步线程，后期要改为消息队列
+
+			hotelMemberLevelDetailService.addIntegral(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), hotelOrderEntity.getTotalCost());
 			// 增加积分
 			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "订单支付成功");
+
 		} catch (WxPayException e) {
 			log.error("search wx order error,outTradeNo:{}", outTradeNo);
 			throw new RRException("查询微信支付订单异常");
@@ -843,8 +831,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			// 添加流水
 			HotelMemberLevelDetailEntity memberLevelDetailEntity = hotelMemberLevelDetailService.getOne(Wrappers.<HotelMemberLevelDetailEntity>lambdaQuery().eq(HotelMemberLevelDetailEntity::getSellerId, hotelOrderEntity.getSellerId()).eq(HotelMemberLevelDetailEntity::getMemberId, userId));
 			hotelRechargeService.addConsumptionRecord(-hotelOrderEntity.getTotalCost().intValue(), memberLevelDetailEntity.getLevelId(), userId, "在线预定，" + hotelOrderEntity.getRoomType());
-			hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
-			baseMapper.updateById(hotelOrderEntity);
+			this.updateOrderStatusWithOrderSetting(hotelOrderEntity);
 			return null;
 		} else if (PayMethodConstants.INTEGRAL.equals(payMethod)) {
 			// 扣除积分
@@ -855,8 +842,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 			sendReserveMessage(hotelOrderEntity, hotelSellerEntity, hotelMemberEntity, hotelWxConfigEntity, formId);
 			// 添加积分流水
 			hotelScoreService.transactionScore(hotelOrderEntity.getSellerId(), hotelOrderEntity.getUserId(), 2, hotelOrderEntity.getTotalCost().intValue(), "在线预定，" + hotelOrderEntity.getRoomType());
-			hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
-			baseMapper.updateById(hotelOrderEntity);
+			this.updateOrderStatusWithOrderSetting(hotelOrderEntity);
 			return null;
 		} else if (PayMethodConstants.WX.equals(payMethod)) {
 			log.info("调用微信统一下单--start,userId:{},sellerId:{},params:{}", userId, hotelRoomEntity.getSellerId(), JSON.toJSONString(hotelOrderEntity));
@@ -985,7 +971,14 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public void completeOrder() {
+		DateTime date = DateUtil.offsetDay(DateUtil.date(), 15);
+		List<HotelOrderEntity> hotelOrderEntities = baseMapper.selectList(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getStatus, HotelOrderStatus.WAIT_COMMENT).gt(HotelOrderEntity::getCreateTime, date));
+		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
+			hotelOrderEntity.setStatus(HotelOrderStatus.COMPLETE);
+			baseMapper.updateById(hotelOrderEntity);
+		}
 	}
 
 	@Override
@@ -1029,7 +1022,7 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		int hour = DateUtil.hour(DateUtil.date(), true);
 		List<HotelOrderEntity> hotelOrderEntities = baseMapper.selectList(Wrappers.<HotelOrderEntity>lambdaQuery().eq(HotelOrderEntity::getStatus, HotelOrderStatus.CHECK_IN).le(HotelOrderEntity::getArrivalTime, DateUtil.date()));
 		for (HotelOrderEntity hotelOrderEntity : hotelOrderEntities) {
-			if (hour == sys) {
+			if (hour >= sys) {
 				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_COMMENT); // 更新订单为待评价
 				baseMapper.updateById(hotelOrderEntity);
 			}
@@ -1067,7 +1060,51 @@ public class HotelOrderServiceImpl extends ServiceImpl<HotelOrderDao, HotelOrder
 		if (null == hotelOrderEntity) {
 			throw new RRException("非法操作");
 		}
-		hotelOrderEntity.setStatus(HotelOrderStatus.PAYED);
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		if (hotelRoomMoneyEntity.getPrepay() == 0) {
+			hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_CHECK_IN);
+		} else {
+			if (hotelOrderEntity.getPayFlag() == 1) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_CHECK_IN);
+			}
+		}
+		// 支付单逻辑处理
 		baseMapper.updateById(hotelOrderEntity);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public void updateOrderStatusWithOrderSetting(HotelOrderEntity hotelOrderEntity) {
+		HotelRoomMoneyEntity hotelRoomMoneyEntity = hotelRoomMoneyService.getById(hotelOrderEntity.getMoneyId());
+		// 查看订单是否需要确认
+		HotelOrderSettingEntity hotelOrderSettingEntity = hotelOrderSettingService.getOne(Wrappers.<HotelOrderSettingEntity>lambdaQuery().eq(HotelOrderSettingEntity::getSellerId, hotelOrderEntity.getSellerId()));
+		if (null != hotelOrderSettingEntity && hotelOrderSettingEntity.getAutoOrder().intValue() == 1 && (hotelRoomMoneyEntity.getPrepay() == 0 || hotelOrderEntity.getPayFlag() == 1)) {
+			hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+			// 适用房型
+			List<HotelOrderSettingRoomEntity> hotelOrderSettingRoomEntities = hotelOrderSettingRoomService.list(Wrappers.<HotelOrderSettingRoomEntity>lambdaQuery().eq(HotelOrderSettingRoomEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingRoomEntity::getRoomId, hotelOrderEntity.getRoomId()));
+			if (CollectionUtil.isNotEmpty(hotelOrderSettingRoomEntities)) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_CHECK_IN);
+			}
+			// 适用时间
+			DateTime now = DateUtil.parse(DateUtil.format(hotelOrderEntity.getArrivalTime(), "yyyy-MM-dd"));
+			int day = now.dayOfWeek(); // 1-周日 以此类推
+			List<HotelOrderSettingDateEntity> hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 2).eq(HotelOrderSettingDateEntity::getDate, day));
+			if (CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_CHECK_IN);
+			}
+			// 不适用时间
+			hotelOrderSettingDateEntities = hotelOrderSettingDateService.list(Wrappers.<HotelOrderSettingDateEntity>lambdaQuery().eq(HotelOrderSettingDateEntity::getSettingId, hotelOrderSettingEntity.getId()).eq(HotelOrderSettingDateEntity::getType, 1).eq(HotelOrderSettingDateEntity::getDate, hotelOrderEntity.getArrivalTime()));
+			if (CollectionUtil.isNotEmpty(hotelOrderSettingDateEntities)) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+			}
+		} else {
+			if (hotelRoomMoneyEntity.getPrepay() == 1 && hotelOrderEntity.getPayFlag() == 0) {
+				hotelOrderEntity.setStatus(HotelOrderStatus.UN_PAY);
+			} else {
+				hotelOrderEntity.setStatus(HotelOrderStatus.WAIT_AFFIRM);
+			}
+		}
+		baseMapper.updateById(hotelOrderEntity);
+
 	}
 }

@@ -153,4 +153,11 @@ public interface HotelOrderService extends IService<HotelOrderEntity> {
 	 * @param sellerId
 	 */
 	void orderAffirm(Long id, Long sellerId);
+
+	/**
+	 * 根据商家订单设置更改订单状态
+	 * 
+	 * @param hotelOrderEntity
+	 */
+	void updateOrderStatusWithOrderSetting(HotelOrderEntity hotelOrderEntity);
 }

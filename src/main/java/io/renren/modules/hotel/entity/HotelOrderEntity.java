@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -229,6 +228,11 @@ public class HotelOrderEntity implements Serializable {
 	 * 评论标识
 	 */
 	private int commentFlag;
+	
+	/**
+	 * 支付标识
+	 */
+	private int payFlag;
 
 	/**
 	 * 备注
